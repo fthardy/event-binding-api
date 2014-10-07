@@ -6,7 +6,7 @@ import de.javax.util.eventbinding.spi.EventSource;
 /**
  * TODO
  * 
- * @author Frank Hardy
+ * @author Matthias Hanisch
  */
 public class DefaultEventSource implements EventSource {
 
