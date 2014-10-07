@@ -1,0 +1,31 @@
+
+def vaadinVersion = '7.1+'
+
+subprojects {
+	apply plugin: 'eclipse'
+	apply plugin: 'groovy'
+	
+	group='de.javax.util.eventbinding'
+
+	version = '1.0-SNAPSHOT'
+
+	sourceCompatibility = 1.6
+
+	repositories {
+		mavenCentral()
+		mavenLocal()
+	}
+
+	dependencies {
+		testCompile 'junit:junit:4.10+'
+		testCompile 'org.mockito:mockito-all:1.9+'
+		testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+	}
+}
+	
+project('base-impl') {
+	dependencies {
+		compile project(':base')
+	}
+}
+
