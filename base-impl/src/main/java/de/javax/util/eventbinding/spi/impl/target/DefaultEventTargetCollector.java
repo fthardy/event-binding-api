@@ -2,12 +2,18 @@ package de.javax.util.eventbinding.spi.impl.target;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
+import de.javax.util.eventbinding.spi.impl.reflect.Filter;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParameterCountPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodReturnTypePredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodWithAnnotationPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.PublicMethodPredicate;
 import de.javax.util.eventbinding.target.EventHandler;
 import de.javax.util.eventbinding.target.FromEventSource;
 
@@ -40,15 +46,13 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	 * @return the set of all event handler methods.
 	 */
 	protected Set<Method> collectEventHandlerMethods(Class<?> targetProviderClass) {
-		Set<Method> collectedMethods = new HashSet<Method>();
-		for (Method method : targetProviderClass.getMethods()) {
-			if (method.getAnnotation(EventHandler.class) != null) {
-				if (this.isValidEventHandlerMethod(method)) {
-					collectedMethods.add(method);
-				} // TODO Maybe log an information here
-			}
-		}
-		return collectedMethods;
+	  Filter<Method> filter = 
+	      new Filter<Method>(new HashSet<Method>(Arrays.asList(targetProviderClass.getMethods())))
+	      .filter(new MethodWithAnnotationPredicate(EventHandler.class))
+	      .filter(new PublicMethodPredicate())
+	      .filter(new MethodReturnTypePredicate(Void.TYPE))
+	      .filter(new MethodParameterCountPredicate(1));
+	  return new HashSet<Method>(filter.getElements());
 	}
 
 	/**
@@ -78,8 +82,8 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	 * @return the source identifier from the annotation or <code>null</code> if
 	 *         the parameter was not annotated.
 	 */
-	protected Object getSourceId(Method eventHandlerMethod) {
-		Object sourceId = null;
+	protected String getSourceId(Method eventHandlerMethod) {
+	  String sourceId = null;
 		Annotation[][] parameterAnnotations = eventHandlerMethod.getParameterAnnotations();
 		if (parameterAnnotations[0].length > 0) {
 			for(Annotation annotation : parameterAnnotations[0]) {
@@ -89,15 +93,5 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 			}
 		}
 		return sourceId;
-	}
-	
-	private boolean isValidEventHandlerMethod(Method method) {
-		boolean accepted = false;
-		if (method.getReturnType() == Void.TYPE) {
-			if (method.getParameterTypes().length == 1) {
-				accepted = true;
-			}
-		}
-		return accepted;
 	}
 }

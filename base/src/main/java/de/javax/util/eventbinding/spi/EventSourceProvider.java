@@ -13,7 +13,7 @@ public interface EventSourceProvider {
 	 * Find a particular event source which has the given identifier and
 	 * supports the given event type.
 	 * 
-	 * @param id
+	 * @param eventSourceId
 	 *            the identifier of the event source.
 	 * @param eventType
 	 *            the type of event expected from the event source.
@@ -21,7 +21,7 @@ public interface EventSourceProvider {
 	 * @return the event source or <code>null</code> if no such event source
 	 *         exists.
 	 */
-	EventSource findEventSource(Object id, Class<?> eventType);
+	EventSource findEventSource(String eventSourceId, Class<?> eventType);
 
 	/**
 	 * Find a set of event sources which support events of the given type.

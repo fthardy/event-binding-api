@@ -1,5 +1,8 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
+import java.lang.reflect.Field;
+import java.util.List;
+
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
 
@@ -10,22 +13,40 @@ import de.javax.util.eventbinding.spi.EventSource;
  */
 public class DefaultEventSource implements EventSource {
 
-	/**
-	 * 
-	 */
-	public DefaultEventSource() {
-		// TODO Auto-generated constructor stub
+	private Object source;
+  private List<Field> fields;
+  private String id;
+  private String alias;
+  
+	public DefaultEventSource(String id, String alias, Object source, List<Field> fields) {
+    this.id = id;
+    this.alias = alias;
+    this.source = source;
+    this.fields = fields;
+  }
+	
+	@Override
+	public String getAlias() {
+	  return alias;
+	}
+	
+	@Override
+	public Class<?> getType() {
+	  return fields.get(fields.size()-1).getType();
+	}
+	
+	@Override
+	public String getId() {
+	  return id;
 	}
 
-	/** {@inheritDoc} */
+  /** {@inheritDoc} */
 	@Override
 	public void register(EventDispatcher eventDispatcher) {
-		// TODO Auto-generated method stub
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void unregisterEventDispatcher() {
-		// TODO Auto-generated method stub
 	}
 }
