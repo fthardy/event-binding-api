@@ -2,8 +2,7 @@ package de.javax.util.eventbinding.impl.target;
 
 import java.util.Date;
 
-import de.javax.util.eventbinding.target.EventHandler;
-import de.javax.util.eventbinding.target.FromEventSource;
+import de.javax.util.eventbinding.target.HandleEvent;
 
 public class TestEventTargetProvider {
 	
@@ -13,19 +12,19 @@ public class TestEventTargetProvider {
 	boolean handleEventCalled;
 	boolean handleEventsCalled;
 
-	@EventHandler public static void handleEventStatic(@FromEventSource("stringEventSource") String stringEvent) {
+	public static void handleEventStatic(@HandleEvent(fromSource="stringEventSource") String stringEvent) {
 		handleEventStaticCalled = true;
 	}
 	
-	@EventHandler public static void handleEventsStatic(Date dateEvent) {
+	public static void handleEventsStatic(@HandleEvent Date dateEvent) {
 		handleEventsStaticCalled = true;
 	}
 	
-	@EventHandler public void handleEvent(@FromEventSource("stringEventSource") String stringEvent) {
+	public void handleEvent(@HandleEvent(fromSource="stringEventSource") String stringEvent) {
 		handleEventCalled = true;
 	}
 	
-	@EventHandler public void handleEvents(Date dateEvent) {
+	public void handleEvents(@HandleEvent Date dateEvent) {
 		handleEventsCalled = true;
 	}
 }

@@ -18,7 +18,8 @@ import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
  */
 public class DefaultEventBindingServiceProvider implements EventBindingServiceProvider {
 	
-	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector();
+	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
+	        new DefaultEventTargetCollector.DefaultEventTargetFactory());
 
 	@Override
 	public EventTargetCollector getEventTargetCollector() {

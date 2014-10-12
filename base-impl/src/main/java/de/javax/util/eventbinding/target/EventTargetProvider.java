@@ -12,4 +12,14 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.FIELD)
-public @interface EventTargetProvider { }
+public @interface EventTargetProvider {
+	
+	/**
+	 * Defines a prefix for the event source identifiers of the underlying event handlers.
+	 * Usually this is used to set the identifier name of a nested event source provider
+	 * of the sources to be bound.
+	 * 
+	 * @return the identifier prefix.
+	 */
+	String sourceIdPrefix() default "";
+}
