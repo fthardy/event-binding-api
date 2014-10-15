@@ -19,22 +19,4 @@ public interface EventSource {
 	 * Unregister the registered event dispatcher from the underlying event source.
 	 */
 	void unregisterEventDispatcher();
-
-	/**
-	 * Returns the id of this event source.
-	 * @return
-	 */
-	String getId();
-	
-	/**
-	 * Returns the type of the event source.
-	 * @return
-	 */
-  Class<?> getType();
-  
-  /**
-   * Returns the alias of the event source.
-   * @return
-   */
-  String getAlias();
 }

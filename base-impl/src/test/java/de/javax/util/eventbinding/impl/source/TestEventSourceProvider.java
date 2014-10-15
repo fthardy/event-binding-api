@@ -4,26 +4,13 @@ import de.javax.util.eventbinding.source.EventSource;
 import de.javax.util.eventbinding.source.EventSourceProvider;
 
 public class TestEventSourceProvider {
-  
-  @EventSource("firstEventSource")
-  private TestEventSource firstEventSource;
 
-  @EventSource("secondEventSource")
-  private TestEventSource secondEventSource;
-  
-  @EventSourceProvider("nestedProvider")
-  private NestedTestEventSourceProvider nestedProvider;
-  
-  
-//	@EventSource("fieldEventSource") 
-//	private final Object eventSource;
-//	
-//	@NestedEventSourceAlias(eventSourceId="nestedProvider.someEventSource", alias="nestedEventSource")
-//	@EventSourceProvider("nestedProvider")
-//	private final Object nestedEventSourceProvider;
-//	
-//	public TestEventSourceProvider(Object eventSource, Object nestedEventSourceProvider) {
-//		this.eventSource = eventSource;
-//		this.nestedEventSourceProvider = nestedEventSourceProvider;
-//	}
+    @EventSource("firstEventSource")
+    TestEventSource firstEventSource = new TestEventSource();
+
+    @EventSource("secondEventSource")
+    private TestEventSource secondEventSource = new TestEventSource();
+
+    @EventSourceProvider("nestedProvider")
+    private NestedTestEventSourceProvider nestedProvider = new NestedTestEventSourceProvider();
 }
