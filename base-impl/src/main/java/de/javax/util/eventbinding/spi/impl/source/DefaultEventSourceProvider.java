@@ -1,9 +1,8 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -14,12 +13,7 @@ import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
 import de.javax.util.eventbinding.spi.impl.EventBindingSpiUtils;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodParameterTypeHasEventMethodForTypePredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodNamePredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParameterCountPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.PublicMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.StaticMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.NotPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
 
 /**
  * This implementation of an event source provider is based on sources which
@@ -32,7 +26,7 @@ import de.javax.util.eventbinding.spi.impl.reflect.NotPredicate;
 public class DefaultEventSourceProvider implements EventSourceProvider {
 
     private final Object source;
-    private Set<EventSource> allEventSources;
+    private Set<EventSourceObject> allEventSourceObjects;
 
     public DefaultEventSourceProvider(Object source) {
         if (source == null) {
@@ -42,79 +36,83 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
     }
 
     @Override
-    public EventSource findEventSource(String id, Class<?> eventType) {
-        Set<EventSource> collectedSources = getEventSources();
-        collectedSources = filterByType(filterById(collectedSources, id), eventType);
-        if (collectedSources.size() == 1) {
-            return collectedSources.iterator().next();
-        } else {
-            // TODO what if more than one?
-            return null;
-        }
-    }
+    public EventSource findEventSource(final String id, Class<?> eventType) {
+        Filter<EventSourceObject> filter = new Filter<DefaultEventSourceProvider.EventSourceObject>(getEventSourceObjects());
+        filter = filter.filter(new Predicate<EventSourceObject>() {
 
-    private Set<EventSource> filterById(Set<EventSource> eventSources, String id) {
-        Set<EventSource> filteredSources = new HashSet<EventSource>();
-        for (EventSource eventSource : eventSources) {
-            if (id.equals(eventSource.getId())) {
-                filteredSources.add(eventSource);
+            @Override
+            public boolean apply(EventSourceObject eventSourceObject) {
+                return id.equals(eventSourceObject.getEventSourceId());
+            }
+        });
+        for(EventSourceObject eventSourceObject:filter.getElements()) {
+            EventListenerAdapter adapter = EventListenerProviderFactory.createAdapter(eventSourceObject.getEventSource(), eventType);
+            if(adapter!=null)  {
+                return createEventSource(eventSourceObject, adapter);
             }
         }
-        return filteredSources;
+        return null;
     }
 
     @Override
     public Set<EventSource> findEventSourcesByType(Class<?> eventType) {
-        Set<EventSource> collectedSources = getEventSources();
-        return filterByType(collectedSources, eventType);
-    }
-
-    private Set<EventSource> filterByType(Set<EventSource> eventSources, Class<?> eventType) {
-        Set<EventSource> filteredSources = new HashSet<EventSource>();
-        for (EventSource eventSource : eventSources) {
-            if (sourceSupportsEventType(eventSource.getType(), eventType)) {
-                filteredSources.add(eventSource);
+        Set<EventSource> eventSources = new HashSet<EventSource>();
+        Collection<EventSourceObject> eventSourceObjects = getEventSourceObjects();
+        for(EventSourceObject eventSourceObject:eventSourceObjects)  {
+            EventListenerAdapter adapter = EventListenerProviderFactory.createAdapter(eventSourceObject.getEventSource(), eventType);
+            if(adapter!=null) {
+                eventSources.add(createEventSource(eventSourceObject, adapter));
             }
         }
-        return filteredSources;
+        return eventSources;
     }
 
-    private Set<EventSource> getEventSources() {
-        if (this.allEventSources == null) {
-            this.allEventSources = new HashSet<EventSource>();
-            this.allEventSources.addAll(findEventSources(this.source, this.source.getClass(), "",
+    private EventSource createEventSource(EventSourceObject eventSourceObject,
+            EventListenerAdapter adapter) {
+        return new DefaultEventSource(adapter);
+    }
+
+    private Collection<EventSourceObject> getEventSourceObjects() {
+        if (this.allEventSourceObjects == null) {
+            this.allEventSourceObjects = new HashSet<EventSourceObject>();
+            this.allEventSourceObjects.addAll(findEventSources(this.source, this.source.getClass(), "",
                     Collections.EMPTY_LIST));
         }
-        return this.allEventSources;
+        return this.allEventSourceObjects;
     }
 
-    private boolean sourceSupportsEventType(Class<?> type, Class<?> eventType) {
-        Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(type.getMethods())))
-                .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
-                .filter(new MethodParameterCountPredicate(1)).filter(new MethodNamePredicate("add.+Listener"))
-                .filter(new MethodParameterTypeHasEventMethodForTypePredicate(eventType));
-        return filter.getElements().size() > 0;
-    }
-
-    private Set<EventSource> findEventSources(Object source, Class<?> sourceClass, String sourceId, List<Field> tree) {
-        Set<EventSource> collectedSources = new HashSet<EventSource>();
+    private Set<EventSourceObject> findEventSources(Object source, Class<?> sourceClass, String sourceId, List<Field> tree) {
+        Set<EventSourceObject> collectedSources = new HashSet<EventSourceObject>();
         Field[] declaredFields = sourceClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
             String eventSourceFieldId = getEventSourceId(declaredField);
             if (eventSourceFieldId != null) {
                 // TODO care about alias
                 String id = EventBindingSpiUtils.extendSourceId(sourceId, eventSourceFieldId);
-                collectedSources.add(createEventSource(source, id, null, tree, declaredField));
+                collectedSources.add(createEventSourceObject(getFieldValue(declaredField, source), id, null, tree, declaredField));
             }
             String eventSourceProviderPrefix = getEventSourceProviderPrefix(declaredField);
             if (eventSourceProviderPrefix != null) {
                 String prefix = EventBindingSpiUtils.extendSourceId(sourceId, eventSourceProviderPrefix);
                 List<Field> fields = new ArrayList<Field>(tree);
                 fields.add(declaredField);
-                collectedSources.addAll(findEventSources(source, declaredField.getType(), prefix, fields));
+                collectedSources.addAll(findEventSources(getFieldValue(declaredField, source), declaredField.getType(), prefix, fields));
             }
         }
         return collectedSources;
+    }
+
+    private static Object getFieldValue(Field field, Object object) {
+        field.setAccessible(true);  
+        try {
+            return field.get(object);
+        } catch (IllegalArgumentException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
+        } finally {
+            field.setAccessible(false);
+        }
     }
 
     private String getEventSourceProviderPrefix(Field declaredField) {
@@ -127,11 +125,11 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
         }
     }
 
-    private EventSource createEventSource(Object source, String eventSourceId, String alias, List<Field> tree,
+    private EventSourceObject createEventSourceObject(Object source, String eventSourceId, String alias, List<Field> tree,
             Field declaredField) {
         List<Field> fields = new ArrayList<Field>(tree);
         fields.add(declaredField);
-        return new DefaultEventSource(eventSourceId, alias, source, fields);
+        return EventSourceObject.create(eventSourceId, alias, source);
     }
 
     private static String getEventSourceId(Field declaredField) {
@@ -141,6 +139,28 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
             return null;
         } else {
             return annotation.value().trim();
+        }
+    }
+
+    static class EventSourceObject {
+        String eventSourceId;
+        String alias;
+        Object eventSource;
+        static EventSourceObject create(String eventSourceId, String alias, Object eventSource) {
+            EventSourceObject eventSourceObject = new EventSourceObject();
+            eventSourceObject.eventSourceId = eventSourceId;
+            eventSourceObject.alias = alias;
+            eventSourceObject.eventSource = eventSource;
+            return eventSourceObject;
+        }
+        public String getAlias() {
+            return alias;
+        }
+        public Object getEventSource() {
+            return eventSource;
+        }
+        public String getEventSourceId() {
+            return eventSourceId;
         }
     }
 
