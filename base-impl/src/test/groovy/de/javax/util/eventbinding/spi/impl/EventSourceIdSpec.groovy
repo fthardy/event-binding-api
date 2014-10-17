@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 class EventSourceIdSpec extends Specification {
     
-    def 'disallowed identifier names on instance creation'() {
+    def 'check disallowed identifier names'() {
         expect:
         try {
             new EventSourceId(name)
@@ -16,25 +16,20 @@ class EventSourceIdSpec extends Specification {
         name << [null, '', '666', '6abc', 'ab c', 'a.bc', 'ab$c', ' sdkd']
     }
     
-    def 'allowed identifier names on instance creation'() {
+    def 'check allowed identifier names'() {
+        given:
+        EventSourceId id = new EventSourceId(name)
+        
+        when:
+        def names = id.names
+
+        then:
+        names[0] == name
+        
         expect:'no exception on instance creation'
-        new EventSourceId(name) != null
-        
-        
+        id != null
+                
         where:'the following names are allowed...'
         name << ['abc', 'a1b2c3', '_ab_c_', '$bla']
-    }
-    
-    def 'extention should create new instance'() {
-        given:
-        EventSourceId id = new EventSourceId('test')
-        EventSourceId newId = id.extend('foo')
-        
-        expect:
-        newId != id
-        id.names == ['test']
-        newId.names == ['test', 'foo']
-        id.parentNames == []
-        newId.parentNames == ['test']
     }
 }

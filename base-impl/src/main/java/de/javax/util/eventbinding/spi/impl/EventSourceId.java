@@ -1,89 +1,75 @@
 package de.javax.util.eventbinding.spi.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents an identifier for an event source object.<br/>
- * An event source identifier consist of one or more names which qualify the
- * event source within a hierachical structure.
+ * An event source identifier consist of one or more names.
  * 
  * @author Frank Hardy
  */
 public class EventSourceId {
     
-    private final String[] names;
+    private final List<String> names;
 
     /**
      * Creates a new event source identifier.
      * 
      * @param name
-     *            the identifier name which becomes the first segment of this
-     *            event source identifier.
+     *            the name for the new identifier.
      */
     public EventSourceId(String name) {
-        this.validateName(name);
-        this.names = new String[] { name };
+        this(Arrays.asList(new String[] { name }));
     }
     
     /**
-     * Only for internal use.
+     * Creates a new event source identifier.
      * 
      * @param names
      *            the names for the new instance.
      */
-    private EventSourceId(String[] names) {
-        assert names != null && names.length > 0; 
-        this.names = names;
+    public EventSourceId(List<String> names) {
+        this.validateNames(names);
+        this.names = Collections.unmodifiableList(new ArrayList<String>(names));
     }
     
     @Override
     public int hashCode() {
-        return Arrays.hashCode(this.names);
+        return this.names.hashCode();
     }
 
     @Override
     public boolean equals(Object other) {
-        return Arrays.equals(this.names, ((EventSourceId) other).names);
+        return this.names.equals(other);
     }
     
     @Override
     public String toString() {
-        return Arrays.toString(this.names);
+        return this.names.toString();
     }
     
     /**
-     * @return an array of the names.
+     * @return the list of names.
      */
     public List<String> getNames() {
-        return Arrays.asList(this.names);
+        return this.names;
     }
     
-    /**
-     * @return an array of the names without the last name.
-     */
-    public List<String> getParentNames() {
-        return Arrays.asList(Arrays.copyOf(this.names, this.names.length - 1));
-    }
-
-    /**
-     * Extend this identifier by a new name segment.
-     * 
-     * @param name
-     *            the new identifier name segment to extend this identifier with.
-     * 
-     * @return a new identifier with the given segment.
-     */
-    public EventSourceId extend(String name) {
-        this.validateName(name);
-        String[] newNames = Arrays.copyOf(this.names, this.names.length + 1);
-        newNames[this.names.length] = name;
-        return new EventSourceId(newNames);
+    private void validateNames(List<String> names) {
+        if (names == null || names.size() == 0) {
+            throw new IllegalArgumentException("Undefined identifier names!");
+        }
+        for (String name : names) {
+            this.validateName(name);
+        }
     }
     
     private void validateName(String name) {
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("Undefined identifier name segment!");
+            throw new IllegalArgumentException("Undefined identifier name!");
         }
         boolean valid = Character.isJavaIdentifierStart(name.charAt(0));
         if (valid && name.length() > 1) {
@@ -92,7 +78,7 @@ public class EventSourceId {
             }
         }
         if (!valid) {
-            throw new IllegalArgumentException("Invalid event source identifier name segment: " + name);
+            throw new IllegalArgumentException("Invalid event source identifier name: " + name);
         }
     }
  }
