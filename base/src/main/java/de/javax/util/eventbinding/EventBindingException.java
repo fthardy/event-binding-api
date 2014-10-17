@@ -6,11 +6,22 @@ package de.javax.util.eventbinding;
  * @author Frank Hardy
  */
 public abstract class EventBindingException extends RuntimeException {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public EventBindingException() { }
-	
+
+    private static final long serialVersionUID = 1L;
+
+    public EventBindingException() {
+    }
+    
+    /**
+     * Initialise this exception with a message.
+     * 
+     * @param message
+     *            the message.
+     */
+    public EventBindingException(String message) {
+        super(message);
+    }
+
     /**
      * Initialises this exception with a message and a cause.
      * 
@@ -19,7 +30,7 @@ public abstract class EventBindingException extends RuntimeException {
      * @param cause
      *            the cause.
      */
-	public EventBindingException(String message, Throwable cause) {
-	    super(message, cause);
+    public EventBindingException(String message, Throwable cause) {
+        super(message, cause);
     }
 }
