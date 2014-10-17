@@ -8,6 +8,7 @@ import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
 import de.javax.util.eventbinding.spi.EventTarget;
+import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
 
 /**
  * An event target implementation.
@@ -17,8 +18,7 @@ import de.javax.util.eventbinding.spi.EventTarget;
 public class DefaultEventTarget implements EventTarget {
 
 	private final Class<?> eventType;
-	private final String sourceId;
-	
+	private final EventSourceIdSelector sourceIdSelector;
 	private final EventDispatcher eventDispatcher;
 	
 	private Set<EventSource> boundEventSources;
@@ -31,16 +31,18 @@ public class DefaultEventTarget implements EventTarget {
 	 * created target instance is intended to be bound to one or more event
 	 * sources which send events of the given event type.
 	 * 
-	 * @param sourceId
-	 *            the identifier of the source to bind this target to. May be
-	 *            <code>null</code>.
+	 * @param sourceIdSelector
+	 *            the selector for the source identifiers.
 	 * @param eventType
 	 *            the type of the event which this target wants to handle.
 	 * @param dispatcher
 	 *            the event dispatcher.
 	 */
-	public DefaultEventTarget(String sourceId, Class<?> eventType, EventDispatcher dispatcher) {
-		this.sourceId = sourceId;
+	public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventType, EventDispatcher dispatcher) {
+        if (sourceIdSelector == null) {
+            throw new NullPointerException("Undefined event source identifier pattern!");
+        }
+		this.sourceIdSelector = sourceIdSelector;
 		if (eventType == null) {
 			throw new NullPointerException("Undefined event type!");
 		}
@@ -111,10 +113,11 @@ public class DefaultEventTarget implements EventTarget {
 	protected Set<EventSource> determineSources(EventSourceProvider sourceProvider) {
 		@SuppressWarnings("unchecked")
 		Set<EventSource> eventSources = Collections.EMPTY_SET;
-		if (this.sourceId == null) {
+		if (this.sourceIdSelector == null) {
 			eventSources = sourceProvider.findEventSourcesByType(this.eventType);
 		} else {
-			EventSource source = sourceProvider.findEventSource(this.sourceId, this.eventType);
+		    // TODO This must be changed
+			EventSource source = sourceProvider.findEventSource(this.sourceIdSelector.toString(), this.eventType);
 			if (source != null) {
 				eventSources = new HashSet<EventSource>();
 				eventSources.add(source);

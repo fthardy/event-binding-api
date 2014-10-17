@@ -12,7 +12,9 @@ import java.util.Set;
 import de.javax.util.eventbinding.EventBindingException;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.EventBindingSpiUtils;
+import de.javax.util.eventbinding.spi.impl.EventSourceId;
+import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
+import de.javax.util.eventbinding.spi.impl.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
 import de.javax.util.eventbinding.target.EventTargetProvider;
@@ -26,23 +28,29 @@ import de.javax.util.eventbinding.target.HandleEvent;
 public class DefaultEventTargetCollector implements EventTargetCollector {
     
     private final MethodEventTargetFactory targetFactory;
+    private final EventSourceIdSelectorFactory idSelectorFactory;
     
     /**
      * Creates a new instance of this event target collector.
      * 
-     * @param factory
+     * @param targetfactory
      *            the target factory.
      */
-    public DefaultEventTargetCollector(MethodEventTargetFactory factory) {
-        if (factory == null) {
+    public DefaultEventTargetCollector(
+            MethodEventTargetFactory targetfactory, EventSourceIdSelectorFactory selectorFactory) {
+        if (targetfactory == null) {
             throw new NullPointerException("Undefined method event target factory!");
         }
-        this.targetFactory = factory;
+        this.targetFactory = targetfactory;
+        if (selectorFactory == null) {
+            throw new NullPointerException("Undefined event source identifier selector factory!");
+        }
+        this.idSelectorFactory = selectorFactory;
     }
 
 	@Override
 	public Set<EventTarget> collectEventTargetsFrom(Object targetProvider) {
-	    return this.collectEventTargetsFrom(targetProvider, null);
+	    return this.collectEventTargetsFrom(targetProvider, this.idSelectorFactory);
 	}
 
     /**
@@ -50,37 +58,45 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * 
      * @param targetProvider
      *            the target provider object.
-     * @param sourceIdPrefix
-     *            the prefix for the source identifiers.
+     * @param selectorFactory
+     *            the factory for creating ID-selectors.
      * 
      * @return a set with all found event targets. If none are found return an empty set.
      */
-	protected Set<EventTarget> collectEventTargetsFrom(Object targetProvider, String sourceIdPrefix) {
-        Set<Method> eventHandlerMethods = this.collectEventHandlerMethods(targetProvider.getClass());
+	protected Set<EventTarget> collectEventTargetsFrom(
+	        Object targetProvider, EventSourceIdSelectorFactory selectorFactory) {
+	    
+	    Class<? extends Object> targetProviderClass = targetProvider.getClass();
+        Set<Method> handlerMethods = this.collectEventHandlerMethods(targetProviderClass);
 
         @SuppressWarnings("unchecked")
-        Set<EventTarget> allTargets = eventHandlerMethods.isEmpty() ? 
-                Collections.EMPTY_SET : new HashSet<EventTarget>();
-        for (Method targetMethod : eventHandlerMethods) {
-            allTargets.add(this.targetFactory.createEventTarget(
-                    targetProvider, targetMethod, this.getSourceId(targetMethod, sourceIdPrefix)));
+        Set<EventTarget> targets = handlerMethods.isEmpty() ? Collections.EMPTY_SET : new HashSet<EventTarget>();
+        for (Method targetMethod : handlerMethods) {
+            targets.add(this.targetFactory.createEventTarget(
+                    targetProvider, targetMethod, this.getSourceIdPattern(targetMethod, selectorFactory)));
         }
         
-        Set<Field> nestedTargetProviderFields = this.collectNestedTargetProviderFields(targetProvider.getClass());
-        if (!nestedTargetProviderFields.isEmpty()) {
-            try {
-                for (Field field : nestedTargetProviderFields) {
-                    String extendedPrefix = EventBindingSpiUtils.extendSourceId(
-                            sourceIdPrefix, field.getAnnotation(EventTargetProvider.class).sourceIdPrefix().trim());
-                    
-                    // Recursive call!
-                    allTargets.addAll(this.collectEventTargetsFrom(field.get(targetProvider), extendedPrefix));
+        try {
+            for (Field field : this.collectNestedTargetProviderFields(targetProviderClass)) {
+                EventSourceIdSelectorFactory cascadedSelectorFactory = new CascadedSelectorFactory(
+                        selectorFactory, selectorFactory.createEventSourceIdSelector(
+                                field.getAnnotation(EventTargetProvider.class).from()));
+                
+                Object nestedTargetProvider = field.get(targetProvider);
+                if (nestedTargetProvider == null) {
+                    throw new TargetProviderAccessException(
+                            "The value of field '" + field.toGenericString() + "' in class '" + 
+                                    targetProviderClass + "' is null!");
                 }
-            } catch (Exception e) {
-                throw new TargetProviderAccessException(e);
+                
+                // --- recursive call ---
+                targets.addAll(this.collectEventTargetsFrom(nestedTargetProvider, cascadedSelectorFactory));
             }
+        } catch (Exception e) {
+            throw new TargetProviderAccessException(
+                    "Failed to access field in class '" + targetProviderClass + "'!", e);
         }
-        return allTargets;
+        return targets;
 	}
 	
 	/**
@@ -94,7 +110,12 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      */
 	protected Set<Field> collectNestedTargetProviderFields(Class<? extends Object> targetProviderClass) {
         return new HashSet<Field>(new Filter<Field>(Arrays.asList(targetProviderClass.getDeclaredFields())).filter(
-                new EventTargetProviderFieldFilterPredicate()).getElements());
+                new Predicate<Field>() {
+                    @Override
+                    public boolean apply(Field field) {
+                        return field.getAnnotation(EventTargetProvider.class) != null;
+                    }
+                }).getElements());
     }
 
     /**
@@ -107,7 +128,30 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	 */
     protected Set<Method> collectEventHandlerMethods(Class<?> targetProviderClass) {
         return new HashSet<Method>(new Filter<Method>(Arrays.asList(targetProviderClass.getMethods())).filter(
-                new EventHandlerMethodFilterPredicate()).getElements());
+                new Predicate<Method>() {
+                    @Override
+                    public boolean apply(Method method) {
+                        int modifiers = method.getModifiers();
+                        
+                        Annotation[] parameterAnnotations = method.getParameterAnnotations()[0];
+                        
+                        boolean isAccepted = Modifier.isPublic(modifiers)
+                                && !Modifier.isAbstract(modifiers)
+                                && method.getParameterTypes().length == 1
+                                && method.getReturnType() == Void.TYPE
+                                && parameterAnnotations.length > 0;
+                        if (isAccepted) {
+                            isAccepted = false;
+                            for (Annotation annotation : parameterAnnotations) {
+                                if (annotation.annotationType() == HandleEvent.class) {
+                                    isAccepted = true;
+                                    break;
+                                }
+                            }
+                        }
+                        return isAccepted;
+                    }
+                }).getElements());
     }
 
     /**
@@ -115,23 +159,26 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * 
      * @param eventHandlerMethod
      *            the event handler method.
+     * @param selectorFactory
+     *            the factory for creating ID-selectors.
      * 
      * @return the source identifier from the annotation. <code>null</code> if
      *         no source identifier was defined.
      */
-	protected String getSourceId(Method eventHandlerMethod, String sourceIdPrefix) {
-		String sourceId = null;
-		Annotation[] parameterAnnotations = eventHandlerMethod.getParameterAnnotations()[0];
-		
-		for (Annotation annotation : parameterAnnotations) {
+	protected EventSourceIdSelector getSourceIdPattern(
+	        Method eventHandlerMethod, EventSourceIdSelectorFactory selectorFactory) {
+		String selectorExpression = null;
+		for (Annotation annotation : eventHandlerMethod.getParameterAnnotations()[0]) {
 		    if (annotation instanceof HandleEvent) {
-		        sourceId = ((HandleEvent) annotation).fromSource().trim();
-		        if (sourceId.isEmpty()) {
-		            sourceId = null;
+		        selectorExpression = ((HandleEvent) annotation).from();
+		        if (selectorExpression.isEmpty()) {
+		            selectorExpression = "*";
 		        }
+		        break;
 		    }
 		}
-		return EventBindingSpiUtils.extendSourceId(sourceIdPrefix, sourceId);
+		assert selectorExpression != null;
+		return selectorFactory.createEventSourceIdSelector(selectorExpression);
 	}
 
     /**
@@ -144,79 +191,46 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	public static class TargetProviderAccessException extends EventBindingException {
 
         private static final long serialVersionUID = 3137888076154365395L;
+        
+        public TargetProviderAccessException(String message) {
+            super(message);
+        }
 
-        /**
-         * Create a new instance of this exception.
-         * 
-         * @param cause
-         *            the causing exception.
-         */
-        public TargetProviderAccessException(Throwable cause) {
-            super("", cause);
+        public TargetProviderAccessException(String message, Throwable cause) {
+            super(message, cause);
         }
 	}
 	
-	/**
-	 * The default implementation of the factory for the event targets.
-	 * 
-	 * @author Frank Hardy
-	 */
-	public static class DefaultEventTargetFactory implements MethodEventTargetFactory {
+	protected static class CascadedSelectorFactory implements EventSourceIdSelectorFactory {
+	    
+	    private final EventSourceIdSelector preSelector;
+	    private final EventSourceIdSelectorFactory selectorFactory;
+	    
+	    public CascadedSelectorFactory(EventSourceIdSelectorFactory factory, EventSourceIdSelector preSelector) {
+	        this.selectorFactory = factory;
+            this.preSelector = preSelector;
+        }
 	    
 	    @Override
-	    public EventTarget createEventTarget(Object targetProvider, Method eventHandlerMethod, String sourceId) {
-	        return new DefaultEventTarget(
-	                sourceId,
-	                eventHandlerMethod.getParameterTypes()[0],
-	                new MethodAdaptingEventDispatcher(eventHandlerMethod, targetProvider));
+	    public EventSourceIdSelector createEventSourceIdSelector(String expression) {
+	        return new CascadedEventSourceIdSelector(
+	                this.preSelector, this.selectorFactory.createEventSourceIdSelector(expression));
 	    }
 	}
-
-    /**
-     * The filter predicate for identifying event handler methods.<br/>
-     * Accepts only methods which are public non-abstract and do have one
-     * parameter which is annotated with {@link HandleEvent} and have a return
-     * type of <code>void</code>.
-     * 
-     * @author Frank Hardy
-     */
-	protected static class EventHandlerMethodFilterPredicate implements Predicate<Method> {
-
-		@Override
-		public boolean apply(Method method) {
-			int modifiers = method.getModifiers();
-			
-			Annotation[] parameterAnnotations = method.getParameterAnnotations()[0];
-			
-			boolean isAccepted = Modifier.isPublic(modifiers)
-					&& !Modifier.isAbstract(modifiers)
-					&& method.getParameterTypes().length == 1
-					&& method.getReturnType() == Void.TYPE
-					&& parameterAnnotations.length > 0;
-			if (isAccepted) {
-			    isAccepted = false;
-    			for (Annotation annotation : parameterAnnotations) {
-    			    if (annotation.annotationType() == HandleEvent.class) {
-    			        isAccepted = true;
-    			        break;
-    			    }
-    			}
-			}
-			return isAccepted;
-		}
-	}
 	
-	/**
-	 * The filter predicate for identifying event target provider fields.<br/>
-	 * Accepts only fields which are annotated with {@link EventTargetProvider}.
-	 * 
-	 * @author Frank Hardy
-	 */
-	protected static class EventTargetProviderFieldFilterPredicate implements Predicate<Field> {
+	protected static class CascadedEventSourceIdSelector implements EventSourceIdSelector {
+	    
+	    private final EventSourceIdSelector preSelector;
+	    private final EventSourceIdSelector postSelector;
+	    
+	    public CascadedEventSourceIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post) {
+            this.preSelector = pre;
+            this.postSelector = post;
+        }
 	    
 	    @Override
-	    public boolean apply(Field field) {
-	        return field.getAnnotation(EventTargetProvider.class) != null;
+	    public boolean matches(EventSourceId sourceId) {
+	        return this.preSelector.matches(sourceId) && this.postSelector.matches(sourceId);
 	    }
 	}
 }

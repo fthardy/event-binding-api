@@ -6,20 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Indicates that the object of the annotated field is a target provider.
+ * Identifies a field within an event target provider object which contains a
+ * nested event target provider object.<br/>
  * 
  * @author Frank Hardy
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = ElementType.FIELD)
 public @interface EventTargetProvider {
-	
-	/**
-	 * Defines a prefix for the event source identifiers of the underlying event handlers.
-	 * Usually this is used to set the identifier name of a nested event source provider
-	 * of the sources to be bound.
-	 * 
-	 * @return the identifier prefix.
-	 */
-	String sourceIdPrefix() default "";
+
+    /**
+     * @return the expression that defines from which event source(s) the events
+     *         are delegated to the event target provider.
+     */
+    String from() default "";
 }

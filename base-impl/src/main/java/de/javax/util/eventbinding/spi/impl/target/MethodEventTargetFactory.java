@@ -3,6 +3,7 @@ package de.javax.util.eventbinding.spi.impl.target;
 import java.lang.reflect.Method;
 
 import de.javax.util.eventbinding.spi.EventTarget;
+import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
 
 /**
  * Creates new event targets.
@@ -18,10 +19,11 @@ public interface MethodEventTargetFactory {
      *            the target provider object to which the method belongs to.
      * @param eventHandlerMethod
      *            the event handler method.
-     * @param sourceId
-     *            the identifier of the event source or null or an empty string.
+     * @param sourceIdSelector
+     *            the source identifier selector.
      * 
      * @return the new event target instance.
      */
-    EventTarget createEventTarget(Object targetProvider, Method eventHandlerMethod, String sourceId);
+    EventTarget createEventTarget(
+            Object targetProvider, Method eventHandlerMethod, EventSourceIdSelector sourceIdSelector);
 }

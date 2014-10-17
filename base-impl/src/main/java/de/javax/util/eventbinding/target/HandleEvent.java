@@ -7,15 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * Identifies the event parameter of an event handler method at an event target
- * object.<br/>
+ * provider object.<br/>
  * An event handler method is a non-abstract, public method which can be either
  * static or non-static. It must have only one parameter and must have a return
  * value of type <code>void</code>.<br/>
- * The optional attribute <code>fromSource</code> defines an identifier of an
- * event source. When a source identifier is defined the event handler method
- * expects the events only from an event source which has the defined
- * identifier. If the source identifier is not defined the method expects the
- * events from any event source.
+ * The optional attribute is used to define an expression that describes from
+ * which event source(s) the events are expected by the event handler method.
  * 
  * @author Frank Hardy
  */
@@ -23,8 +20,9 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.PARAMETER)
 public @interface HandleEvent {
 
-	/**
-	 * @return the identifier of the event source.
-	 */
-	String fromSource() default "";
+    /**
+     * @return the expression that defines from which event source(s) the event
+     *         is expected.
+     */
+    String from() default "";
 }

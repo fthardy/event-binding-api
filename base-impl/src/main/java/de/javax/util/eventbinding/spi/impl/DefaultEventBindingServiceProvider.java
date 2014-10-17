@@ -1,5 +1,6 @@
 package de.javax.util.eventbinding.spi.impl;
 
+import java.lang.reflect.Method;
 import java.util.Set;
 
 import de.javax.util.eventbinding.EventBinding;
@@ -9,7 +10,10 @@ import de.javax.util.eventbinding.spi.EventSourceProvider;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceProvider;
+import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
+import de.javax.util.eventbinding.spi.impl.target.MethodAdaptingEventDispatcher;
+import de.javax.util.eventbinding.spi.impl.target.MethodEventTargetFactory;
 
 /**
  * The default implementation of the event binding service.
@@ -19,7 +23,22 @@ import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 public class DefaultEventBindingServiceProvider implements EventBindingServiceProvider {
 	
 	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
-	        new DefaultEventTargetCollector.DefaultEventTargetFactory());
+	        new MethodEventTargetFactory() {
+	            @Override
+	            public EventTarget createEventTarget(
+	                    Object targetProvider, Method eventHandlerMethod, EventSourceIdSelector pattern) {
+	                return new DefaultEventTarget(
+	                        pattern,
+	                        eventHandlerMethod.getParameterTypes()[0],
+	                        new MethodAdaptingEventDispatcher(eventHandlerMethod, targetProvider));
+	            }
+	        },
+	        new EventSourceIdSelectorFactory() {
+                @Override
+                public EventSourceIdSelector createEventSourceIdSelector(String expression) {
+                    return new DefaultEventSourceIdSelector(expression);
+                }
+            });
 
 	@Override
 	public EventTargetCollector getEventTargetCollector() {

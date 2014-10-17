@@ -11,7 +11,7 @@ import java.util.Set;
 import de.javax.util.eventbinding.source.NestedEventSourceAlias;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
-import de.javax.util.eventbinding.spi.impl.EventBindingSpiUtils;
+import de.javax.util.eventbinding.spi.impl.EventSourceId;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
 
@@ -75,28 +75,33 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
     private Collection<EventSourceObject> getEventSourceObjects() {
         if (this.allEventSourceObjects == null) {
             this.allEventSourceObjects = new HashSet<EventSourceObject>();
-            this.allEventSourceObjects.addAll(findEventSources(this.source, this.source.getClass(), "",
-                    Collections.EMPTY_LIST));
+            this.allEventSourceObjects.addAll(
+                    this.findEventSources(this.source, this.source.getClass(), Collections.EMPTY_LIST, null));
         }
         return this.allEventSourceObjects;
     }
 
-    private Set<EventSourceObject> findEventSources(Object source, Class<?> sourceClass, String sourceId, List<Field> tree) {
+    private Set<EventSourceObject> findEventSources(
+            Object source, Class<?> sourceClass, List<Field> tree, EventSourceId parentId) {
         Set<EventSourceObject> collectedSources = new HashSet<EventSourceObject>();
         Field[] declaredFields = sourceClass.getDeclaredFields();
         for (Field declaredField : declaredFields) {
-            String eventSourceFieldId = getEventSourceId(declaredField);
+            EventSourceId eventSourceFieldId = getEventSourceId(declaredField, parentId);
             if (eventSourceFieldId != null) {
                 // TODO care about alias
-                String id = EventBindingSpiUtils.extendSourceId(sourceId, eventSourceFieldId);
-                collectedSources.add(createEventSourceObject(getFieldValue(declaredField, source), id, null, tree, declaredField));
+                collectedSources.add(createEventSourceObject(
+                        getFieldValue(declaredField, source), eventSourceFieldId, tree, declaredField));
             }
-            String eventSourceProviderPrefix = getEventSourceProviderPrefix(declaredField);
+            
+            EventSourceId eventSourceProviderPrefix = getEventSourceProviderPrefix(declaredField, parentId);
             if (eventSourceProviderPrefix != null) {
-                String prefix = EventBindingSpiUtils.extendSourceId(sourceId, eventSourceProviderPrefix);
                 List<Field> fields = new ArrayList<Field>(tree);
                 fields.add(declaredField);
-                collectedSources.addAll(findEventSources(getFieldValue(declaredField, source), declaredField.getType(), prefix, fields));
+                collectedSources.addAll(findEventSources(
+                        getFieldValue(declaredField, source),
+                        declaredField.getType(),
+                        fields,
+                        eventSourceProviderPrefix));
             }
         }
         return collectedSources;
@@ -115,53 +120,62 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
         }
     }
 
-    private String getEventSourceProviderPrefix(Field declaredField) {
-        de.javax.util.eventbinding.source.EventSourceProvider annotation = declaredField
-                .getAnnotation(de.javax.util.eventbinding.source.EventSourceProvider.class);
-        if (annotation == null) {
-            return null;
+    private EventSourceId getEventSourceProviderPrefix(Field declaredField, EventSourceId parentId) {
+        de.javax.util.eventbinding.source.EventSourceProvider annotation = declaredField.getAnnotation(
+                de.javax.util.eventbinding.source.EventSourceProvider.class);
+        String id = annotation == null ? null : annotation.value();
+        
+        EventSourceId newId = null;
+        if (parentId == null) {
+            newId = new EventSourceId(id); 
         } else {
-            return annotation.value().trim();
+            List<String> names = parentId.getNames();
+            names.add(id);
+            newId = new EventSourceId(names);
         }
+        return newId;
     }
 
-    private EventSourceObject createEventSourceObject(Object source, String eventSourceId, String alias, List<Field> tree,
-            Field declaredField) {
+    private EventSourceObject createEventSourceObject(
+            Object source, EventSourceId eventSourceId, List<Field> tree, Field declaredField) {
         List<Field> fields = new ArrayList<Field>(tree);
         fields.add(declaredField);
-        return EventSourceObject.create(eventSourceId, alias, source);
+        return EventSourceObject.create(eventSourceId, source);
     }
 
-    private static String getEventSourceId(Field declaredField) {
-        de.javax.util.eventbinding.source.EventSource annotation = declaredField
-                .getAnnotation(de.javax.util.eventbinding.source.EventSource.class);
-        if (annotation == null) {
-            return null;
+    private EventSourceId getEventSourceId(Field declaredField, EventSourceId parentId) {
+        de.javax.util.eventbinding.source.EventSource annotation = declaredField.getAnnotation(
+                de.javax.util.eventbinding.source.EventSource.class);
+        String id = annotation == null ? null : annotation.value();
+        
+        EventSourceId newId = null;
+        if (parentId == null) {
+            newId = new EventSourceId(id); 
         } else {
-            return annotation.value().trim();
+            List<String> names = parentId.getNames();
+            names.add(id);
+            newId = new EventSourceId(names);
         }
+        return newId;
     }
 
     static class EventSourceObject {
-        String eventSourceId;
-        String alias;
+        
+        EventSourceId eventSourceId;
         Object eventSource;
-        static EventSourceObject create(String eventSourceId, String alias, Object eventSource) {
+        
+        static EventSourceObject create(EventSourceId eventSourceId, Object eventSource) {
             EventSourceObject eventSourceObject = new EventSourceObject();
             eventSourceObject.eventSourceId = eventSourceId;
-            eventSourceObject.alias = alias;
             eventSourceObject.eventSource = eventSource;
             return eventSourceObject;
         }
-        public String getAlias() {
-            return alias;
-        }
+        
         public Object getEventSource() {
             return eventSource;
         }
-        public String getEventSourceId() {
+        public EventSourceId getEventSourceId() {
             return eventSourceId;
         }
     }
-
 }
