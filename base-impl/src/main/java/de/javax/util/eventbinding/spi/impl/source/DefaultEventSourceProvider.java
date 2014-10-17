@@ -10,8 +10,9 @@ import java.util.Set;
 
 import de.javax.util.eventbinding.source.NestedEventSourceAlias;
 import de.javax.util.eventbinding.spi.EventSource;
+import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
-import de.javax.util.eventbinding.spi.impl.EventSourceId;
+import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
 
@@ -34,8 +35,14 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
         }
         this.source = source;
     }
-
+    
     @Override
+    public boolean bindTargetToSources(EventTarget eventTargets) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
     public EventSource findEventSource(final String id, Class<?> eventType) {
         Filter<EventSourceObject> filter = new Filter<DefaultEventSourceProvider.EventSourceObject>(getEventSourceObjects());
         filter = filter.filter(new Predicate<EventSourceObject>() {
@@ -54,7 +61,7 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
         return null;
     }
 
-    @Override
+    @Deprecated
     public Set<EventSource> findEventSourcesByType(Class<?> eventType) {
         Set<EventSource> eventSources = new HashSet<EventSource>();
         Collection<EventSourceObject> eventSourceObjects = getEventSourceObjects();

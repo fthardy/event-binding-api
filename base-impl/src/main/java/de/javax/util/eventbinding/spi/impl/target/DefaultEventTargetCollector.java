@@ -10,11 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.EventBindingException;
+import de.javax.util.eventbinding.spi.EventSourceId;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
+import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.EventSourceId;
-import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
-import de.javax.util.eventbinding.spi.impl.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
 import de.javax.util.eventbinding.target.EventTargetProvider;

@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.impl;
+package de.javax.util.eventbinding.spi;
 
 import java.util.ArrayList;
 import java.util.Arrays;

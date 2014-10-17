@@ -1,5 +1,6 @@
-package de.javax.util.eventbinding.spi.impl
+package de.javax.util.eventbinding.spi
 
+import de.javax.util.eventbinding.spi.EventSourceId;
 import spock.lang.Specification
 
 class EventSourceIdSpec extends Specification {

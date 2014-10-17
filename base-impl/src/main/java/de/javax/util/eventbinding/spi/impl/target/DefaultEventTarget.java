@@ -1,14 +1,11 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
-import de.javax.util.eventbinding.spi.EventSourceProvider;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
 
 /**
  * An event target implementation.
@@ -71,22 +68,28 @@ public class DefaultEventTarget implements EventTarget {
 	public String toString() {
 		return this.eventDispatcher.toString();
 	}
-
+	
 	@Override
-	public boolean bindToSourcesOf(EventSourceProvider sourceProvider) {
-		if (this.boundEventSources != null) {
-			throw new IllegalStateException("Event target is already bound to event sources!");
-		}
-		
-		Set<EventSource> eventSources = this.determineSources(sourceProvider);
-		if (!eventSources.isEmpty()) {
-			for (EventSource source : eventSources) {
-				source.register(this.eventDispatcher);
-			}
-			this.boundEventSources = eventSources;
-		}
-		
-		return this.boundEventSources != null ? !this.boundEventSources.isEmpty() : false;
+	public Class<?> getEventType() {
+	    return this.eventType;
+	}
+	
+	@Override
+	public EventSourceIdSelector getEventSourceIdSelector() {
+	    return this.sourceIdSelector;
+	}
+	
+	@Override
+	public EventDispatcher getEventDispatcher() {
+	    return this.eventDispatcher;
+	}
+	
+	@Override
+	public void setBoundSources(Set<EventSource> boundSources) {
+	    if (this.boundEventSources != null) {
+	        throw new IllegalStateException("Event target is already bound to event sources!");
+	    }
+	    this.boundEventSources = boundSources;
 	}
 
 	@Override
@@ -95,34 +98,8 @@ public class DefaultEventTarget implements EventTarget {
 			throw new IllegalStateException("Target is not bound to any source!");
 		}
 		for (EventSource boundSource : this.boundEventSources) {
-			boundSource.unregisterEventDispatcher();
+			boundSource.unbindFrom(this);
 		}
 		this.boundEventSources = null;
-	}
-	
-	/**
-	 * Determine the event sources relevant for this event target from the give
-	 * event source provider.
-	 * 
-	 * @param sourceProvider
-	 *            the source provider instance.
-	 * 
-	 * @return the set of event sources or an empty set. Never <code>null</code>
-	 *         .
-	 */
-	protected Set<EventSource> determineSources(EventSourceProvider sourceProvider) {
-		@SuppressWarnings("unchecked")
-		Set<EventSource> eventSources = Collections.EMPTY_SET;
-		if (this.sourceIdSelector == null) {
-			eventSources = sourceProvider.findEventSourcesByType(this.eventType);
-		} else {
-		    // TODO This must be changed
-			EventSource source = sourceProvider.findEventSource(this.sourceIdSelector.toString(), this.eventType);
-			if (source != null) {
-				eventSources = new HashSet<EventSource>();
-				eventSources.add(source);
-			}
-		}
-		return eventSources;
 	}
 }

@@ -3,6 +3,9 @@ package de.javax.util.eventbinding.spi.impl;
 import java.util.Arrays;
 import java.util.List;
 
+import de.javax.util.eventbinding.spi.EventSourceId;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
+
 /**
  * The default implementation of the event source identifier selector.<br/>
  * 

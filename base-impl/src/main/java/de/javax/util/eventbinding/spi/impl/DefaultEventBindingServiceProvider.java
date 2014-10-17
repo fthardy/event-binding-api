@@ -6,6 +6,8 @@ import java.util.Set;
 import de.javax.util.eventbinding.EventBinding;
 import de.javax.util.eventbinding.impl.DefaultEventBinding;
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
+import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;

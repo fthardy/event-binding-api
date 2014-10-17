@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.impl;
+package de.javax.util.eventbinding.spi;
 
 /**
  * The interface definition for an event source identifier selector.

@@ -61,7 +61,7 @@ public class DefaultEventBinder implements EventBinder {
 		}
 		
 		return this.serviceProvider.createEventBinding(
-				source, target, this.bindTargetsToSource(foundTargets, eventSourceProvider));
+				source, target, this.bindTargetsToSources(foundTargets, eventSourceProvider));
 	}
 	
 	/**
@@ -92,12 +92,12 @@ public class DefaultEventBinder implements EventBinder {
 	 * 
 	 * @return the set of bound event targets. Never <code>null</code>.
 	 */
-	protected Set<EventTarget> bindTargetsToSource(Set<EventTarget> eventTargets, EventSourceProvider sourceProvider) {
+	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, EventSourceProvider sourceProvider) {
 		Set<EventTarget> boundTargets = new HashSet<EventTarget>();
 		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		for (EventTarget eventTarget : eventTargets) {
-			if (eventTarget.bindToSourcesOf(sourceProvider)) {
+			if (sourceProvider.bindTargetToSources(eventTarget)) {
 				boundTargets.add(eventTarget);
 			} else if (this.strictBindingMode) {
 				unboundTargets.add(eventTarget);

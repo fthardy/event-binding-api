@@ -2,8 +2,8 @@ package de.javax.util.eventbinding.spi.impl.target;
 
 import java.lang.reflect.Method;
 
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.EventSourceIdSelector;
 
 /**
  * Creates new event targets.

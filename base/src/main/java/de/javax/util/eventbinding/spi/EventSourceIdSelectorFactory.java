@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.impl;
+package de.javax.util.eventbinding.spi;
 
 /**
  * Creates new instances of {@link EventSourceIdSelector}s.

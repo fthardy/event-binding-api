@@ -1,7 +1,7 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
-import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
+import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
  * Default implementation of EventSource delegating 
@@ -21,16 +21,10 @@ public class DefaultEventSource implements EventSource {
         }
         this.adapter = adapter;
     }
-
-    /** {@inheritDoc} */
+    
     @Override
-    public void register(EventDispatcher eventDispatcher) {
-        this.adapter.registerEventListener(eventDispatcher);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void unregisterEventDispatcher() {
+    public void unbindFrom(EventTarget target) {
+        // TODO Auto-generated method stub
         this.adapter.unregisterEventListener();
     }
 }

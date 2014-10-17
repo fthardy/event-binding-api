@@ -2,21 +2,17 @@ package de.javax.util.eventbinding.spi;
 
 /**
  * Represents a source of events in an event binding.
- *
+ * 
  * @author Frank Hardy
  */
 public interface EventSource {
 
-	/**
-	 * Register a given event dispatcher at the underlying event source.
-	 * 
-	 * @param eventDispatcher
-	 *            the event dispatcher to be registered.
-	 */
-	void register(EventDispatcher eventDispatcher);
-	
-	/**
-	 * Unregister the registered event dispatcher from the underlying event source.
-	 */
-	void unregisterEventDispatcher();
+    /**
+     * Unbind the given event target from the receiving event source.
+     * 
+     * @param target
+     *            the event target to be unbound from the receiving event
+     *            source.
+     */
+    void unbindFrom(EventTarget target);
 }

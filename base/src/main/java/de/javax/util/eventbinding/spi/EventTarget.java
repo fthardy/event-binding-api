@@ -1,5 +1,7 @@
 package de.javax.util.eventbinding.spi;
 
+import java.util.Set;
+
 /**
  * Represents a target for events in a event binding.
  * 
@@ -8,18 +10,31 @@ package de.javax.util.eventbinding.spi;
  * @see EventTargetCollector
  */
 public interface EventTarget {
-
-	/**
-	 * Bind the receiving event target to a given event source.
-	 * 
-	 * @param sourceProvider
-	 *            the event source provider.
-	 * 
-	 * @return <code>true</code> when the receiving event target has been bound
-	 *         to at least one event source.
-	 */
-	boolean bindToSourcesOf(EventSourceProvider sourceProvider);
-
+    
+    /**
+     * TODO
+     * @return
+     */
+    Class<?> getEventType();
+    
+    /**
+     * TODO
+     * @return
+     */
+    EventSourceIdSelector getEventSourceIdSelector();
+    
+    /**
+     * TODO
+     * @return
+     */
+    EventDispatcher getEventDispatcher();
+    
+    /**
+     * TODO
+     * @param boundSources
+     */
+    void setBoundSources(Set<EventSource> boundSources);
+    
 	/**
 	 * Release all source bindings of the receiving event target.
 	 */
