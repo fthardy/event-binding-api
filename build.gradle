@@ -29,3 +29,10 @@ project('base-impl') {
 	}
 }
 
+project('vaadin-impl') {
+	dependencies {
+		compile project(':base')
+		
+		compile 'com.vaadin:vaadin-server:7.3.2'
+	}
+}
