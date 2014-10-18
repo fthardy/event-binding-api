@@ -28,7 +28,7 @@ public class MethodAdaptingEventDispatcher implements EventDispatcher {
 	 *            parameter will be ignored.
 	 */
 	public MethodAdaptingEventDispatcher(Method method, Object instance) {
-		if (this.method == null) {
+		if (method == null) {
 			throw new NullPointerException("Undefined method!");
 		}
 		this.method = method;

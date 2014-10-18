@@ -9,7 +9,7 @@ public class AddressEditorGuiLogic {
         
     }
     
-    // TODO Should only get events from corresponding event source provider!!!
+    // Short form of @HandleEvent(from="*")
     public void onAnyTextFieldChange(@HandleEvent TextChangeEvent event) {
         
     }

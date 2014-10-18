@@ -10,33 +10,40 @@ import java.util.Set;
  * @see EventTargetCollector
  */
 public interface EventTarget {
-    
+
     /**
-     * TODO
-     * @return
+     * @return the type of events supported by the receiving event target.
      */
     Class<?> getEventType();
-    
+
     /**
-     * TODO
-     * @return
+     * @return the event source identifier selector which is used to select the
+     *         event sources by their identifiers.
      */
     EventSourceIdSelector getEventSourceIdSelector();
-    
+
     /**
-     * TODO
-     * @return
+     * @return the event dispatcher used to dispatch the events from the event
+     *         source to the event target.
      */
     EventDispatcher getEventDispatcher();
-    
+
     /**
-     * TODO
+     * @return the unmodifieable set of the bound event sources.
+     */
+    Set<EventSource> getBoundSources();
+
+    /**
+     * Set the event sources which have been bound to the receiving event
+     * target.
+     * 
      * @param boundSources
+     *            the set of the bound sources.
      */
     void setBoundSources(Set<EventSource> boundSources);
-    
-	/**
-	 * Release all source bindings of the receiving event target.
-	 */
-	void release();
+
+    /**
+     * Unbind the receiving event target from all bound event sources.
+     */
+    void unbindFromSources();
 }

@@ -19,5 +19,5 @@ public @interface EventTargetProvider {
      * @return the expression that defines from which event source(s) the events
      *         are delegated to the event target provider.
      */
-    String from() default "";
+    String from() default "*";
 }

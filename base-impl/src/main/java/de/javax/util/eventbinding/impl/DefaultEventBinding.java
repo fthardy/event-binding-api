@@ -59,7 +59,7 @@ public class DefaultEventBinding implements EventBinding {
 			throw new IllegalStateException("The event binding has been already released!");
 		}
 		for (EventTarget target : this.boundTargets) {
-			target.release();
+			target.unbindFromSources();
 		}
 		this.source = null;
 		this.target = null;

@@ -1,5 +1,7 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventDispatcher;
@@ -8,7 +10,7 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
- * An event target implementation.
+ * The default implementation for the event target.
  *
  * @author Frank Hardy
  */
@@ -50,20 +52,6 @@ public class DefaultEventTarget implements EventTarget {
 		this.eventDispatcher = dispatcher;
 	}
 	
-	/**
-	 * Creates a new instance of this event target implementation. The created
-	 * target instance is intended to be bound to one or more event sources
-	 * which send events of the given event type.
-	 * 
-	 * @param eventType
-	 *            the type of the event which this target wants to handle.
-	 * @param dispatcher
-	 *            the event dispatcher.
-	 */
-	public DefaultEventTarget(Class<?> eventType, EventDispatcher dispatcher) {
-		this(null, eventType, dispatcher);
-	}
-	
 	@Override
 	public String toString() {
 		return this.eventDispatcher.toString();
@@ -85,17 +73,22 @@ public class DefaultEventTarget implements EventTarget {
 	}
 	
 	@Override
+	public Set<EventSource> getBoundSources() {
+	    return Collections.unmodifiableSet(this.boundEventSources);
+	}
+	
+	@Override
 	public void setBoundSources(Set<EventSource> boundSources) {
 	    if (this.boundEventSources != null) {
 	        throw new IllegalStateException("Event target is already bound to event sources!");
 	    }
-	    this.boundEventSources = boundSources;
+	    this.boundEventSources = new HashSet<EventSource>(boundSources);
 	}
 
 	@Override
-	public void release() {
+	public void unbindFromSources() {
 		if (this.boundEventSources == null) {
-			throw new IllegalStateException("Target is not bound to any source!");
+			throw new IllegalStateException("Event target is not bound to any event source!");
 		}
 		for (EventSource boundSource : this.boundEventSources) {
 			boundSource.unbindFrom(this);

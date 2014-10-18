@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.javax.util.eventbinding.EventBindingException;
-import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -26,6 +24,8 @@ import de.javax.util.eventbinding.target.HandleEvent;
  * @author Frank Hardy
  */
 public class DefaultEventTargetCollector implements EventTargetCollector {
+    
+    private static final String SEPARATOR_WILDCARD = EventSourceIdSelector.SEPARATOR + EventSourceIdSelector.WILDCARD;
     
     private final MethodEventTargetFactory targetFactory;
     private final EventSourceIdSelectorFactory idSelectorFactory;
@@ -50,7 +50,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 
 	@Override
 	public Set<EventTarget> collectEventTargetsFrom(Object targetProvider) {
-	    return this.collectEventTargetsFrom(targetProvider, this.idSelectorFactory);
+	    return this.collectTargetsFrom(targetProvider, this.idSelectorFactory);
 	}
 
     /**
@@ -63,84 +63,52 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * 
      * @return a set with all found event targets. If none are found return an empty set.
      */
-	protected Set<EventTarget> collectEventTargetsFrom(
-	        Object targetProvider, EventSourceIdSelectorFactory selectorFactory) {
-	    
+	protected Set<EventTarget> collectTargetsFrom(Object targetProvider, EventSourceIdSelectorFactory selectorFactory) {
 	    Class<? extends Object> targetProviderClass = targetProvider.getClass();
-        Set<Method> handlerMethods = this.collectEventHandlerMethods(targetProviderClass);
-
+	    
+	    // Collect event handler methods and create an event target for each one
+        Set<Method> handlerMethods = this.collectHandlerMethods(targetProviderClass);
         @SuppressWarnings("unchecked")
         Set<EventTarget> targets = handlerMethods.isEmpty() ? Collections.EMPTY_SET : new HashSet<EventTarget>();
         for (Method targetMethod : handlerMethods) {
             targets.add(this.targetFactory.createEventTarget(
-                    targetProvider, targetMethod, this.getSourceIdPattern(targetMethod, selectorFactory)));
+                    targetProvider, targetMethod, this.getSourceIdSelector(targetMethod, selectorFactory)));
         }
         
-        try {
-            for (Field field : this.collectNestedTargetProviderFields(targetProviderClass)) {
-                EventSourceIdSelectorFactory cascadedSelectorFactory = new CascadedSelectorFactory(
-                        selectorFactory, selectorFactory.createEventSourceIdSelector(
-                                field.getAnnotation(EventTargetProvider.class).from()));
-                
-                Object nestedTargetProvider = field.get(targetProvider);
-                if (nestedTargetProvider == null) {
-                    throw new TargetProviderAccessException(
-                            "The value of field '" + field.toGenericString() + "' in class '" + 
-                                    targetProviderClass + "' is null!");
-                }
-                
-                // --- recursive call ---
-                targets.addAll(this.collectEventTargetsFrom(nestedTargetProvider, cascadedSelectorFactory));
+        try { // drill recursively down the target provider structure
+            for (Field field : this.collectNestedTargetProviderFieldsFrom(targetProviderClass)) {
+                targets.addAll(this.collectNestedTargetsFromProviderField(
+                        field, targetProvider, targetProviderClass, selectorFactory));
             }
         } catch (Exception e) {
-            throw new TargetProviderAccessException(
+            throw new EventTargetProviderAccessException(
                     "Failed to access field in class '" + targetProviderClass + "'!", e);
         }
         return targets;
 	}
-	
-	/**
-     * Collect all nested event target provider fields from the given target
-     * provider class.
+
+    /**
+     * Collect all event handler methods from the given target provider class.
      * 
      * @param targetProviderClass
      *            the class of the target provider object.
-     *            
-     * @return the set of fields declaring nested event target providers. If none are found the set is empty.
+     * 
+     * @return the set of all event handler methods. If none are found the set is empty.
      */
-	protected Set<Field> collectNestedTargetProviderFields(Class<? extends Object> targetProviderClass) {
-        return new HashSet<Field>(new Filter<Field>(Arrays.asList(targetProviderClass.getDeclaredFields())).filter(
-                new Predicate<Field>() {
-                    @Override
-                    public boolean apply(Field field) {
-                        return field.getAnnotation(EventTargetProvider.class) != null;
-                    }
-                }).getElements());
-    }
-
-    /**
-	 * Collect all event handler methods from the given target provider class.
-	 * 
-	 * @param targetProviderClass
-	 *            the class of the target provider object.
-	 * 
-	 * @return the set of all event handler methods. If none are found the set is empty.
-	 */
-    protected Set<Method> collectEventHandlerMethods(Class<?> targetProviderClass) {
+    private Set<Method> collectHandlerMethods(Class<?> targetProviderClass) {
         return new HashSet<Method>(new Filter<Method>(Arrays.asList(targetProviderClass.getMethods())).filter(
                 new Predicate<Method>() {
                     @Override
                     public boolean apply(Method method) {
                         int modifiers = method.getModifiers();
                         
-                        Annotation[] parameterAnnotations = method.getParameterAnnotations()[0];
                         
                         boolean isAccepted = Modifier.isPublic(modifiers)
                                 && !Modifier.isAbstract(modifiers)
                                 && method.getParameterTypes().length == 1
-                                && method.getReturnType() == Void.TYPE
-                                && parameterAnnotations.length > 0;
+                                && method.getReturnType() == Void.TYPE;
                         if (isAccepted) {
+                            Annotation[] parameterAnnotations = method.getParameterAnnotations()[0];
                             isAccepted = false;
                             for (Annotation annotation : parameterAnnotations) {
                                 if (annotation.annotationType() == HandleEvent.class) {
@@ -155,9 +123,28 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
     }
 
     /**
+     * Collect all nested event target provider fields from the given target
+     * provider class.
+     * 
+     * @param targetProviderClass
+     *            the class of the target provider object.
+     *            
+     * @return the set of fields declaring nested event target providers. If none are found the set is empty.
+     */
+	private Set<Field> collectNestedTargetProviderFieldsFrom(Class<? extends Object> targetProviderClass) {
+        return new HashSet<Field>(new Filter<Field>(Arrays.asList(targetProviderClass.getDeclaredFields())).filter(
+                new Predicate<Field>() {
+                    @Override
+                    public boolean apply(Field field) {
+                        return field.getAnnotation(EventTargetProvider.class) != null;
+                    }
+                }).getElements());
+    }
+
+    /**
      * Get the identifier from the annotation if it was defined.
      * 
-     * @param eventHandlerMethod
+     * @param handlerMethod
      *            the event handler method.
      * @param selectorFactory
      *            the factory for creating ID-selectors.
@@ -165,14 +152,14 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * @return the source identifier from the annotation. <code>null</code> if
      *         no source identifier was defined.
      */
-	protected EventSourceIdSelector getSourceIdPattern(
-	        Method eventHandlerMethod, EventSourceIdSelectorFactory selectorFactory) {
+	private EventSourceIdSelector getSourceIdSelector(
+	        Method handlerMethod, EventSourceIdSelectorFactory selectorFactory) {
 		String selectorExpression = null;
-		for (Annotation annotation : eventHandlerMethod.getParameterAnnotations()[0]) {
+		for (Annotation annotation : handlerMethod.getParameterAnnotations()[0]) {
 		    if (annotation instanceof HandleEvent) {
 		        selectorExpression = ((HandleEvent) annotation).from();
 		        if (selectorExpression.isEmpty()) {
-		            selectorExpression = "*";
+		            selectorExpression = EventSourceIdSelector.WILDCARD;
 		        }
 		        break;
 		    }
@@ -181,56 +168,32 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 		return selectorFactory.createEventSourceIdSelector(selectorExpression);
 	}
 
-    /**
-     * Will be thrown by
-     * {@link DefaultEventTargetCollector#collectEventTargetsFrom(Object)} when
-     * the access to the target provider object is not allowed.
-     * 
-     * @author Frank Hardy
-     */
-	public static class TargetProviderAccessException extends EventBindingException {
-
-        private static final long serialVersionUID = 3137888076154365395L;
+	/**
+	 * This method is a part of {@link #collectTargetsFrom(Object, EventSourceIdSelectorFactory)}.
+	 */
+    private Set<EventTarget> collectNestedTargetsFromProviderField(
+            Field field, Object targetProvider, Class<?> targetProviderClass,
+            EventSourceIdSelectorFactory selectorFactory) throws IllegalAccessException {
         
-        public TargetProviderAccessException(String message) {
-            super(message);
+        String selectorExpression = field.getAnnotation(EventTargetProvider.class).from();
+        if (selectorExpression.isEmpty()) {
+            selectorExpression = EventSourceIdSelector.WILDCARD;
+        } else if (!selectorExpression.endsWith(SEPARATOR_WILDCARD)) {
+            selectorExpression += SEPARATOR_WILDCARD;
         }
-
-        public TargetProviderAccessException(String message, Throwable cause) {
-            super(message, cause);
+        
+        EventSourceIdSelectorFactory cascadedSelectorFactory = new CascadedSelectorFactory(
+                selectorFactory, selectorFactory.createEventSourceIdSelector(selectorExpression));
+        
+        field.setAccessible(true);
+        Object nestedTargetProvider = field.get(targetProvider);
+        if (nestedTargetProvider == null) {
+            throw new EventTargetProviderAccessException(
+                    "The value of field '" + field.toGenericString() + "' in class '" + 
+                            targetProviderClass + "' is null!");
         }
-	}
-	
-	protected static class CascadedSelectorFactory implements EventSourceIdSelectorFactory {
-	    
-	    private final EventSourceIdSelector preSelector;
-	    private final EventSourceIdSelectorFactory selectorFactory;
-	    
-	    public CascadedSelectorFactory(EventSourceIdSelectorFactory factory, EventSourceIdSelector preSelector) {
-	        this.selectorFactory = factory;
-            this.preSelector = preSelector;
-        }
-	    
-	    @Override
-	    public EventSourceIdSelector createEventSourceIdSelector(String expression) {
-	        return new CascadedEventSourceIdSelector(
-	                this.preSelector, this.selectorFactory.createEventSourceIdSelector(expression));
-	    }
-	}
-	
-	protected static class CascadedEventSourceIdSelector implements EventSourceIdSelector {
-	    
-	    private final EventSourceIdSelector preSelector;
-	    private final EventSourceIdSelector postSelector;
-	    
-	    public CascadedEventSourceIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post) {
-            this.preSelector = pre;
-            this.postSelector = post;
-        }
-	    
-	    @Override
-	    public boolean matches(EventSourceId sourceId) {
-	        return this.preSelector.matches(sourceId) && this.postSelector.matches(sourceId);
-	    }
-	}
+        
+        // --- this is an indirect, recursive call ---
+        return this.collectTargetsFrom(nestedTargetProvider, cascadedSelectorFactory);
+    }
 }

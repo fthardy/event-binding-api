@@ -7,7 +7,8 @@ import java.util.List;
 
 /**
  * Represents an identifier for an event source object.<br/>
- * An event source identifier consist of one or more names.
+ * An event source identifier consist of one or more names. Each name has to
+ * conform to the naming rules of Java identifiers.
  * 
  * @author Frank Hardy
  */

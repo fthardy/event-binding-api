@@ -1,6 +1,7 @@
 package de.javax.util.eventbinding.spi.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.javax.util.eventbinding.spi.EventSourceId;
@@ -12,40 +13,66 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelector;
  * @author Frank Hardy
  */
 public class DefaultEventSourceIdSelector implements EventSourceIdSelector {
-
-    private static List<String> splitExpressionIntoSegments(String expression) {
-        if (expression == null || expression.isEmpty()) {
-            throw new IllegalArgumentException("Undefined event source identifier pattern expression!");
+    
+    static List<String> splitExpression(String expression) {
+        assert expression != null;
+        
+        boolean valid = true;
+        List<String> parts = Arrays.asList(expression.split("\\" + SEPARATOR));
+        for (int i = 0; i < (parts.size() - 1) && valid; i++) {
+            valid = isValidPart(parts.get(i));
         }
-        return Arrays.asList(expression.split("."));
+        
+        if (valid) {
+            String lastPart = parts.get(parts.size() - 1);
+            valid = lastPart.equals(WILDCARD) || isValidPart(lastPart);
+        }
+        
+        if (!valid) {
+            throw new IllegalArgumentException("Invalid event source identifier selector expression: " + expression);
+        }
+            
+        return parts;
+    }
+    
+    static boolean isValidPart(String part) {
+        if (part.isEmpty()) {
+            return false;
+        }
+        boolean valid = Character.isJavaIdentifierStart(part.charAt(0));
+        if (valid && part.length() > 1) {
+            for (int i = 1; i < part.length() && valid; i++) {
+                valid = Character.isJavaIdentifierPart(part.charAt(i));
+            }
+        }
+        return valid;
     }
 
-    private final List<String> names;
+    private final List<String> parts;
 
     /**
-     * Create a new event source identifier reference.
+     * Create a new instance of this event source identifier selector.
      * 
      * @param expression
-     *            the expression of the source identifier.
+     *            the selector expression.
      */
     public DefaultEventSourceIdSelector(String expression) {
-        this(splitExpressionIntoSegments(expression));
-    }
-
-    private DefaultEventSourceIdSelector(List<String> names) {
-        this.names = names;
+        this.parts = Collections.unmodifiableList(splitExpression(expression));
     }
 
     @Override
     public boolean matches(EventSourceId sourceId) {
-        if (this.refersToEventSourceProvider()) {
-            return this.names.equals(sourceId.getNames().subList(0, sourceId.getNames().size() - 1));
+        boolean match = false;
+        if (this.parts.get(this.parts.size() - 1).equals(WILDCARD)) {
+            if (this.parts.size() == 1) {
+                match = true;
+            } else {
+                match = this.parts.subList(0, this.parts.size() - 1).equals(
+                        sourceId.getNames().subList(0, sourceId.getNames().size() - 1));
+            }
         } else {
-            return this.names.equals(sourceId.getNames());
+            match = this.parts.equals(sourceId.getNames());
         }
-    }
-    
-    private boolean refersToEventSourceProvider() {
-        return "*".equals(this.names.get(this.names.size()- 1));
+        return match;
     }
 }

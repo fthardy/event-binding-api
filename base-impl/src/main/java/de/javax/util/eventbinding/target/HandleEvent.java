@@ -24,5 +24,5 @@ public @interface HandleEvent {
      * @return the expression that defines from which event source(s) the event
      *         is expected.
      */
-    String from() default "";
+    String from() default "*";
 }
