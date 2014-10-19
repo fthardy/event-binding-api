@@ -19,5 +19,5 @@ public interface EventSourceProvider {
      * @return <code>true</code> if at least one event source has been bound to
      *         the given event target.
      */
-    boolean bindTargetToSources(EventTarget eventTargets);
+    boolean bindTargetToSources(EventTarget eventTarget);
 }
