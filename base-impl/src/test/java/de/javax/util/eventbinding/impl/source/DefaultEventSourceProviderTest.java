@@ -1,63 +1,82 @@
 package de.javax.util.eventbinding.impl.source;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import de.javax.util.eventbinding.impl.source.testmodel.AddressEditorGui;
+import de.javax.util.eventbinding.impl.source.testmodel.ContactEditorGui;
+import de.javax.util.eventbinding.impl.source.testmodel.PersonEditorGui;
+import de.javax.util.eventbinding.impl.testmodel.ButtonClickEvent;
+import de.javax.util.eventbinding.impl.testmodel.CalendarChangeEvent;
+import de.javax.util.eventbinding.impl.testmodel.TextChangeEvent;
+import de.javax.util.eventbinding.spi.EventDispatcher;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventSourceProvider;
+import de.javax.util.eventbinding.spi.EventTarget;
+import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceProvider;
+import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
 
 public class DefaultEventSourceProviderTest {
 
-    private TestEventSourceProvider testEventSourceProvider;
+    private AddressEditorGui adressEditorGui;
+    private PersonEditorGui personEditorGui;
+    private ContactEditorGui contactEditorGui;
     private EventSourceProvider eventSourceProvider;
+    
+    private EventDispatcher eventDispatcher;
 
     @Before
     public void prepare() throws Exception {
-        testEventSourceProvider = new TestEventSourceProvider();
-        eventSourceProvider = new DefaultEventSourceProvider(testEventSourceProvider);
-    }
-
-    @Test
-    public void findEventSourceByType() throws Exception {
-        /*
-        Set<EventSource> eventSources = eventSourceProvider.findEventSourcesByType(TestEvent.class);
-        Assert.assertEquals(4, eventSources.size());
-        */
+        adressEditorGui = new AddressEditorGui();
+        personEditorGui = new PersonEditorGui();
+        contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
+        eventSourceProvider = new DefaultEventSourceProvider(contactEditorGui);
+        eventDispatcher = Mockito.mock(EventDispatcher.class);
     }
 
     @Test
     public void findEventSourceById() throws Exception {
-        /*
-        EventSource eventSource = eventSourceProvider.findEventSource("firstEventSource", TestEvent.class);
-        Assert.assertNotNull(eventSource);
-        eventSource = eventSourceProvider.findEventSource("secondEventSource", TestEvent.class);
-        Assert.assertNotNull(eventSource);
-        eventSource = eventSourceProvider.findEventSource("nestedProvider.firstEventSource", TestEvent.class);
-        Assert.assertNotNull(eventSource);
-        eventSource = eventSourceProvider.findEventSource("nestedProvider.secondEventSource", TestEvent.class);
-        Assert.assertNotNull(eventSource);
-        eventSource = eventSourceProvider.findEventSource("noEventSource", TestEvent.class);
-        Assert.assertNull(eventSource);
-        */
-    }
+        checkBoundSources("personEditor.firstNameField", TextChangeEvent.class, 1);
+        checkBoundSources("personEditor.lastNameField", TextChangeEvent.class, 1);
+        checkBoundSources("personEditor.birthDateField", CalendarChangeEvent.class, 1);
+        
+        checkBoundSources("personEditor.birthDateField", TextChangeEvent.class, 0);
+        
+        checkBoundSources("addressEditor.streetField", TextChangeEvent.class, 1);
+        checkBoundSources("addressEditor.zipField", TextChangeEvent.class, 1);
+        checkBoundSources("addressEditor.cityField", TextChangeEvent.class, 1);
 
+        checkBoundSources("okButton", ButtonClickEvent.class, 1);
+        checkBoundSources("cancelButton", ButtonClickEvent.class, 1);
+    }    
+    
     @Test
-    public void processEvent() throws Exception {
-        /*
-        EventSource eventSource = eventSourceProvider.findEventSource("firstEventSource", TestEvent.class);
-        EventDispatcher dispatcher = new EventDispatcher() {
-            
-            @Override
-            public void dispatchEvent(Object event) {
-                System.out.println(event);
-            }
-        };
-        eventSource.register(dispatcher);
-        testEventSourceProvider.firstEventSource.fireTestEvent(new TestEvent());
-        Thread.sleep(1000);
-        eventSource.unregisterEventDispatcher();
-        testEventSourceProvider.firstEventSource.fireTestEvent(new TestEvent());
-        Thread.sleep(1000);
-        */
+    public void findEventSourceByWildcard() throws Exception {
+        checkBoundSources("personEditor.*", TextChangeEvent.class, 2);
+        checkBoundSources("personEditor.*", CalendarChangeEvent.class, 1);
+        checkBoundSources("addressEditor.*", TextChangeEvent.class, 3);
+        checkBoundSources("*", TextChangeEvent.class, 5);
+        checkBoundSources("*", CalendarChangeEvent.class, 1);
+        checkBoundSources("*", ButtonClickEvent.class, 2);
+    }
+    
+    
+    private void checkBoundSources(String eventSourceIdSelectorAsString, Class<?> eventType, int expectedNumberOfBoundSources) {
+        EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorAsString);
+        EventTarget eventTarget = new DefaultEventTarget(eventSourceIdSelector, eventType, eventDispatcher);
+        if(expectedNumberOfBoundSources>0) {
+            Assert.assertTrue(eventSourceProvider.bindTargetToSources(eventTarget));
+            Assert.assertEquals(expectedNumberOfBoundSources, eventTarget.getBoundSources().size());
+        } else {
+            Assert.assertFalse(eventSourceProvider.bindTargetToSources(eventTarget));
+        }
+        if(!eventTarget.getBoundSources().isEmpty()) {
+            eventTarget.unbindFromSources();
+        }
+        Assert.assertEquals(0, eventTarget.getBoundSources().size());
     }
 }
