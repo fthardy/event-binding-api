@@ -64,12 +64,12 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
         if (this.allCandidates == null) {
             this.allCandidates = new HashSet<EventSourceCandidate>();
             this.allCandidates.addAll(
-                    this.findEventSourceCandidates(this.source, this.source.getClass(), Collections.EMPTY_LIST, null));
+                    this.findEventSources(this.source, this.source.getClass(), Collections.EMPTY_LIST, null));
         }
         return this.allCandidates;
     }
 
-    private Set<EventSourceCandidate> findEventSourceCandidates(
+    private Set<EventSourceCandidate> findEventSources(
             Object source, Class<?> sourceClass, List<Field> tree, EventSourceId parentId) {
         Set<EventSourceCandidate> collectedSources = new HashSet<EventSourceCandidate>();
         Field[] declaredFields = sourceClass.getDeclaredFields();
@@ -77,7 +77,6 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
             EventSourceId eventSourceFieldId = getEventSourceId(declaredField, parentId);
             Object fieldValue = getFieldValue(declaredField, source);
             if (eventSourceFieldId != null && fieldValue != null) {
-                // TODO care about alias
                 collectedSources.add(createEventSourceObject(
                         fieldValue, eventSourceFieldId, tree, declaredField));
             }
@@ -86,7 +85,7 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
             if (eventSourceProviderPrefix != null && fieldValue != null) {
                 List<Field> fields = new ArrayList<Field>(tree);
                 fields.add(declaredField);
-                collectedSources.addAll(findEventSourceCandidates(
+                collectedSources.addAll(findEventSources(
                         fieldValue,
                         declaredField.getType(),
                         fields,
