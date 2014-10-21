@@ -6,7 +6,7 @@ import java.util.ServiceLoader;
 /**
  * Factory providing all {@link EventListenerProvider} available.
  * @author Matthias Hanisch
- *
+ * @TODO: MATHAN move to DefaultEventSourceProvider to avoid static declarations
  */
 public class EventListenerProviderFactory {
 

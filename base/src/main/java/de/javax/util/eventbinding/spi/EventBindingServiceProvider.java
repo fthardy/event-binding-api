@@ -24,7 +24,7 @@ public interface EventBindingServiceProvider {
 	 * 
 	 * @return a new event source provider instance.
 	 */
-	EventSourceProvider createEventSourceProvider(Object source);
+	EventSourceProvider createEventSourceProvider();
 	
 	/**
 	 * Create a new event binding context instance.

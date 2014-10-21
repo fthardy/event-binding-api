@@ -26,19 +26,12 @@ import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
  */
 public class DefaultEventSourceProvider implements EventSourceProvider {
 
-    private final Object source;
-    private Set<EventSourceCandidate> allCandidates;
-
-    public DefaultEventSourceProvider(Object source) {
-        if (source == null) {
-            throw new NullPointerException("Undefined source!");
-        }
-        this.source = source;
+    public DefaultEventSourceProvider() {
     }
     
     @Override
-    public boolean bindTargetToSources(final EventTarget eventTarget) {
-        Filter<EventSourceCandidate> filter = new Filter<EventSourceCandidate>(getEventSourceCandidates())
+    public boolean bindTargetToSources(Object source, final EventTarget eventTarget) {
+        Filter<EventSourceCandidate> filter = new Filter<EventSourceCandidate>(getEventSourceCandidates(source))
                 .filter(new Predicate<EventSourceCandidate>() {
                     @Override
                     public boolean apply(EventSourceCandidate element) {
@@ -60,13 +53,12 @@ public class DefaultEventSourceProvider implements EventSourceProvider {
     }
 
     @SuppressWarnings("unchecked")
-    private Collection<EventSourceCandidate> getEventSourceCandidates() {
-        if (this.allCandidates == null) {
-            this.allCandidates = new HashSet<EventSourceCandidate>();
-            this.allCandidates.addAll(
-                    this.findEventSources(this.source, this.source.getClass(), Collections.EMPTY_LIST, null));
-        }
-        return this.allCandidates;
+    private Collection<EventSourceCandidate> getEventSourceCandidates(Object source) {
+        //TODO cache?
+        Set<EventSourceCandidate> allCandidates;
+        allCandidates = new HashSet<EventSourceCandidate>();
+        allCandidates.addAll(this.findEventSources(source, source.getClass(), Collections.EMPTY_LIST, null));
+        return allCandidates;
     }
 
     private Set<EventSourceCandidate> findEventSources(

@@ -44,6 +44,16 @@ public class DefaultEventListenerProvider implements EventListenerProvider {
         return null;
     }
 
+    /**
+     * Returns a Method of the given eventSourceType with a method name matching the given regular expression and
+     * having a single method parameter of the given eventType.
+     * @param eventSourceType The type of the event source object.
+     * @param eventType The type of the event which should be method parameter type also.
+     * @param methodNameRegEx The name of the method to find. (e.g. &quot;add.+Listener&quot; can be used to find
+     * regular methods adding listener instances)
+     * @return A Method object if there is exactly one method matching all criteria otherwise <code>null</code> is
+     * returned.
+     */
     private Method findListenerMethod(Class<?> eventSourceType, Class<?> eventType, String methodNameRegEx) {
         Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(eventSourceType.getMethods())))
                 .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
@@ -55,6 +65,13 @@ public class DefaultEventListenerProvider implements EventListenerProvider {
         return null;
     }
     
+    /**
+     * Returns a Method of the given listenerType with single method parameter of the given eventType.
+     * @param listenerType The type of the event listener.
+     * @param eventType The type of the event which should be method parameter type also.
+     * @return A Method object if there is exactly one method matching all criteria otherwise <code>null</code>
+     * is returned.
+     */
     private Method findEventMethod(Class<?> listenerType, Class<?> eventType) {
         Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(listenerType.getMethods())))
                 .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))

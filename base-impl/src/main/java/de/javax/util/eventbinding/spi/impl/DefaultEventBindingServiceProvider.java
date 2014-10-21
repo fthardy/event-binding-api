@@ -28,8 +28,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
 	}
 
 	@Override
-	public EventSourceProvider createEventSourceProvider(Object sourceProvider) {
-		return new DefaultEventSourceProvider(sourceProvider);
+	public EventSourceProvider createEventSourceProvider() {
+		return new DefaultEventSourceProvider();
 	}
 
 	@Override

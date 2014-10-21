@@ -53,7 +53,6 @@ public class DefaultEventBinder implements EventBinder {
 	 */
 	@Override
 	public EventBinding bind(Object source, Object target) throws EventBindingException {
-		EventSourceProvider eventSourceProvider = this.serviceProvider.createEventSourceProvider(source);
 		
 		Set<EventTarget> foundTargets = this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(target);
 		if (foundTargets == null || foundTargets.isEmpty()) {
@@ -61,7 +60,7 @@ public class DefaultEventBinder implements EventBinder {
 		}
 		
 		return this.serviceProvider.createEventBinding(
-				source, target, this.bindTargetsToSources(foundTargets, eventSourceProvider));
+				source, target, this.bindTargetsToSources(foundTargets, source));
 	}
 	
 	/**
@@ -92,12 +91,12 @@ public class DefaultEventBinder implements EventBinder {
 	 * 
 	 * @return the set of bound event targets. Never <code>null</code>.
 	 */
-	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, EventSourceProvider sourceProvider) {
+	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Object source) {
 		Set<EventTarget> boundTargets = new HashSet<EventTarget>();
 		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		for (EventTarget eventTarget : eventTargets) {
-			if (sourceProvider.bindTargetToSources(eventTarget)) {
+			if (this.serviceProvider.createEventSourceProvider().bindTargetToSources(source, eventTarget)) {
 				boundTargets.add(eventTarget);
 			} else if (this.strictBindingMode) {
 				unboundTargets.add(eventTarget);

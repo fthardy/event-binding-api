@@ -34,7 +34,7 @@ public class DefaultEventSourceProviderTest {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceProvider = new DefaultEventSourceProvider(contactEditorGui);
+        eventSourceProvider = new DefaultEventSourceProvider();
         eventDispatcher = Mockito.mock(EventDispatcher.class);
     }
 
@@ -69,10 +69,10 @@ public class DefaultEventSourceProviderTest {
         EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorAsString);
         EventTarget eventTarget = new DefaultEventTarget(eventSourceIdSelector, eventType, eventDispatcher);
         if(expectedNumberOfBoundSources>0) {
-            Assert.assertTrue(eventSourceProvider.bindTargetToSources(eventTarget));
+            Assert.assertTrue(eventSourceProvider.bindTargetToSources(contactEditorGui, eventTarget));
             Assert.assertEquals(expectedNumberOfBoundSources, eventTarget.getBoundSources().size());
         } else {
-            Assert.assertFalse(eventSourceProvider.bindTargetToSources(eventTarget));
+            Assert.assertFalse(eventSourceProvider.bindTargetToSources(contactEditorGui, eventTarget));
         }
         if(!eventTarget.getBoundSources().isEmpty()) {
             eventTarget.unbindFromSources();
