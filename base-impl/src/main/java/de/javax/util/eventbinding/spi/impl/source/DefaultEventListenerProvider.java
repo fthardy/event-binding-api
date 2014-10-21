@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import de.javax.util.eventbinding.source.EventListenerAdapter;
+import de.javax.util.eventbinding.source.EventListenerProvider;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.MethodParameterTypeHasEventMethodForTypePredicate;
 import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodNamePredicate;

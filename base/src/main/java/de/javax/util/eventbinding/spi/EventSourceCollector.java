@@ -6,7 +6,7 @@ package de.javax.util.eventbinding.spi;
  * 
  * @author Frank Hardy
  */
-public interface EventSourceProvider {
+public interface EventSourceCollector {
 
     /**
      * Bind the given target to the event sources of the receiving event source

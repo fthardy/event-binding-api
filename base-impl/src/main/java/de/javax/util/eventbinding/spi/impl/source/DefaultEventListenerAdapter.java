@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import de.javax.util.eventbinding.source.InternalEventBindingException;
+import de.javax.util.eventbinding.source.EventListenerAdapter;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 
 /**
@@ -128,11 +128,11 @@ public class DefaultEventListenerAdapter implements EventListenerAdapter {
         try {
             this.addMethod.invoke(this.eventSource, this.listener);
         } catch (IllegalAccessException e) {
-            throw new InternalEventBindingException("registering event listener failed", e);
+            throw new EventSourceAccessException("registering event listener failed", e);
         } catch (IllegalArgumentException e) {
-            throw new InternalEventBindingException("registering event listener failed", e);
+            throw new EventSourceAccessException("registering event listener failed", e);
         } catch (InvocationTargetException e) {
-            throw new InternalEventBindingException("registering event listener failed", e);
+            throw new EventSourceAccessException("registering event listener failed", e);
         }
     }
 
@@ -146,11 +146,11 @@ public class DefaultEventListenerAdapter implements EventListenerAdapter {
             try {
                 this.removeMethod.invoke(eventSource, this.listener);
             } catch (IllegalAccessException e) {
-                throw new InternalEventBindingException("unregistering event listener failed", e);
+                throw new EventSourceAccessException("unregistering event listener failed", e);
             } catch (IllegalArgumentException e) {
-                throw new InternalEventBindingException("unregistering event listener failed", e);
+                throw new EventSourceAccessException("unregistering event listener failed", e);
             } catch (InvocationTargetException e) {
-                throw new InternalEventBindingException("unregistering event listener failed", e);
+                throw new EventSourceAccessException("unregistering event listener failed", e);
             }
             this.listener = null;
         }

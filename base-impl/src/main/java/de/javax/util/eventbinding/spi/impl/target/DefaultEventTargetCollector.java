@@ -81,7 +81,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
                         field, targetProvider, targetProviderClass, selectorFactory));
             }
         } catch (Exception e) {
-            throw new EventTargetProviderAccessException(
+            throw new EventTargetAccessException(
                     "Failed to access field in class '" + targetProviderClass + "'!", e);
         }
         return targets;
@@ -188,7 +188,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
         field.setAccessible(true);
         Object nestedTargetProvider = field.get(targetProvider);
         if (nestedTargetProvider == null) {
-            throw new EventTargetProviderAccessException(
+            throw new EventTargetAccessException(
                     "The value of field '" + field.toGenericString() + "' in class '" + 
                             targetProviderClass + "' is null!");
         }

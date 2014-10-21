@@ -14,10 +14,10 @@ import de.javax.util.eventbinding.impl.testmodel.CalendarChangeEvent;
 import de.javax.util.eventbinding.impl.testmodel.TextChangeEvent;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
-import de.javax.util.eventbinding.spi.EventSourceProvider;
+import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelector;
-import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceProvider;
+import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
 
 public class DefaultEventSourceProviderTest {
@@ -25,7 +25,7 @@ public class DefaultEventSourceProviderTest {
     private AddressEditorGui adressEditorGui;
     private PersonEditorGui personEditorGui;
     private ContactEditorGui contactEditorGui;
-    private EventSourceProvider eventSourceProvider;
+    private EventSourceCollector eventSourceProvider;
     
     private EventDispatcher eventDispatcher;
 
@@ -34,7 +34,7 @@ public class DefaultEventSourceProviderTest {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceProvider = new DefaultEventSourceProvider();
+        eventSourceProvider = new DefaultEventSourceCollector();
         eventDispatcher = Mockito.mock(EventDispatcher.class);
     }
 

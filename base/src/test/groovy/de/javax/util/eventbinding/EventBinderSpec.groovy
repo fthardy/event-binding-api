@@ -2,7 +2,7 @@ package de.javax.util.eventbinding
 
 import spock.lang.Specification
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider
-import de.javax.util.eventbinding.spi.EventSourceProvider
+import de.javax.util.eventbinding.spi.EventSourceCollector
 import de.javax.util.eventbinding.spi.EventTarget
 import de.javax.util.eventbinding.spi.EventTargetCollector
 
@@ -12,7 +12,7 @@ class EventBinderSpec extends Specification {
 	
 	private EventBindingServiceProvider serviceProviderMock = Mock()
 	private EventTargetCollector targetCollectorMock = Mock()
-	private EventSourceProvider eventSourceProviderMock = Mock()
+	private EventSourceCollector eventSourceProviderMock = Mock()
 	
 	def setup() {
 		this.eventBinder = new DefaultEventBinder(this.serviceProviderMock)
@@ -38,7 +38,7 @@ class EventBinderSpec extends Specification {
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
 		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceProvider(sourceProvider) >> this.eventSourceProviderMock
+		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
 		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
@@ -73,7 +73,7 @@ class EventBinderSpec extends Specification {
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
 		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceProvider(sourceProvider) >> this.eventSourceProviderMock
+		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
 		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
@@ -108,7 +108,7 @@ class EventBinderSpec extends Specification {
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
 		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceProvider(sourceProvider) >> this.eventSourceProviderMock
+		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
 		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
@@ -142,7 +142,7 @@ class EventBinderSpec extends Specification {
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 
 		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceProvider(sourceProvider) >> this.eventSourceProviderMock
+		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
 		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock

@@ -3,6 +3,9 @@ package de.javax.util.eventbinding.spi.impl.source;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import de.javax.util.eventbinding.source.EventListenerAdapter;
+import de.javax.util.eventbinding.source.EventListenerProvider;
+
 /**
  * Factory providing all {@link EventListenerProvider} available.
  * @author Matthias Hanisch

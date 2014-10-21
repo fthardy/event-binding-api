@@ -8,10 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.javax.util.eventbinding.source.NestedEventSourceAlias;
+import de.javax.util.eventbinding.source.EventListenerAdapter;
 import de.javax.util.eventbinding.spi.EventSource;
+import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
-import de.javax.util.eventbinding.spi.EventSourceProvider;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
@@ -20,13 +20,13 @@ import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
  * This implementation of an event source provider is based on sources which
  * event source components are annotated with
  * {@link de.javax.util.eventbinding.source.EventSource} ,
- * {@link EventSourceProvider} and {@link NestedEventSourceAlias}.
+ * {@link EventSourceCollector} and {@link NestedEventSourceAlias}.
  * 
  * @author Matthias Hanisch
  */
-public class DefaultEventSourceProvider implements EventSourceProvider {
+public class DefaultEventSourceCollector implements EventSourceCollector {
 
-    public DefaultEventSourceProvider() {
+    public DefaultEventSourceCollector() {
     }
     
     @Override

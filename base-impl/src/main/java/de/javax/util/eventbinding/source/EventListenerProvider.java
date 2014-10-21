@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.impl.source;
+package de.javax.util.eventbinding.source;
 
 
 /**

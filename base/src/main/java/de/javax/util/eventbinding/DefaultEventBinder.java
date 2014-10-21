@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
-import de.javax.util.eventbinding.spi.EventSourceProvider;
+import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
@@ -96,7 +96,7 @@ public class DefaultEventBinder implements EventBinder {
 		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		for (EventTarget eventTarget : eventTargets) {
-			if (this.serviceProvider.createEventSourceProvider().bindTargetToSources(source, eventTarget)) {
+			if (this.serviceProvider.createEventSourceCollector().bindTargetToSources(source, eventTarget)) {
 				boundTargets.add(eventTarget);
 			} else if (this.strictBindingMode) {
 				unboundTargets.add(eventTarget);

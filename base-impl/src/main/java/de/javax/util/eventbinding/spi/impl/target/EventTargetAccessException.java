@@ -9,15 +9,15 @@ import de.javax.util.eventbinding.EventBindingException;
  * 
  * @author Frank Hardy
  */
-public class EventTargetProviderAccessException extends EventBindingException {
+public class EventTargetAccessException extends EventBindingException {
 
     private static final long serialVersionUID = 3137888076154365395L;
     
-    public EventTargetProviderAccessException(String message) {
+    public EventTargetAccessException(String message) {
         super(message);
     }
 
-    public EventTargetProviderAccessException(String message, Throwable cause) {
+    public EventTargetAccessException(String message, Throwable cause) {
         super(message, cause);
     }
 }

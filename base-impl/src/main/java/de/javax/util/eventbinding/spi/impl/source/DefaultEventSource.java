@@ -1,5 +1,6 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
+import de.javax.util.eventbinding.source.EventListenerAdapter;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventTarget;
 
