@@ -8,6 +8,21 @@ package de.javax.util.eventbinding.spi;
 public interface EventSource {
 
     /**
+     * @return the identifier of the receiving event source.
+     */
+    EventSourceId getId();
+
+    /**
+     * Bind a given event target to the receiving event source.
+     * 
+     * @param eventTarget
+     *            the event target to be bound to the source.
+     *            
+     * @return <code>true</code> if the target has been bound to the receiving event source.
+     */
+    boolean bindTo(EventTarget eventTarget);
+
+    /**
      * Unbind the given event target from the receiving event source.
      * 
      * @param target

@@ -17,9 +17,6 @@ public interface EventSourceCollector {
      *            event source provider.
      * @param eventSourceProvider
      *            the event source provider object.
-     * 
-     * @return <code>true</code> if at least one event source has been bound to
-     *         the given event target.
      */
-    boolean bindTargetToSources(EventTarget eventTarget, Object eventSourceProvider);
+    void bindTargetToSources(EventTarget eventTarget, Object eventSourceProvider);
 }

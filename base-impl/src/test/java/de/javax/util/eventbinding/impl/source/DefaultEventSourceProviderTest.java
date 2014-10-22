@@ -70,10 +70,12 @@ public class DefaultEventSourceProviderTest {
         EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorAsString);
         EventTarget eventTarget = new DefaultEventTarget(eventSourceIdSelector, eventType, eventDispatcher);
         if (expectedNumberOfBoundSources > 0) {
-            Assert.assertTrue(eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui));
+            eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui);
+            Assert.assertFalse(eventTarget.getBoundSources().isEmpty());
             Assert.assertEquals(expectedNumberOfBoundSources, eventTarget.getBoundSources().size());
         } else {
-            Assert.assertFalse(eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui));
+            eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui);
+            Assert.assertTrue(eventTarget.getBoundSources().isEmpty());
         }
         if (!eventTarget.getBoundSources().isEmpty()) {
             eventTarget.unbindFromSources();

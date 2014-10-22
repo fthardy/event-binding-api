@@ -29,18 +29,18 @@ public interface EventTarget {
     EventDispatcher getEventDispatcher();
 
     /**
-     * @return the unmodifieable set of the bound event sources.
+     * Add a bound event source to the receiving event target.
+     * 
+     * @param source
+     *            the bound event source.
      */
-    Set<EventSource> getBoundSources();
+    void addBoundSource(EventSource source);
 
     /**
-     * Set the event sources which have been bound to the receiving event
-     * target.
-     * 
-     * @param boundSources
-     *            the set of the bound sources.
+     * @return the set of the bound event sources. The set is empty when no
+     *         sources are bound to the receiving event target.
      */
-    void setBoundSources(Set<EventSource> boundSources);
+    Set<EventSource> getBoundSources();
 
     /**
      * Unbind the receiving event target from all bound event sources.
