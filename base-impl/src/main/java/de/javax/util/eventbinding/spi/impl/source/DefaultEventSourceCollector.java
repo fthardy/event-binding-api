@@ -4,11 +4,16 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.javax.util.eventbinding.source.EventListenerAdapter;
+import de.javax.util.eventbinding.source.EventListenerProvider;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
@@ -25,10 +30,10 @@ import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
  * @author Matthias Hanisch
  */
 public class DefaultEventSourceCollector implements EventSourceCollector {
-
-    public DefaultEventSourceCollector() {
-    }
     
+    private static final String PROPERY_USE_CACHE ="DefaultEventSourceCollector.useCache";
+    private Map<Object,Set<EventSourceCandidate>> cache;
+
     @Override
     public boolean bindTargetToSources(Object source, final EventTarget eventTarget) {
         Filter<EventSourceCandidate> filter = new Filter<EventSourceCandidate>(getEventSourceCandidates(source))
@@ -41,7 +46,7 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
                 });
         Set<EventSource> boundSources = new HashSet<EventSource>();
         for(EventSourceCandidate eventSourceObject:filter.getElements()) {
-            EventListenerAdapter adapter = EventListenerProviderFactory.createAdapter(eventSourceObject.getEventSource(), eventTarget.getEventType());
+            EventListenerAdapter adapter = createAdapter(eventSourceObject.getEventSource(), eventTarget.getEventType());
             if(adapter!=null) {
                 EventSource eventSource = new DefaultEventSource(adapter);
                 adapter.registerEventListener(eventTarget.getEventDispatcher());
@@ -54,11 +59,21 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 
     @SuppressWarnings("unchecked")
     private Collection<EventSourceCandidate> getEventSourceCandidates(Object source) {
-        //TODO cache?
-        Set<EventSourceCandidate> allCandidates;
-        allCandidates = new HashSet<EventSourceCandidate>();
-        allCandidates.addAll(this.findEventSources(source, source.getClass(), Collections.EMPTY_LIST, null));
-        return allCandidates;
+        Set<EventSourceCandidate> candidates = null;
+        if(Boolean.getBoolean(PROPERY_USE_CACHE)) {
+            if(cache == null) {
+                cache = new HashMap<Object, Set<EventSourceCandidate>>();
+            }
+            candidates = cache.get(source);
+        }
+        if(candidates == null) {
+            candidates = new HashSet<EventSourceCandidate>();
+            candidates.addAll(this.findEventSources(source, source.getClass(), Collections.EMPTY_LIST, null));
+            if(Boolean.getBoolean(PROPERY_USE_CACHE)) {
+                cache.put(source, candidates);
+            }
+        }
+        return candidates;
     }
 
     private Set<EventSourceCandidate> findEventSources(
@@ -143,6 +158,35 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
             newId = new EventSourceId(names);
         }
         return newId;
+    }
+
+    /**
+     * Creates an EventListenerAdapter handling events of the given type for the given event source by
+     * checking all {@link getEventListenerAdapterProviders providers}.
+     * @param eventSource
+     * @param eventType
+     * @return An instance of EventListenerAdapter or <code>null</code> if none of the providers
+     * available supports event type or event source-
+     */
+    public EventListenerAdapter createAdapter(Object eventSource, Class<?> eventType) {
+        Iterator<EventListenerProvider> it = getEventListenerAdapterProviders();
+        while(it.hasNext()) {
+            EventListenerAdapter adapter = it.next().createEventListenerAdapter(eventSource, eventType);
+            if(adapter!=null) {
+                // TODO cache?
+                return adapter;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retuns an Iterator of all available {@link EventListenerProvider}.
+     * @return
+     */
+    public Iterator<EventListenerProvider> getEventListenerAdapterProviders() {
+        ServiceLoader<EventListenerProvider> serviceLoader = ServiceLoader.load(EventListenerProvider.class);
+        return serviceLoader.iterator();
     }
 
     static class EventSourceCandidate {
