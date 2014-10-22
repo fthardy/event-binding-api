@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
-import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
@@ -36,13 +35,12 @@ public class DefaultEventBinder implements EventBinder {
 	}
 
 	/**
-	 * Create an event binding between a given event source and target.
+	 * Create an event binding between a given event source provider and event target provider.
 	 * 
-	 * @param source
-	 *            the object representing a source of events.
-	 * @param target
-	 *            the object representing the target of the events from the
-	 *            source.
+	 * @param sourceProvider
+	 *            the provider of event sources for binding.
+	 * @param targetProvider
+	 *            the provider of event targets for binding.
 	 * 
 	 * @return an object which represents the event binding between the given
 	 *         source and target object.
@@ -52,15 +50,15 @@ public class DefaultEventBinder implements EventBinder {
 	 *             reason.
 	 */
 	@Override
-	public EventBinding bind(Object source, Object target) throws EventBindingException {
-		
-		Set<EventTarget> foundTargets = this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(target);
+	public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
+		Set<EventTarget> foundTargets = 
+		        this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(targetProvider);
 		if (foundTargets == null || foundTargets.isEmpty()) {
 			throw new NoEventTargetsFoundException();
 		}
 		
 		return this.serviceProvider.createEventBinding(
-				source, target, this.bindTargetsToSources(foundTargets, source));
+				sourceProvider, targetProvider, this.bindTargetsToSources(foundTargets, sourceProvider));
 	}
 	
 	/**
@@ -82,21 +80,21 @@ public class DefaultEventBinder implements EventBinder {
 
 	/**
 	 * Implements the process of binding the found event targets to the event
-	 * sources from the source provider.
+	 * sources from the given event source provider object.
 	 * 
 	 * @param eventTargets
 	 *            the found event targets.
 	 * @param sourceProvider
-	 *            the event source provider.
+	 *            the event source provider object.
 	 * 
 	 * @return the set of bound event targets. Never <code>null</code>.
 	 */
-	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Object source) {
+	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Object sourceProvider) {
 		Set<EventTarget> boundTargets = new HashSet<EventTarget>();
 		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		for (EventTarget eventTarget : eventTargets) {
-			if (this.serviceProvider.createEventSourceCollector().bindTargetToSources(source, eventTarget)) {
+			if (this.serviceProvider.getEventSourceCollector().bindTargetToSources(eventTarget, sourceProvider)) {
 				boundTargets.add(eventTarget);
 			} else if (this.strictBindingMode) {
 				unboundTargets.add(eventTarget);

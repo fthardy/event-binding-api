@@ -35,7 +35,7 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
     private Map<Object,Set<EventSourceCandidate>> cache;
 
     @Override
-    public boolean bindTargetToSources(Object source, final EventTarget eventTarget) {
+    public boolean bindTargetToSources(final EventTarget eventTarget, Object source) {
         Filter<EventSourceCandidate> filter = new Filter<EventSourceCandidate>(getEventSourceCandidates(source))
                 .filter(new Predicate<EventSourceCandidate>() {
                     @Override

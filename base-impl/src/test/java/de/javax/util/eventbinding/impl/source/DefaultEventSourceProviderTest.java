@@ -25,8 +25,8 @@ public class DefaultEventSourceProviderTest {
     private AddressEditorGui adressEditorGui;
     private PersonEditorGui personEditorGui;
     private ContactEditorGui contactEditorGui;
-    private EventSourceCollector eventSourceProvider;
-    
+    private EventSourceCollector eventSourceCollector;
+
     private EventDispatcher eventDispatcher;
 
     @Before
@@ -34,7 +34,7 @@ public class DefaultEventSourceProviderTest {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceProvider = new DefaultEventSourceCollector();
+        eventSourceCollector = new DefaultEventSourceCollector();
         eventDispatcher = Mockito.mock(EventDispatcher.class);
     }
 
@@ -43,17 +43,17 @@ public class DefaultEventSourceProviderTest {
         checkBoundSources("personEditor.firstNameField", TextChangeEvent.class, 1);
         checkBoundSources("personEditor.lastNameField", TextChangeEvent.class, 1);
         checkBoundSources("personEditor.birthDateField", CalendarChangeEvent.class, 1);
-        
+
         checkBoundSources("personEditor.birthDateField", TextChangeEvent.class, 0);
-        
+
         checkBoundSources("addressEditor.streetField", TextChangeEvent.class, 1);
         checkBoundSources("addressEditor.zipField", TextChangeEvent.class, 1);
         checkBoundSources("addressEditor.cityField", TextChangeEvent.class, 1);
 
         checkBoundSources("okButton", ButtonClickEvent.class, 1);
         checkBoundSources("cancelButton", ButtonClickEvent.class, 1);
-    }    
-    
+    }
+
     @Test
     public void findEventSourceByWildcard() throws Exception {
         checkBoundSources("personEditor.*", TextChangeEvent.class, 2);
@@ -63,18 +63,19 @@ public class DefaultEventSourceProviderTest {
         checkBoundSources("*", CalendarChangeEvent.class, 1);
         checkBoundSources("*", ButtonClickEvent.class, 2);
     }
-    
-    
-    private void checkBoundSources(String eventSourceIdSelectorAsString, Class<?> eventType, int expectedNumberOfBoundSources) {
+
+    private void checkBoundSources(
+            String eventSourceIdSelectorAsString, Class<?> eventType, int expectedNumberOfBoundSources) {
+        
         EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorAsString);
         EventTarget eventTarget = new DefaultEventTarget(eventSourceIdSelector, eventType, eventDispatcher);
-        if(expectedNumberOfBoundSources>0) {
-            Assert.assertTrue(eventSourceProvider.bindTargetToSources(contactEditorGui, eventTarget));
+        if (expectedNumberOfBoundSources > 0) {
+            Assert.assertTrue(eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui));
             Assert.assertEquals(expectedNumberOfBoundSources, eventTarget.getBoundSources().size());
         } else {
-            Assert.assertFalse(eventSourceProvider.bindTargetToSources(contactEditorGui, eventTarget));
+            Assert.assertFalse(eventSourceCollector.bindTargetToSources(eventTarget, contactEditorGui));
         }
-        if(!eventTarget.getBoundSources().isEmpty()) {
+        if (!eventTarget.getBoundSources().isEmpty()) {
             eventTarget.unbindFromSources();
         }
         Assert.assertEquals(0, eventTarget.getBoundSources().size());
