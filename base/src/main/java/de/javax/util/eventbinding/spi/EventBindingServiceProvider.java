@@ -5,7 +5,7 @@ import java.util.Set;
 import de.javax.util.eventbinding.EventBinding;
 
 /**
- * The service provider interface for the event binding.
+ * The interface definition of the service provider for the event binding.
  *
  * @author Frank Hardy
  */
@@ -17,26 +17,21 @@ public interface EventBindingServiceProvider {
 	EventTargetCollector getEventTargetCollector();
 
 	/**
-	 * Creates a new event source provider for a given source object.
-	 * 
-	 * @param source
-	 *            the object representing a source of events.
-	 * 
-	 * @return a new event source provider instance.
+	 * @return the event source collector instance.
 	 */
-	EventSourceCollector createEventSourceCollector();
+	EventSourceCollector getEventSourceCollector();
 	
 	/**
 	 * Create a new event binding context instance.
 	 * 
-	 * @param source
-	 *            the source object.
-	 * @param target
-	 *            the target object.
+	 * @param sourceProvider
+	 *            the event source provider object.
+	 * @param targetProvider
+	 *            the event target provider object.
 	 * @param boundEventTargets
 	 *            the set of bound event targets.
 	 * 
 	 * @return the new event binding context instance.
 	 */
-	EventBinding createEventBinding(Object source, Object target, Set<EventTarget> boundEventTargets);
+	EventBinding createEventBinding(Object sourceProvider, Object targetProvider, Set<EventTarget> boundEventTargets);
 }

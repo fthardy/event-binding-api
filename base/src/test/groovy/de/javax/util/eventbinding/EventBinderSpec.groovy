@@ -12,7 +12,7 @@ class EventBinderSpec extends Specification {
 	
 	private EventBindingServiceProvider serviceProviderMock = Mock()
 	private EventTargetCollector targetCollectorMock = Mock()
-	private EventSourceCollector eventSourceProviderMock = Mock()
+	private EventSourceCollector eventSourceCollectorMock = Mock()
 	
 	def setup() {
 		this.eventBinder = new DefaultEventBinder(this.serviceProviderMock)
@@ -37,9 +37,6 @@ class EventBinderSpec extends Specification {
 		when:
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
-		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
 
@@ -48,8 +45,9 @@ class EventBinderSpec extends Specification {
 			targetProvider) >> ([eventTargetMock1, eventTargetMock2] as Set)
 			
 		then:'None event target is bound to the source'
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock1) >> false
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock2) >> false
+        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider) >> false
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider) >> false
 				
 		then:
 		UnboundTargetsException e = thrown(UnboundTargetsException)
@@ -72,9 +70,6 @@ class EventBinderSpec extends Specification {
 		when:
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
-		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
 
@@ -83,8 +78,9 @@ class EventBinderSpec extends Specification {
 			([eventTargetMock1, eventTargetMock2] as Set)
 			
 		then:'One event target is bound to the source and the other is not bound'
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock1) >> true
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock2) >> false
+		this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider) >> true
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider) >> false
 		
 		then:
 		UnboundTargetsException e = thrown(UnboundTargetsException)
@@ -107,9 +103,6 @@ class EventBinderSpec extends Specification {
 		when:
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
-		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
 
@@ -118,8 +111,9 @@ class EventBinderSpec extends Specification {
 			targetProvider) >> ([eventTargetMock1, eventTargetMock2] as Set)
 			
 		then:'Both event targets are bound to the source'
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock1) >> true
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock2) >> true
+		this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider) >> true
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider) >> true
 		
 		then:'An event binding container is created with the found and bound event target'
 		this.serviceProviderMock.createEventBinding(sourceProvider, targetProvider,
@@ -141,9 +135,6 @@ class EventBinderSpec extends Specification {
 		when:
 		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.createEventSourceCollector(sourceProvider) >> this.eventSourceProviderMock
-		
 		then:'The target collector is obtained from the service'
 			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
 
@@ -152,8 +143,9 @@ class EventBinderSpec extends Specification {
 			([eventTargetMock1, eventTargetMock2] as Set)
 			
 		then:'One event target is bound to the source and the other is not bound'
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock1) >> true
-        this.eventSourceProviderMock.bindTargetToSources(eventTargetMock2) >> false
+		this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider) >> true
+        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider) >> false
 		
 		then:'An event binding container is created with the found and bound event target'
 		this.serviceProviderMock.createEventBinding(sourceProvider, targetProvider,

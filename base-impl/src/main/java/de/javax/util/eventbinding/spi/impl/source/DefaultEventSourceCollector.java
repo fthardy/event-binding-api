@@ -26,11 +26,8 @@ import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
  */
 public class DefaultEventSourceCollector implements EventSourceCollector {
 
-    public DefaultEventSourceCollector() {
-    }
-    
     @Override
-    public boolean bindTargetToSources(Object source, final EventTarget eventTarget) {
+    public boolean bindTargetToSources(final EventTarget eventTarget, Object source) {
         Filter<EventSourceCandidate> filter = new Filter<EventSourceCandidate>(getEventSourceCandidates(source))
                 .filter(new Predicate<EventSourceCandidate>() {
                     @Override
@@ -41,7 +38,8 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
                 });
         Set<EventSource> boundSources = new HashSet<EventSource>();
         for(EventSourceCandidate eventSourceObject:filter.getElements()) {
-            EventListenerAdapter adapter = EventListenerProviderFactory.createAdapter(eventSourceObject.getEventSource(), eventTarget.getEventType());
+            EventListenerAdapter adapter = EventListenerProviderFactory.createAdapter(
+                    eventSourceObject.getEventSource(), eventTarget.getEventType());
             if(adapter!=null) {
                 EventSource eventSource = new DefaultEventSource(adapter);
                 adapter.registerEventListener(eventTarget.getEventDispatcher());

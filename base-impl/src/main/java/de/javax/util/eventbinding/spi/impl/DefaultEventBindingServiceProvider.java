@@ -21,6 +21,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
 	
 	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
 	        new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory() );
+	
+	private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector();
 
 	@Override
 	public EventTargetCollector getEventTargetCollector() {
@@ -28,8 +30,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
 	}
 
 	@Override
-	public EventSourceCollector createEventSourceCollector() {
-		return new DefaultEventSourceCollector();
+	public EventSourceCollector getEventSourceCollector() {
+		return this.eventSourceCollector;
 	}
 
 	@Override
