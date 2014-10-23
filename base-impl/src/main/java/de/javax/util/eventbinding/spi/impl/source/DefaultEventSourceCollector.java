@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.javax.util.eventbinding.source.EventListenerAdapterFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
@@ -27,9 +28,25 @@ import de.javax.util.eventbinding.spi.impl.reflect.Predicate;
  */
 public class DefaultEventSourceCollector implements EventSourceCollector {
     
-    private static final String PROPERY_USE_CACHE ="DefaultEventSourceCollector.useCache";
+    private static final String PROPERY_USE_CACHE = DefaultEventSourceCollector.class.getSimpleName() + ".useCache";
+    
+    private final EventListenerAdapterFactory listenerAdapterFactory;
+    
     private Map<Object,Set<EventSource>> cache;
 
+    /**
+     * Creates a new instance of this event source collector.
+     * 
+     * @param listenerAdapterFactory
+     *            the listener adapter factory.
+     */
+    public DefaultEventSourceCollector(EventListenerAdapterFactory listenerAdapterFactory) {
+        if (listenerAdapterFactory == null) {
+            throw new NullPointerException("Undefined listener adapter factory!");
+        }
+        this.listenerAdapterFactory = listenerAdapterFactory;
+    }
+    
     @Override
     public void bindTargetToSources(final EventTarget eventTarget, Object eventSourceProvider) {
         Filter<EventSource> matchingEventSources = 
@@ -92,10 +109,8 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
         field.setAccessible(true);  
         try {
             return field.get(object);
-        } catch (IllegalArgumentException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
+        } catch (Exception e) {
+            throw new EventSourceAccessException("Failed to access field!", e);
         } finally {
             field.setAccessible(false);
         }
@@ -121,10 +136,10 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
     }
 
     private EventSource createEventSourceObject(
-            Object source, EventSourceId eventSourceId, List<Field> tree, Field declaredField) {
+            Object eventSourceProvider, EventSourceId eventSourceId, List<Field> tree, Field declaredField) {
         List<Field> fields = new ArrayList<Field>(tree);
         fields.add(declaredField);
-        return new DefaultEventSource(eventSourceId, source);
+        return new DefaultEventSource(eventSourceId, eventSourceProvider, this.listenerAdapterFactory);
     }
 
     private EventSourceId getEventSourceId(Field declaredField, EventSourceId parentId) {

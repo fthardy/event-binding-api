@@ -1,12 +1,10 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 import de.javax.util.eventbinding.source.EventListenerAdapter;
-import de.javax.util.eventbinding.source.EventListenerProvider;
+import de.javax.util.eventbinding.source.EventListenerAdapterFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -22,7 +20,8 @@ public class DefaultEventSource implements EventSource {
 
     private final EventSourceId id;
     private final Object eventSource;
-    private final Map<EventTarget, EventListenerAdapter> targetToListenerAdapterMapping = 
+    private final EventListenerAdapterFactory listenerAdapterFactory;
+    private final Map<EventTarget, EventListenerAdapter> adapterMapping = 
             new HashMap<EventTarget, EventListenerAdapter>();
 
     /**
@@ -34,7 +33,8 @@ public class DefaultEventSource implements EventSource {
      *            the real event source object represented (or proxied) by this
      *            instance.
      */
-    public DefaultEventSource(EventSourceId id, Object eventSource) {
+    public DefaultEventSource(
+            EventSourceId id, Object eventSource, EventListenerAdapterFactory listenerAdapterFactory) {
         if (id == null) {
             throw new NullPointerException("Undefined identifier!");
         }
@@ -43,6 +43,10 @@ public class DefaultEventSource implements EventSource {
             throw new NullPointerException("Undefined event source object!");
         }
         this.eventSource = eventSource;
+        if (listenerAdapterFactory == null) {
+            throw new NullPointerException("Undefinded listener adapter factory!");
+        }
+        this.listenerAdapterFactory = listenerAdapterFactory;
     }
 
     @Override
@@ -52,15 +56,16 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public boolean bindTo(EventTarget eventTarget) {
-        if (this.targetToListenerAdapterMapping.containsKey(eventTarget)) {
+        if (this.adapterMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is already bound to this source!");
         }
         
         boolean bound = false;
-        EventListenerAdapter listenerAdapter = this.createAdapter(this.eventSource, eventTarget.getEventType());
+        EventListenerAdapter listenerAdapter = this.listenerAdapterFactory.createEventListenerAdapter(
+                this.eventSource, eventTarget.getEventType());
         if(listenerAdapter != null) {
             listenerAdapter.registerEventListener(eventTarget.getEventDispatcher());
-            this.targetToListenerAdapterMapping.put(eventTarget, listenerAdapter);
+            this.adapterMapping.put(eventTarget, listenerAdapter);
             eventTarget.addBoundSource(this);
             bound = true;
         }
@@ -69,39 +74,10 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public void unbindFrom(EventTarget eventTarget) {
-        if (!this.targetToListenerAdapterMapping.containsKey(eventTarget)) {
+        if (!this.adapterMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is not bound to this source!");
         }
-        this.targetToListenerAdapterMapping.get(eventTarget).unregisterEventListener();
-        this.targetToListenerAdapterMapping.remove(eventTarget);
-    }
-
-    /**
-     * Creates an EventListenerAdapter handling events of the given type for the given event source by
-     * checking all {@link getEventListenerAdapterProviders providers}.
-     * @param eventSource
-     * @param eventType
-     * @return An instance of EventListenerAdapter or <code>null</code> if none of the providers
-     * available supports event type or event source-
-     */
-    public EventListenerAdapter createAdapter(Object eventSource, Class<?> eventType) {
-        Iterator<EventListenerProvider> it = getEventListenerAdapterProviders();
-        while (it.hasNext()) {
-            EventListenerAdapter adapter = it.next().createEventListenerAdapter(eventSource, eventType);
-            if (adapter != null) {
-                // TODO cache?
-                return adapter;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retuns an Iterator of all available {@link EventListenerProvider}.
-     * @return
-     */
-    public Iterator<EventListenerProvider> getEventListenerAdapterProviders() {
-        ServiceLoader<EventListenerProvider> serviceLoader = ServiceLoader.load(EventListenerProvider.class);
-        return serviceLoader.iterator();
+        this.adapterMapping.get(eventTarget).unregisterEventListener();
+        this.adapterMapping.remove(eventTarget);
     }
 }

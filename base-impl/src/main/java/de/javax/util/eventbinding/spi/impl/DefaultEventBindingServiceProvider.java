@@ -8,6 +8,7 @@ import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
+import de.javax.util.eventbinding.spi.impl.source.DefaultEventListenerAdapterFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
@@ -22,7 +23,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
 	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
 	        new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory() );
 	
-	private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector();
+	private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
+	        new DefaultEventListenerAdapterFactory());
 
 	@Override
 	public EventTargetCollector getEventTargetCollector() {
