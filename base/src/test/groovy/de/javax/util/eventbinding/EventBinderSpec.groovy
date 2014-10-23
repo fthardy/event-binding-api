@@ -1,9 +1,13 @@
 package de.javax.util.eventbinding
 
+import org.spockframework.compiler.model.ThenBlock;
+
 import spock.lang.Specification
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector
+import de.javax.util.eventbinding.spi.EventSourceId
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget
 import de.javax.util.eventbinding.spi.EventTargetCollector
 
@@ -12,223 +16,268 @@ class EventBinderSpec extends Specification {
 	private EventBinder eventBinder;
 	
 	private EventBindingServiceProvider serviceProviderMock = Mock()
-	private EventTargetCollector targetCollectorMock = Mock()
+	private EventTargetCollector eventTargetCollectorMock = Mock()
 	private EventSourceCollector eventSourceCollectorMock = Mock()
 	
 	def setup() {
 		this.eventBinder = new DefaultEventBinder(this.serviceProviderMock)
 	}
     
-    def 'Service provider must be defined'() {
+    def 'No service provider is defined on construction'() {
         when:
         new DefaultEventBinder(null)
         
         then:
         thrown(NullPointerException)
     }
+    
+    def 'No event sources are found'() {
+        given:
+            def targetProvider = new Object()
+            def sourceProvider = new Object()
+            EventSource eventSourceMock = Mock()
+            
+        when:
+            EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
+        
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >> ([] as Set)
+    
+        then:
+            thrown(NoEventSourcesFoundException)
+    }
+    
+    def 'No event targets are found'() {
+        given:
+            def targetProvider = new Object()
+            def sourceProvider = new Object()
+            EventSource eventSourceMock = Mock()
+            
+        when:
+            EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
+        
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >> ([eventSourceMock] as Set)
+            
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventTargetCollector() >> this.eventTargetCollectorMock
+        and:
+            this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> ([] as Set)
+
+        then:
+            thrown(NoEventTargetsFoundException)
+    }
 	
-	def 'None of the found targets could be bound to the source'() {
+	def 'No event targets can be bound to any sources'() {
 		given:
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-		EventTarget eventTargetMock1 = Mock()
-		EventTarget eventTargetMock2 = Mock()
-		EventBinding eventBindingMock = Mock()
-		 
+    		def targetProvider = new Object()
+    		def sourceProvider = new Object()
+            EventSourceIdSelector eventTarget1IdSelector = Mock()
+            EventSourceIdSelector eventTarget2IdSelector = Mock()
+    		EventTarget eventTargetMock1 = Mock()
+    		EventTarget eventTargetMock2 = Mock()
+    		EventSource eventSourceMock1 = Mock()
+    		EventSource eventSourceMock2 = Mock()
+    		EventBinding eventBindingMock = Mock()
+            EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
+            EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
+            eventSourceMock1.getId() >> eventSource1Id
+            eventSourceMock2.getId() >> eventSource2Id
+            eventTargetMock1.getEventSourceIdSelector() >> eventTarget1IdSelector
+            eventTargetMock2.getEventSourceIdSelector() >> eventTarget2IdSelector
+            
 		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
+		    EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
 		
-		then:'The target collector is obtained from the service'
-		    this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-
-	    then:'Two event targets are found by the target collector'
-	        this.targetCollectorMock.collectEventTargetsFrom(
-                targetProvider) >> ([eventTargetMock1, eventTargetMock2] as Set)
+        then:'the source collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:'two sources are found at the given event source provider object'
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >>
+                ([eventSourceMock1, eventSourceMock2] as Set)
+        
+		then:'the target collector is obtained from the service'
+		    this.serviceProviderMock.getEventTargetCollector() >> this.eventTargetCollectorMock
+	    and:'two event targets are found for the given event target provider object'
+	        this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
+                ([eventTargetMock1, eventTargetMock2] as Set)
 		                
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-		this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider)
-        eventTargetMock1.getBoundSources() >> []
-		
-
-		then:'None event target is bound to the source'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider)
-        eventTargetMock2.getBoundSources() >> []
+		then:'none of the event sources are matching with an event target'
+            eventTarget1IdSelector.matches(eventSource1Id) >> false
+            eventTarget1IdSelector.matches(eventSource2Id) >> false
+            eventTarget2IdSelector.matches(eventSource1Id) >> false
+            eventTarget2IdSelector.matches(eventSource2Id) >> false
 				
 		then:
-		UnboundTargetsException e = thrown(UnboundTargetsException)
+		    UnboundTargetsException e = thrown(UnboundTargetsException)
 		
 		expect:
-		e.unboundTargetInfos.length == 2
-		this.eventBinder.strictBindingMode == false
+    		e.unboundTargetInfos.length == 2
+    		this.eventBinder.strictBindingMode == false
 	}
 	
-	def 'At least one target could not be bound in strict binding mode'() {
+	def 'Not all targets can be bound in strict binding mode'() {
 		given:
-		this.eventBinder.setStrictBindingMode(true)
+		    this.eventBinder.setStrictBindingMode(true)
 
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-		EventTarget eventTargetMock1 = Mock()
-		EventTarget eventTargetMock2 = Mock()
-		EventBinding eventBindingMock = Mock()
-        EventSource eventSourceMock = Mock()
+            def targetProvider = new Object()
+            def sourceProvider = new Object()
+            EventSourceIdSelector eventTarget1IdSelector = Mock()
+            EventSourceIdSelector eventTarget2IdSelector = Mock()
+            EventTarget eventTargetMock1 = Mock()
+            EventTarget eventTargetMock2 = Mock()
+            EventSource eventSourceMock1 = Mock()
+            EventSource eventSourceMock2 = Mock()
+            EventBinding eventBindingMock = Mock()
+            EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
+            EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
+            eventSourceMock1.getId() >> eventSource1Id
+            eventSourceMock2.getId() >> eventSource2Id
+            eventTargetMock1.getEventSourceIdSelector() >> eventTarget1IdSelector
+            eventTargetMock2.getEventSourceIdSelector() >> eventTarget2IdSelector
 		 
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-		
-        then:'The target collector is obtained from the service'
-            this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-
-        then:'Two event targets are found by the target collector'
-        this.targetCollectorMock.collectEventTargetsFrom(targetProvider) >>
-            ([eventTargetMock1, eventTargetMock2] as Set)
-
-		then:'A source provider is created for the source object'
-		this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider)
-        eventTargetMock1.getBoundSources() >> [eventSourceMock]
+        when:
+            EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
         
-		then:'One event target is bound to the source and the other is not bound'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider)
-        eventTargetMock2.getBoundSources() >> []
+        then:'the source collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:'two sources are found at the given event source provider object'
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >>
+                ([eventSourceMock1, eventSourceMock2] as Set)
+        
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventTargetCollector() >> this.eventTargetCollectorMock
+        and:'two event targets are found for the given event target provider object'
+            this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
+                ([eventTargetMock1, eventTargetMock2] as Set)
+                        
+        then:'one of the event sources is matching with an event target'
+            eventTarget1IdSelector.matches(eventSource1Id) >> false
+            eventTarget1IdSelector.matches(eventSource2Id) >> false
+            eventTarget2IdSelector.matches(eventSource1Id) >> true
+            eventTarget2IdSelector.matches(eventSource2Id) >> false
+        and:'the binding between the event source and event target is successful'
+            eventSourceMock1.bindTo(eventTargetMock2) >> true
 		
 		then:
-		UnboundTargetsException e = thrown(UnboundTargetsException)
+		    UnboundTargetsException e = thrown(UnboundTargetsException)
 		
 		expect:
-		e.unboundTargetInfos.length == 1
-		this.eventBinder.strictBindingMode == true
+    		e.unboundTargetInfos.length == 1
+    		this.eventBinder.strictBindingMode == true
 	}
 	
-	def 'Successfully establish an event binding (strict binding mode)'() {
-		given:
-		this.eventBinder.setStrictBindingMode(true)
-		
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-		EventTarget eventTargetMock1 = Mock()
-		EventTarget eventTargetMock2 = Mock()
-		EventBinding eventBindingMock = Mock()
-        EventSource eventSourceMock = Mock()
-		 
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-		
-		then:'The target collector is obtained from the service'
-			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
+	def 'Binding succeeds in strict binding mode'() {
+        given:
+            this.eventBinder.setStrictBindingMode(true)
 
-		then:'Two event targets are found by the target collector'
-		this.targetCollectorMock.collectEventTargetsFrom(
-			targetProvider) >> ([eventTargetMock1, eventTargetMock2] as Set)
-			
-        then:'A source provider is created for the source object'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider)
-        eventTargetMock1.getBoundSources() >> [eventSourceMock]
+            def targetProvider = new Object()
+            def sourceProvider = new Object()
+            EventSourceIdSelector eventTarget1IdSelector = Mock()
+            EventSourceIdSelector eventTarget2IdSelector = Mock()
+            EventTarget eventTargetMock1 = Mock()
+            EventTarget eventTargetMock2 = Mock()
+            EventSource eventSourceMock1 = Mock()
+            EventSource eventSourceMock2 = Mock()
+            EventBinding eventBindingMock = Mock()
+            EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
+            EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
+            eventSourceMock1.getId() >> eventSource1Id
+            eventSourceMock2.getId() >> eventSource2Id
+            eventTargetMock1.getEventSourceIdSelector() >> eventTarget1IdSelector
+            eventTargetMock2.getEventSourceIdSelector() >> eventTarget2IdSelector
+         
+        when:
+            EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
         
-        then:'Both event targets are bound to the source'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider)
-        eventTargetMock2.getBoundSources() >> [eventSourceMock]
-		
-		then:'An event binding container is created with the found and bound event target'
-		this.serviceProviderMock.createEventBinding(sourceProvider, targetProvider,
-			{ it.size() == 2 && it.contains(eventTargetMock1) && it.contains(eventTargetMock2) }) >> eventBindingMock
+        then:'the source collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:'two sources are found at the given event source provider object'
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >>
+                ([eventSourceMock1, eventSourceMock2] as Set)
+        
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventTargetCollector() >> this.eventTargetCollectorMock
+        and:'two event targets are found for the given event target provider object'
+            this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
+                ([eventTargetMock1, eventTargetMock2] as Set)
+                        
+        then:'all of the event sources are matching with all event target'
+            eventTarget1IdSelector.matches(eventSource1Id) >> true
+            eventTarget1IdSelector.matches(eventSource2Id) >> false
+            eventTarget2IdSelector.matches(eventSource1Id) >> true
+            eventTarget2IdSelector.matches(eventSource2Id) >> false
+        and:'the binding between the event sources and event targets is successful'
+            eventSourceMock1.bindTo(eventTargetMock2) >> true
+            eventSourceMock1.bindTo(eventTargetMock1) >> true
+            
+        then:'a binding is created'
+            this.serviceProviderMock.createEventBinding(
+                sourceProvider, targetProvider, { givenSetOfBoundTargets ->
+                    givenSetOfBoundTargets.size() == 2 && 
+                    givenSetOfBoundTargets.containsAll([eventTargetMock1, eventTargetMock2])
+                }) >> eventBindingMock
 		
 		expect:
 		eventBinding == eventBindingMock
 		this.eventBinder.strictBindingMode == true
 	}
 
-	def 'Successfully establish an event binding (non-strict binding mode)'() {
+	def 'Binding succeeds in non-strict binding mode'() {
 		given:
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-		EventTarget eventTargetMock1 = Mock()
-		EventTarget eventTargetMock2 = Mock()
-		EventBinding eventBindingMock = Mock()
-        EventSource eventSourceMock = Mock()
-		 
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-
-		then:'The target collector is obtained from the service'
-			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-
-		then:'Two event targets are found by the target collector'
-		this.targetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
-			([eventTargetMock1, eventTargetMock2] as Set)
-
-        then:'A source provider is created for the source object'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock1, sourceProvider)
-        eventTargetMock1.getBoundSources() >> [eventSourceMock]
-    
-		then:'One event target is bound to the source and the other is not bound'
-        this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
-        this.eventSourceCollectorMock.bindTargetToSources(eventTargetMock2, sourceProvider)
-        eventTargetMock2.getBoundSources() >> []
-		
-		then:'An event binding container is created with the found and bound event target'
-		this.serviceProviderMock.createEventBinding(sourceProvider, targetProvider,
-			{ it.size() == 1 && it.contains(eventTargetMock1) }) >> eventBindingMock
-		
-		expect:
-		eventBinding == eventBindingMock
-		this.eventBinder.strictBindingMode == false
-	}
-	
-	def 'No targets are found at target provider (target collector returns null)'() {
-		given:
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-		
-		then:'The target collector is obtained from the service'
-			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-
-		then:
-		thrown(NoEventTargetsFoundException)
-	}
-	
-	def 'No targets are found at target provider (target collector returns emtpy set)'() {
-		given:
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-		
-		then:'The target collector is obtained from the service'
-			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-		
-		then:'No targets are found by the target collector'
-		this.targetCollectorMock.collectEventTargetsFrom(targetProvider) >> ([] as Set)
-
-		then:
-		thrown(NoEventTargetsFoundException)
-	}
-	
-	def 'No targets are found at target provider (target collector throws NoTargetsFoundException)'() {
-		given:
-		def targetProvider = new Object()
-		def sourceProvider = new Object()
-
-		when:
-		EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
-		
-		then:'The target collector is obtained from the service'
-			this.serviceProviderMock.getEventTargetCollector() >> this.targetCollectorMock
-
-		then:'No targets are found by the target collector'
-		this.targetCollectorMock.collectEventTargetsFrom(targetProvider) >> { throw new NoEventTargetsFoundException() }
-
-		then:
-		thrown(NoEventTargetsFoundException)
+            def targetProvider = new Object()
+            def sourceProvider = new Object()
+            EventSourceIdSelector eventTarget1IdSelector = Mock()
+            EventSourceIdSelector eventTarget2IdSelector = Mock()
+            EventTarget eventTargetMock1 = Mock()
+            EventTarget eventTargetMock2 = Mock()
+            EventSource eventSourceMock1 = Mock()
+            EventSource eventSourceMock2 = Mock()
+            EventBinding eventBindingMock = Mock()
+            EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
+            EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
+            eventSourceMock1.getId() >> eventSource1Id
+            eventSourceMock2.getId() >> eventSource2Id
+            eventTargetMock1.getEventSourceIdSelector() >> eventTarget1IdSelector
+            eventTargetMock2.getEventSourceIdSelector() >> eventTarget2IdSelector
+         
+        when:
+            EventBinding eventBinding = this.eventBinder.bind(sourceProvider, targetProvider)
+        
+        then:'the source collector is obtained from the service'
+            this.serviceProviderMock.getEventSourceCollector() >> this.eventSourceCollectorMock
+        and:'two sources are found at the given event source provider object'
+            this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >>
+                ([eventSourceMock1, eventSourceMock2] as Set)
+        
+        then:'the target collector is obtained from the service'
+            this.serviceProviderMock.getEventTargetCollector() >> this.eventTargetCollectorMock
+        and:'two event targets are found for the given event target provider object'
+            this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
+                ([eventTargetMock1, eventTargetMock2] as Set)
+                        
+        then:'all of the event sources are matching with all event target'
+            eventTarget1IdSelector.matches(eventSource1Id) >> true
+            eventTarget1IdSelector.matches(eventSource2Id) >> true
+            eventTarget2IdSelector.matches(eventSource1Id) >> true
+            eventTarget2IdSelector.matches(eventSource2Id) >> false
+        and:'the binding between the event sources and event targets is successful'
+            eventSourceMock1.bindTo(eventTargetMock1) >> true
+            eventSourceMock2.bindTo(eventTargetMock1) >> true
+            eventSourceMock1.bindTo(eventTargetMock2) >> false
+            
+        then:'a binding is created'
+            this.serviceProviderMock.createEventBinding(
+                sourceProvider, targetProvider, { givenSetOfBoundTargets ->
+                    givenSetOfBoundTargets.size() == 1 && 
+                    givenSetOfBoundTargets.contains(eventTargetMock1)
+                }) >> eventBindingMock
+        
+        expect:
+            eventBinding == eventBindingMock
+            this.eventBinder.strictBindingMode == false
 	}
 }

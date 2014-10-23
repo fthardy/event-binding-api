@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
+import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
@@ -51,14 +52,20 @@ public class DefaultEventBinder implements EventBinder {
 	 */
 	@Override
 	public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
+	    Set<EventSource> foundSources =
+	            this.serviceProvider.getEventSourceCollector().collectEventSourcesFrom(sourceProvider);
+	    if (foundSources == null || foundSources.isEmpty()) {
+	        throw new NoEventSourcesFoundException();
+	    }
+	    
 		Set<EventTarget> foundTargets = 
 		        this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(targetProvider);
 		if (foundTargets == null || foundTargets.isEmpty()) {
 			throw new NoEventTargetsFoundException();
 		}
 		
-		return this.serviceProvider.createEventBinding(
-				sourceProvider, targetProvider, this.bindTargetsToSources(foundTargets, sourceProvider));
+		return this.serviceProvider.createEventBinding(sourceProvider, targetProvider, 
+		        this.bindTargetsToSources(foundTargets, foundSources));
 	}
 	
 	/**
@@ -84,18 +91,18 @@ public class DefaultEventBinder implements EventBinder {
 	 * 
 	 * @param eventTargets
 	 *            the found event targets.
-	 * @param sourceProvider
-	 *            the event source provider object.
+	 * @param eventSources
+	 *            the found event sources.
 	 * 
 	 * @return the set of bound event targets. Never <code>null</code>.
 	 */
-	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Object sourceProvider) {
+	protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Set<EventSource> eventSources) {
 		Set<EventTarget> boundTargets = new HashSet<EventTarget>();
-		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
+		
 		for (EventTarget eventTarget : eventTargets) {
-		    this.serviceProvider.getEventSourceCollector().bindTargetToSources(eventTarget, sourceProvider);
-			if (eventTarget.getBoundSources().isEmpty()) {
+	        Set<EventSource> boundSources = this.bindTargetToSources(eventTarget, eventSources);
+			if (boundSources.isEmpty()) {
 			    if (this.strictBindingMode) {
 			        unboundTargets.add(eventTarget);
 			    }
@@ -114,4 +121,24 @@ public class DefaultEventBinder implements EventBinder {
 		
 		return boundTargets;
 	}
+	
+	private Set<EventSource> bindTargetToSources(EventTarget eventTarget, Set<EventSource> eventSources) {
+        Set<EventSource> boundSources = new HashSet<EventSource>();
+        for(EventSource eventSource : this.determineMatchingSources(eventTarget, eventSources)) {
+            if (eventSource.bindTo(eventTarget)) {
+                boundSources.add(eventSource);
+            }
+        }
+	    return boundSources;
+	}
+
+    private Set<EventSource> determineMatchingSources(EventTarget eventTarget, Set<EventSource> eventSources) {
+        Set<EventSource> matchingSources = new HashSet<EventSource>();
+        for (EventSource eventSource : eventSources) {
+            if (eventTarget.getEventSourceIdSelector().matches(eventSource.getId())) {
+                matchingSources.add(eventSource);
+            }
+        }
+        return matchingSources;
+    }
 }

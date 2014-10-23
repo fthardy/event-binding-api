@@ -1,5 +1,7 @@
 package de.javax.util.eventbinding.spi;
 
+import java.util.Set;
+
 /**
  * Collects for a given event target all matching event sources from a given
  * event source provdier object and binds them to the event target.
@@ -9,14 +11,12 @@ package de.javax.util.eventbinding.spi;
 public interface EventSourceCollector {
 
     /**
-     * Bind the given target to the event sources of the given event source
-     * provider object.
+     * Collect the event sources from a given event source provider.
      * 
-     * @param eventTarget
-     *            the event target to bind to the event sources of the receiving
-     *            event source provider.
      * @param eventSourceProvider
      *            the event source provider object.
+     * 
+     * @return a set of event sources.
      */
-    void bindTargetToSources(EventTarget eventTarget, Object eventSourceProvider);
+    Set<EventSource> collectEventSourcesFrom(Object eventSourceProvider);
 }
