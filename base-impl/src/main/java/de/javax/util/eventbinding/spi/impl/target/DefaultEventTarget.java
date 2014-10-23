@@ -20,7 +20,7 @@ public class DefaultEventTarget implements EventTarget {
 	private final EventSourceIdSelector sourceIdSelector;
 	private final EventDispatcher eventDispatcher;
 	
-	private Set<EventSource> boundEventSources = new HashSet<EventSource>();
+	private final Set<EventSource> boundEventSources = new HashSet<EventSource>();
 	
 	/**
 	 * Creates a new instance of this event target implementation. If source
@@ -73,16 +73,13 @@ public class DefaultEventTarget implements EventTarget {
 	}
 	
 	@Override
-	public Set<EventSource> getBoundSources() {
-	    return Collections.unmodifiableSet(this.boundEventSources);
+	public void addBoundSource(EventSource source) {
+	    this.boundEventSources.add(source);
 	}
 	
 	@Override
-	public void setBoundSources(Set<EventSource> boundSources) {
-	    if (!this.boundEventSources.isEmpty()) {
-	        throw new IllegalStateException("Event target is already bound to event sources!");
-	    }
-	    this.boundEventSources = new HashSet<EventSource>(boundSources);
+	public Set<EventSource> getBoundSources() {
+	    return Collections.unmodifiableSet(this.boundEventSources);
 	}
 
 	@Override
@@ -93,6 +90,6 @@ public class DefaultEventTarget implements EventTarget {
 		for (EventSource boundSource : this.boundEventSources) {
 			boundSource.unbindFrom(this);
 		}
-		this.boundEventSources = new HashSet<EventSource>();
+		this.boundEventSources.clear();
 	}
 }

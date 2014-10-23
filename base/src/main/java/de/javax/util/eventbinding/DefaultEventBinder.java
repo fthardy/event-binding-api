@@ -94,10 +94,13 @@ public class DefaultEventBinder implements EventBinder {
 		
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		for (EventTarget eventTarget : eventTargets) {
-			if (this.serviceProvider.getEventSourceCollector().bindTargetToSources(eventTarget, sourceProvider)) {
-				boundTargets.add(eventTarget);
-			} else if (this.strictBindingMode) {
-				unboundTargets.add(eventTarget);
+		    this.serviceProvider.getEventSourceCollector().bindTargetToSources(eventTarget, sourceProvider);
+			if (eventTarget.getBoundSources().isEmpty()) {
+			    if (this.strictBindingMode) {
+			        unboundTargets.add(eventTarget);
+			    }
+			} else {
+			    boundTargets.add(eventTarget);
 			}
 		}
 		
