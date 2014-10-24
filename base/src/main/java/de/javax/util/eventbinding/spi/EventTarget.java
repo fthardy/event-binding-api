@@ -41,6 +41,15 @@ public interface EventTarget {
      *         sources are bound to the receiving event target.
      */
     Set<EventSource> getBoundSources();
+    
+    /**
+     * Check if the receiving event target is bound to at least one event
+     * source.
+     * 
+     * @return <code>true</code> if the receiving event target is bound to an
+     *         event source. Otherwise <code>false</code>.
+     */
+    boolean isBound();
 
     /**
      * Unbind the receiving event target from all bound event sources.

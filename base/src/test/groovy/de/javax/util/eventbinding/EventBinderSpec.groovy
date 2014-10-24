@@ -105,7 +105,7 @@ class EventBinderSpec extends Specification {
 	        this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
                 ([eventTargetMock1, eventTargetMock2] as Set)
 		                
-		then:'none of the event sources are matching with an event target'
+		then:'none of the event sources are matching with any event target'
             eventTarget1IdSelector.matches(eventSource1Id) >> false
             eventTarget1IdSelector.matches(eventSource2Id) >> false
             eventTarget2IdSelector.matches(eventSource1Id) >> false
@@ -154,13 +154,14 @@ class EventBinderSpec extends Specification {
             this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
                 ([eventTargetMock1, eventTargetMock2] as Set)
                         
-        then:'one of the event sources is matching with an event target'
+        then:'for target 1 no source is matching'
             eventTarget1IdSelector.matches(eventSource1Id) >> false
             eventTarget1IdSelector.matches(eventSource2Id) >> false
+        and:'for target 2 source 1 is matching'
             eventTarget2IdSelector.matches(eventSource1Id) >> true
             eventTarget2IdSelector.matches(eventSource2Id) >> false
-        and:'the binding between the event source and event target is successful'
-            eventSourceMock1.bindTo(eventTargetMock2) >> true
+            eventSourceMock1.bindTo(eventTargetMock2)
+            eventTargetMock2.isBound() >> true
 		
 		then:
 		    UnboundTargetsException e = thrown(UnboundTargetsException)
@@ -205,14 +206,16 @@ class EventBinderSpec extends Specification {
             this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
                 ([eventTargetMock1, eventTargetMock2] as Set)
                         
-        then:'all of the event sources are matching with all event target'
+        then:'for target 1 source 1 is matching'
             eventTarget1IdSelector.matches(eventSource1Id) >> true
             eventTarget1IdSelector.matches(eventSource2Id) >> false
+            eventSourceMock1.bindTo(eventTargetMock1)
+            eventTargetMock1.isBound() >> true
+        and:'for target 2 source 1 is matching'
             eventTarget2IdSelector.matches(eventSource1Id) >> true
             eventTarget2IdSelector.matches(eventSource2Id) >> false
-        and:'the binding between the event sources and event targets is successful'
-            eventSourceMock1.bindTo(eventTargetMock2) >> true
-            eventSourceMock1.bindTo(eventTargetMock1) >> true
+            eventSourceMock1.bindTo(eventTargetMock2)
+            eventTargetMock2.isBound() >> true
             
         then:'a binding is created'
             this.serviceProviderMock.createEventBinding(
@@ -259,21 +262,20 @@ class EventBinderSpec extends Specification {
             this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> 
                 ([eventTargetMock1, eventTargetMock2] as Set)
                         
-        then:'all of the event sources are matching with all event target'
-            eventTarget1IdSelector.matches(eventSource1Id) >> true
-            eventTarget1IdSelector.matches(eventSource2Id) >> true
-            eventTarget2IdSelector.matches(eventSource1Id) >> true
-            eventTarget2IdSelector.matches(eventSource2Id) >> false
-        and:'the binding between the event sources and event targets is successful'
-            eventSourceMock1.bindTo(eventTargetMock1) >> true
-            eventSourceMock2.bindTo(eventTargetMock1) >> true
-            eventSourceMock1.bindTo(eventTargetMock2) >> false
+        then:'for target 1 no sources are matching'
+            eventTarget1IdSelector.matches(eventSource1Id) >> false
+            eventTarget1IdSelector.matches(eventSource2Id) >> false
+        and:'for target 2 source 2 is matching'
+            eventTarget2IdSelector.matches(eventSource1Id) >> false
+            eventTarget2IdSelector.matches(eventSource2Id) >> true
+            eventSourceMock2.bindTo(eventTargetMock2)
+            eventTargetMock2.isBound() >> true
             
         then:'a binding is created'
             this.serviceProviderMock.createEventBinding(
                 sourceProvider, targetProvider, { givenSetOfBoundTargets ->
                     givenSetOfBoundTargets.size() == 1 && 
-                    givenSetOfBoundTargets.contains(eventTargetMock1)
+                    givenSetOfBoundTargets.contains(eventTargetMock2)
                 }) >> eventBindingMock
         
         expect:

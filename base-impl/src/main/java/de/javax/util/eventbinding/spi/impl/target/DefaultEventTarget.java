@@ -81,6 +81,11 @@ public class DefaultEventTarget implements EventTarget {
 	public Set<EventSource> getBoundSources() {
 	    return Collections.unmodifiableSet(this.boundEventSources);
 	}
+	
+	@Override
+	public boolean isBound() {
+	    return !this.boundEventSources.isEmpty();
+	}
 
 	@Override
 	public void unbindFromSources() {

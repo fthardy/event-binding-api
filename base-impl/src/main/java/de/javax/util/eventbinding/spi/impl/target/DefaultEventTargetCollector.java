@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,8 +67,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	    
 	    // Collect event handler methods and create an event target for each one
         Set<Method> handlerMethods = this.collectHandlerMethods(targetProviderClass);
-        @SuppressWarnings("unchecked")
-        Set<EventTarget> targets = handlerMethods.isEmpty() ? Collections.EMPTY_SET : new HashSet<EventTarget>();
+        Set<EventTarget> targets = new HashSet<EventTarget>();
         for (Method targetMethod : handlerMethods) {
             targets.add(this.targetFactory.createEventTarget(
                     targetProvider, targetMethod, this.getSourceIdSelector(targetMethod, selectorFactory)));

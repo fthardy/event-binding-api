@@ -16,7 +16,8 @@ public interface EventSourceCollector {
      * @param eventSourceProvider
      *            the event source provider object.
      * 
-     * @return a set of event sources.
+     * @return a set of event sources. If no event sources are found an empty
+     *         set has to be returned.
      */
     Set<EventSource> collectEventSourcesFrom(Object eventSourceProvider);
 }

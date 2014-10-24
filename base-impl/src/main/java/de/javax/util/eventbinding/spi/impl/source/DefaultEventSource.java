@@ -55,21 +55,18 @@ public class DefaultEventSource implements EventSource {
     }
 
     @Override
-    public boolean bindTo(EventTarget eventTarget) {
+    public void bindTo(EventTarget eventTarget) {
         if (this.connectorMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is already bound to this source!");
         }
 
-        boolean bound = false;
         EventBindingConnector connector = this.connectorFactory.createConnector(
                 this.eventSource, eventTarget.getEventType());
         if (connector != null) {
             connector.connect(eventTarget.getEventDispatcher());
             this.connectorMapping.put(eventTarget, connector);
             eventTarget.addBoundSource(this);
-            bound = true;
         }
-        return bound;
     }
 
     @Override

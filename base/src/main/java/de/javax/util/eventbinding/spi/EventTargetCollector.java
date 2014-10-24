@@ -11,14 +11,14 @@ import java.util.Set;
  */
 public interface EventTargetCollector {
 
-	/**
-	 * Analyses the given object to find targets for an event binding.
-	 * 
-	 * @param eventTargetProvider
-	 *            the event target provider object.
-	 * 
-	 * @return a set with the found event targets. If no event targets are found
-	 *         then <code>null</code> or an emtpy set can be returned.
-	 */
-	Set<EventTarget> collectEventTargetsFrom(Object eventTargetProvider);
+    /**
+     * Analyses the given object to find targets for an event binding.
+     * 
+     * @param eventTargetProvider
+     *            the event target provider object.
+     * 
+     * @return a set with the found event targets. If no event targets are found
+     *         an emtpy set has to be returned.
+     */
+    Set<EventTarget> collectEventTargetsFrom(Object eventTargetProvider);
 }

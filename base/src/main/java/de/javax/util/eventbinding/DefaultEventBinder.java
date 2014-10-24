@@ -54,13 +54,13 @@ public class DefaultEventBinder implements EventBinder {
 	public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
 	    Set<EventSource> foundSources =
 	            this.serviceProvider.getEventSourceCollector().collectEventSourcesFrom(sourceProvider);
-	    if (foundSources == null || foundSources.isEmpty()) {
+	    if (foundSources.isEmpty()) {
 	        throw new NoEventSourcesFoundException();
 	    }
 	    
 		Set<EventTarget> foundTargets = 
 		        this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(targetProvider);
-		if (foundTargets == null || foundTargets.isEmpty()) {
+		if (foundTargets.isEmpty()) {
 			throw new NoEventTargetsFoundException();
 		}
 		
@@ -101,14 +101,15 @@ public class DefaultEventBinder implements EventBinder {
 		Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 		
 		for (EventTarget eventTarget : eventTargets) {
-	        Set<EventSource> boundSources = this.bindTargetToSources(eventTarget, eventSources);
-			if (boundSources.isEmpty()) {
-			    if (this.strictBindingMode) {
-			        unboundTargets.add(eventTarget);
-			    }
-			} else {
+	        for(EventSource eventSource : this.determineMatchingSources(eventTarget, eventSources)) {
+	            eventSource.bindTo(eventTarget);
+	        }
+	        
+			if (eventTarget.isBound()) {
 			    boundTargets.add(eventTarget);
-			}
+			} else if (this.strictBindingMode) {
+                unboundTargets.add(eventTarget);
+            }
 		}
 		
 		if (boundTargets.isEmpty()) {
@@ -122,16 +123,6 @@ public class DefaultEventBinder implements EventBinder {
 		return boundTargets;
 	}
 	
-	private Set<EventSource> bindTargetToSources(EventTarget eventTarget, Set<EventSource> eventSources) {
-        Set<EventSource> boundSources = new HashSet<EventSource>();
-        for(EventSource eventSource : this.determineMatchingSources(eventTarget, eventSources)) {
-            if (eventSource.bindTo(eventTarget)) {
-                boundSources.add(eventSource);
-            }
-        }
-	    return boundSources;
-	}
-
     private Set<EventSource> determineMatchingSources(EventTarget eventTarget, Set<EventSource> eventSources) {
         Set<EventSource> matchingSources = new HashSet<EventSource>();
         for (EventSource eventSource : eventSources) {

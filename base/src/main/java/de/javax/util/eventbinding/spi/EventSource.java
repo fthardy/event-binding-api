@@ -17,10 +17,8 @@ public interface EventSource {
      * 
      * @param eventTarget
      *            the event target to be bound to the source.
-     *            
-     * @return <code>true</code> if the target has been bound to the receiving event source.
      */
-    boolean bindTo(EventTarget eventTarget);
+    void bindTo(EventTarget eventTarget);
 
     /**
      * Unbind the given event target from the receiving event source.
