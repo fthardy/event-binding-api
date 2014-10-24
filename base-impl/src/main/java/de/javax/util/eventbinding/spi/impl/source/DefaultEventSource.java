@@ -10,9 +10,7 @@ import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
- * Default implementation of EventSource delegating the register and unregister
- * calls to the EventListenerAdapter which knows how to handle the
- * register/unregister process for a certain event source.
+ * Default implementation of an event source.<br/>
  * 
  * @author Matthias Hanisch
  */

@@ -4,6 +4,8 @@ import de.javax.util.eventbinding.EventBindingException;
 
 public class EventSourceAccessException extends EventBindingException {
 
+    private static final long serialVersionUID = -4667663270779236887L;
+
     public EventSourceAccessException() {
     }
 

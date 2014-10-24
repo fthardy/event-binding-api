@@ -6,8 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * TODO Documentation
- *
+ * Identifies an event source in an event source provider object.<br/>
+ * An event source is identified by its identifier which has to conform to the
+ * naming rules of Java identifiers.
+ * 
  * @author Frank Hardy
  * 
  * @see EventSourceProvider

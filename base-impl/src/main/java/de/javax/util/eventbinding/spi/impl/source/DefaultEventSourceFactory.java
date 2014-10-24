@@ -6,7 +6,8 @@ import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceId;
 
 /**
- * TODO
+ * The default implementation of the {@link EventSourceFactory}.<br/>
+ * Creates instances of {@link DefaultEventSource}.
  * 
  * @author Frank Hardy
  */
