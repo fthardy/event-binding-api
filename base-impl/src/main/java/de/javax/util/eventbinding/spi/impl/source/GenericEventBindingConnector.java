@@ -5,18 +5,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import de.javax.util.eventbinding.source.EventListenerAdapter;
+import de.javax.util.eventbinding.source.EventBindingConnector;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 
 /**
- * Default implementation of an EventListenerAdapter using a method to register
- * an event listener and a method to unregister an event listener created as
- * proxy and calling {@link EventDispatcher#dispatchEvent(Object)} when
- * receiving an event.
+ * A generic implementation of a {@link EventBindingConnector}.<br/>
+ * It uses a method to register an event listener and a method to unregister an
+ * event listener created as proxy and calling
+ * {@link EventDispatcher#dispatchEvent(Object)} when receiving an event.
  * 
  * @author Matthias Hanisch
  */
-public class GenericEventListenerAdapter implements EventListenerAdapter {
+public class GenericEventBindingConnector implements EventBindingConnector {
 
     /**
      * The Method Object.hashCode() used to identify calls of .hashCode() on the
@@ -75,7 +75,7 @@ public class GenericEventListenerAdapter implements EventListenerAdapter {
         }
     }
 
-    public GenericEventListenerAdapter(Object eventSource, Method addMethod, Method removeMethod, Method eventMethod,
+    public GenericEventBindingConnector(Object eventSource, Method addMethod, Method removeMethod, Method eventMethod,
             Class<?> listenerType) {
         this.eventSource = eventSource;
         this.addMethod = addMethod;
@@ -93,7 +93,7 @@ public class GenericEventListenerAdapter implements EventListenerAdapter {
      *            The event dispatcher to register as event listener.
      */
     @Override
-    public void registerEventListener(final EventDispatcher eventDispatcher) {
+    public void connect(final EventDispatcher eventDispatcher) {
         if (listener != null) {
             throw new IllegalStateException("event already registered");
         }
@@ -150,7 +150,7 @@ public class GenericEventListenerAdapter implements EventListenerAdapter {
      * the event source object.
      */
     @Override
-    public void unregisterEventListener() {
+    public void disconnect() {
         if (listener != null) {
             try {
                 this.removeMethod.invoke(eventSource, this.listener);

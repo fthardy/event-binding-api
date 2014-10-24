@@ -1,14 +1,14 @@
 package de.javax.util.eventbinding.source;
 
 /**
- * Creates instances of event listener adapters.
+ * Creates instances of {@link EventBindingConnector}.
  * 
  * @author Frank Hardy
  */
-public interface EventListenerAdapterFactory {
+public interface EventBindingConnectorFactory {
 
     /**
-     * Creates a new instance of an event listener adapter.
+     * Creates a new instance of a connector.
      * 
      * @param eventSource
      *            the event source object.
@@ -19,5 +19,5 @@ public interface EventListenerAdapterFactory {
      *         if none can be provided for the given event source and event
      *         type.
      */
-    EventListenerAdapter createEventListenerAdapter(Object eventSource, Class<?> eventType);
+    EventBindingConnector createConnector(Object eventSource, Class<?> eventType);
 }

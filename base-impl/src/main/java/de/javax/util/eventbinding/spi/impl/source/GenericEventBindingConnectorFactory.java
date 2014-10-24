@@ -4,8 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import de.javax.util.eventbinding.source.EventListenerAdapter;
-import de.javax.util.eventbinding.source.EventListenerAdapterFactory;
+import de.javax.util.eventbinding.source.EventBindingConnector;
+import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.reflect.Filter;
 import de.javax.util.eventbinding.spi.impl.reflect.MethodParameterTypeHasEventMethodForTypePredicate;
 import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodNamePredicate;
@@ -16,16 +16,14 @@ import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.StaticMethodP
 import de.javax.util.eventbinding.spi.impl.reflect.NotPredicate;
 
 /**
- * Default implementation of EventListenerProvider assuming that there are
- * methods called addxxxListener and removexxxListener for
- * registering/unregistering event listeners for event types.
+ * This factory implementation creates instances {@link GenericEventBindingConnector}.
  * 
  * @author Matthias Hanisch
  */
-public class GenericEventListenerAdapterFactory implements EventListenerAdapterFactory {
+public class GenericEventBindingConnectorFactory implements EventBindingConnectorFactory {
 
     @Override
-    public EventListenerAdapter createEventListenerAdapter(Object eventSource, Class<?> eventType) {
+    public EventBindingConnector createConnector(Object eventSource, Class<?> eventType) {
         Class<?> eventSourceType = eventSource.getClass();
         // find method for registering event listeners of the given type
         Method addMethod = findListenerMethod(eventSourceType, eventType, "add.+Listener");
@@ -39,7 +37,7 @@ public class GenericEventListenerAdapterFactory implements EventListenerAdapterF
             if (listenerTypeAdd.equals(listenerTypeRemove)) {
                 Method eventMethod = findEventMethod(listenerTypeAdd, eventType);
                 // create default event listener adapter using these methods
-                return new GenericEventListenerAdapter(eventSource, addMethod, removeMethod, eventMethod,
+                return new GenericEventBindingConnector(eventSource, addMethod, removeMethod, eventMethod,
                         listenerTypeAdd);
             }
         }

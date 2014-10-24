@@ -3,8 +3,8 @@ package de.javax.util.eventbinding.spi.impl.source;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.javax.util.eventbinding.source.EventListenerAdapter;
-import de.javax.util.eventbinding.source.EventListenerAdapterFactory;
+import de.javax.util.eventbinding.source.EventBindingConnector;
+import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -13,14 +13,15 @@ import de.javax.util.eventbinding.spi.EventTarget;
  * Default implementation of an event source.<br/>
  * 
  * @author Matthias Hanisch
+ * @author Frank Hardy
  */
 public class DefaultEventSource implements EventSource {
 
     private final EventSourceId id;
     private final Object eventSource;
-    private final EventListenerAdapterFactory listenerAdapterFactory;
-    private final Map<EventTarget, EventListenerAdapter> adapterMapping = 
-            new HashMap<EventTarget, EventListenerAdapter>();
+    private final EventBindingConnectorFactory connectorFactory;
+    private final Map<EventTarget, EventBindingConnector> connectorMapping =
+            new HashMap<EventTarget, EventBindingConnector>();
 
     /**
      * Create a new instance of this event source.
@@ -30,9 +31,10 @@ public class DefaultEventSource implements EventSource {
      * @param eventSource
      *            the real event source object represented (or proxied) by this
      *            instance.
+     * @param connectorFactory
+     *            the connector factory.
      */
-    public DefaultEventSource(
-            EventSourceId id, Object eventSource, EventListenerAdapterFactory listenerAdapterFactory) {
+    public DefaultEventSource(EventSourceId id, Object eventSource, EventBindingConnectorFactory connectorFactory) {
         if (id == null) {
             throw new NullPointerException("Undefined identifier!");
         }
@@ -41,10 +43,10 @@ public class DefaultEventSource implements EventSource {
             throw new NullPointerException("Undefined event source object!");
         }
         this.eventSource = eventSource;
-        if (listenerAdapterFactory == null) {
-            throw new NullPointerException("Undefinded listener adapter factory!");
+        if (connectorFactory == null) {
+            throw new NullPointerException("Undefinded connector factory!");
         }
-        this.listenerAdapterFactory = listenerAdapterFactory;
+        this.connectorFactory = connectorFactory;
     }
 
     @Override
@@ -54,16 +56,16 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public boolean bindTo(EventTarget eventTarget) {
-        if (this.adapterMapping.containsKey(eventTarget)) {
+        if (this.connectorMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is already bound to this source!");
         }
-        
+
         boolean bound = false;
-        EventListenerAdapter listenerAdapter = this.listenerAdapterFactory.createEventListenerAdapter(
+        EventBindingConnector connector = this.connectorFactory.createConnector(
                 this.eventSource, eventTarget.getEventType());
-        if(listenerAdapter != null) {
-            listenerAdapter.registerEventListener(eventTarget.getEventDispatcher());
-            this.adapterMapping.put(eventTarget, listenerAdapter);
+        if (connector != null) {
+            connector.connect(eventTarget.getEventDispatcher());
+            this.connectorMapping.put(eventTarget, connector);
             eventTarget.addBoundSource(this);
             bound = true;
         }
@@ -72,10 +74,10 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public void unbindFrom(EventTarget eventTarget) {
-        if (!this.adapterMapping.containsKey(eventTarget)) {
+        if (!this.connectorMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is not bound to this source!");
         }
-        this.adapterMapping.get(eventTarget).unregisterEventListener();
-        this.adapterMapping.remove(eventTarget);
+        this.connectorMapping.get(eventTarget).disconnect();
+        this.connectorMapping.remove(eventTarget);
     }
 }
