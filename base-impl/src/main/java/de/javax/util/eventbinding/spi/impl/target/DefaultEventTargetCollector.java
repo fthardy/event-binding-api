@@ -100,7 +100,6 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
                     public boolean apply(Method method) {
                         int modifiers = method.getModifiers();
                         
-                        
                         boolean isAccepted = Modifier.isPublic(modifiers)
                                 && !Modifier.isAbstract(modifiers)
                                 && method.getParameterTypes().length == 1
@@ -184,14 +183,17 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
                 selectorFactory, selectorFactory.createEventSourceIdSelector(selectorExpression));
         
         field.setAccessible(true);
-        Object nestedTargetProvider = field.get(targetProvider);
-        if (nestedTargetProvider == null) {
-            throw new EventTargetAccessException(
-                    "The value of field '" + field.toGenericString() + "' in class '" + 
-                            targetProviderClass + "' is null!");
+        try {
+            Object nestedTargetProvider = field.get(targetProvider);
+            if (nestedTargetProvider == null) {
+                throw new EventTargetAccessException(
+                        "The value of field '" + field.toGenericString() + "' in class '" + 
+                                targetProviderClass + "' is null!");
+            }
+            // --- this is an indirect, recursive call ---
+            return this.collectTargetsFrom(nestedTargetProvider, cascadedSelectorFactory);
+        } finally {
+            field.setAccessible(false);
         }
-        
-        // --- this is an indirect, recursive call ---
-        return this.collectTargetsFrom(nestedTargetProvider, cascadedSelectorFactory);
     }
 }

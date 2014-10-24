@@ -13,7 +13,7 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
  * 
  * @author Frank Hardy
  */
-public class CascadedSelectorFactory implements EventSourceIdSelectorFactory {
+class CascadedSelectorFactory implements EventSourceIdSelectorFactory {
 
     private final EventSourceIdSelector preSelector;
     private final EventSourceIdSelectorFactory selectorFactory;
