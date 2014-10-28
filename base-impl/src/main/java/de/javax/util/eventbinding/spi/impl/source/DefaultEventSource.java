@@ -56,6 +56,9 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public void bindTo(EventTarget eventTarget) {
+        if(!eventTarget.getEventSourceIdSelector().matches(getId())) {
+            return;
+        }
         if (this.connectorMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is already bound to this source!");
         }
