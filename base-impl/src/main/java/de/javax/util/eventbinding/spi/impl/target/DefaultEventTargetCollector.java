@@ -100,6 +100,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
         if (info == null) {
             info = new TargetProviderClassInfo(this.collectHandlerMethodInfos(targetProviderClass),
                     this.collectionNestedTargetProviderFieldInfos(targetProviderClass));
+            cache.put(targetProviderClass, info);
         }
 
         Set<EventTarget> targets = new HashSet<EventTarget>();
