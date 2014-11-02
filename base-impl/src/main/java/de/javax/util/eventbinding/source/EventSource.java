@@ -21,5 +21,5 @@ public @interface EventSource {
 	/**
 	 * @return the identifier of the event source.
 	 */
-	String value();
+	String value() default "";
 }

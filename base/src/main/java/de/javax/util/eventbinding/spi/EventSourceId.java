@@ -49,7 +49,14 @@ public class EventSourceId {
     
     @Override
     public String toString() {
-        return this.names.toString();
+        StringBuilder sb = new StringBuilder();
+        for(String name:names) {
+            if(sb.length()>0) {
+                sb.append('.');
+            }
+            sb.append(name);
+        }
+        return sb.toString();
     }
     
     /**

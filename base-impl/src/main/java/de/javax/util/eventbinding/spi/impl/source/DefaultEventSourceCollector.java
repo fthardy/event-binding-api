@@ -78,6 +78,10 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
             return null;
         }
         String id =  annotation.value();
+        // if annotation has no value the field name is uses as id of the event source
+        if("".equals(id)) {
+            id = declaredField.getName();
+        }
         
         EventSourceId newId = null;
         if (parentId == null) {
@@ -97,6 +101,10 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
             return null;
         }
         String id = annotation.value();
+        // if annotation has no value the field name is uses as id of the event source
+        if("".equals(id)) {
+            id = declaredField.getName();
+        }
         
         EventSourceId newId = null;
         if (parentId == null) {

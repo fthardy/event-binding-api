@@ -26,5 +26,5 @@ public @interface EventSourceProvider {
 	 * @return the identifier of the event source provider which serves as a
 	 *         prefix for the identifiers of the provided event sources.
 	 */
-	String value();
+	String value() default "";
 }

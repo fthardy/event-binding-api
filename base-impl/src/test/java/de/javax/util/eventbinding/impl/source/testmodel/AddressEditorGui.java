@@ -9,6 +9,6 @@ public class AddressEditorGui {
     private TextField street = new TextField();
     @EventSource("zipField")
     private TextField zip = new TextField();
-    @EventSource("cityField")
-    private TextField city = new TextField();
+    @EventSource
+    private TextField cityField = new TextField();
 }

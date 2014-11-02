@@ -9,7 +9,7 @@ public class ContactEditorGui {
     @EventSourceProvider("personEditor")
     private final PersonEditorGui personEditor;
     
-    @EventSourceProvider("addressEditor")
+    @EventSourceProvider
     final AddressEditorGui addressEditor;
     
     @EventSource("okButton")
