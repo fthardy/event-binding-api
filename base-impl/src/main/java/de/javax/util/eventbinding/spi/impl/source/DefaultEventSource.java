@@ -20,8 +20,7 @@ public class DefaultEventSource implements EventSource {
     private final EventSourceId id;
     private final Object eventSource;
     private final EventBindingConnectorFactory connectorFactory;
-    private final Map<EventTarget, EventBindingConnector> connectorMapping =
-            new HashMap<EventTarget, EventBindingConnector>();
+    private final Map<EventTarget, EventBindingConnector> connectorMapping = new HashMap<EventTarget, EventBindingConnector>();
 
     /**
      * Create a new instance of this event source.
@@ -56,15 +55,15 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public void bindTo(EventTarget eventTarget) {
-        if(!eventTarget.getEventSourceIdSelector().matches(getId())) {
+        if (!eventTarget.getEventSourceIdSelector().matches(getId())) {
             return;
         }
         if (this.connectorMapping.containsKey(eventTarget)) {
             throw new IllegalStateException("The event target is already bound to this source!");
         }
 
-        EventBindingConnector connector = this.connectorFactory.createConnector(
-                this.eventSource, eventTarget.getEventType());
+        EventBindingConnector connector = this.connectorFactory.createConnector(this.eventSource,
+                eventTarget.getEventType());
         if (connector != null) {
             connector.connect(eventTarget.getEventDispatcher());
             this.connectorMapping.put(eventTarget, connector);
@@ -79,5 +78,6 @@ public class DefaultEventSource implements EventSource {
         }
         this.connectorMapping.get(eventTarget).disconnect();
         this.connectorMapping.remove(eventTarget);
+        eventTarget.removeBoundSource(this);
     }
 }

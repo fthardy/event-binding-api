@@ -55,4 +55,10 @@ public interface EventTarget {
      * Unbind the receiving event target from all bound event sources.
      */
     void unbindFromSources();
+
+    /**
+     * Removes a bound event source from this event target.
+     * @param eventSource The bound event source.
+     */
+    void removeBoundSource(EventSource eventSource);
 }

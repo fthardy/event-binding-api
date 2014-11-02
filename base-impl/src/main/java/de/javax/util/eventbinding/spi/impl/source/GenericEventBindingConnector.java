@@ -1,7 +1,6 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -117,30 +116,22 @@ public class GenericEventBindingConnector implements EventBindingConnector {
                             } else if (method.equals(toStringMethod)) {
                                 return proxyToString(proxy);
                             } else {
-                                // TODO check for other calls (finalize?)
-                                throw new InternalError("unexpected Object method dispatched: " + method);
+                                throw new EventSourceAccessException("unexpected Object method dispatched: " + method);
                             }
                         } else {
                             // dispatch the event to the EventDispatcher
                             if (eventMethod.equals(method)) {
                                 eventDispatcher.dispatchEvent(args[0]);
-                                ;
                                 return null;
                             } else {
-                                // TODO should not be called, throw Exception
-                                // instead?
-                                return method.invoke(proxy, args);
+                                throw new EventSourceAccessException("unexpected listener method dispatched: " + method);
                             }
                         }
                     }
                 });
         try {
             this.addMethod.invoke(this.eventSource, this.listener);
-        } catch (IllegalAccessException e) {
-            throw new EventSourceAccessException("registering event listener failed", e);
-        } catch (IllegalArgumentException e) {
-            throw new EventSourceAccessException("registering event listener failed", e);
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             throw new EventSourceAccessException("registering event listener failed", e);
         }
     }
@@ -154,11 +145,7 @@ public class GenericEventBindingConnector implements EventBindingConnector {
         if (listener != null) {
             try {
                 this.removeMethod.invoke(eventSource, this.listener);
-            } catch (IllegalAccessException e) {
-                throw new EventSourceAccessException("unregistering event listener failed", e);
-            } catch (IllegalArgumentException e) {
-                throw new EventSourceAccessException("unregistering event listener failed", e);
-            } catch (InvocationTargetException e) {
+            } catch (Exception e) {
                 throw new EventSourceAccessException("unregistering event listener failed", e);
             }
             this.listener = null;

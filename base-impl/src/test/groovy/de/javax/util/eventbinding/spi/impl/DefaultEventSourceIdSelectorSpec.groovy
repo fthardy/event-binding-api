@@ -64,7 +64,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
         new EventSourceId(['foo','bar']) | false
         new EventSourceId(['foo','bar','bums','dings']) | false
         new EventSourceId(['foo','bar','baz']) | true
-        new EventSourceId(['foo','bar','böm']) | true
+        new EventSourceId(['foo','bar','bÃ¤m']) | true
     }
     
     def 'should match exactly'() {
@@ -78,7 +78,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
         sourceId | result
         new EventSourceId('foo') | false
         new EventSourceId(['foo','bar']) | false
-        new EventSourceId(['foo','bar','böm']) | false
+        new EventSourceId(['foo','bar','bÃ¤m']) | false
         new EventSourceId(['foo','bar','baz']) | true
         new EventSourceId(['foo','blam','baz']) | false
         new EventSourceId(['foo','bar','baz','dings']) | false
