@@ -11,28 +11,21 @@ import de.javax.util.eventbinding.spi.EventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
-import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo;
 
 /**
  * The default implementation of the event binding service.
  *
  * @author Frank Hardy
  */
-public class DefaultEventBindingServiceProvider implements
-		EventBindingServiceProvider {
-
+public class DefaultEventBindingServiceProvider implements EventBindingServiceProvider {
+	
 	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
-			new DefaultMethodEventTargetFactory(),
-			new DefaultEventSourceIdSelectorFactory(),
-			new SimpleClassInfoCache<TargetProviderClassInfo>());
-
+	        new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory() );
+	
 	private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
-			new DefaultEventSourceFactory(
-					new DefaultEventBindingConnectorFactory()),
-			new SimpleClassInfoCache<EventSourceProviderClassInfo>());
+	        new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
 	@Override
 	public EventTargetCollector getEventTargetCollector() {
@@ -45,8 +38,7 @@ public class DefaultEventBindingServiceProvider implements
 	}
 
 	@Override
-	public EventBinding createEventBinding(Object source, Object target,
-			Set<EventTarget> boundEventTargets) {
+	public EventBinding createEventBinding(Object source, Object target, Set<EventTarget> boundEventTargets) {
 		return new DefaultEventBinding(source, target, boundEventTargets);
 	}
 }
