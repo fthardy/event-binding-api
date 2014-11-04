@@ -2,16 +2,15 @@ package de.javax.util.eventbinding.spi.impl.source;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
+import de.javax.util.eventbinding.spi.impl.ClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo.EventSourceFieldInfo;
 
 /**
@@ -26,7 +25,7 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 
 	private final EventSourceFactory eventSourceFactory;
 
-	private final Map<Class<?>, EventSourceProviderClassInfo> cache = new HashMap<Class<?>, EventSourceProviderClassInfo>();
+	private final ClassInfoCache<EventSourceProviderClassInfo> cache;
 
 	/**
 	 * Creates a new instance of this event source collector.
@@ -34,11 +33,16 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 	 * @param eventSourceFactory
 	 *            the event source factory.
 	 */
-	public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory) {
+	public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory,
+			ClassInfoCache<EventSourceProviderClassInfo> cache) {
 		if (eventSourceFactory == null) {
 			throw new NullPointerException("Undefined event source factory!");
 		}
+		if (cache == null) {
+			throw new NullPointerException("Undefined cache");
+		}
 		this.eventSourceFactory = eventSourceFactory;
+		this.cache = cache;
 	}
 
 	@Override
