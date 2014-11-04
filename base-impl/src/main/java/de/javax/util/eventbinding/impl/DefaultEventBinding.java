@@ -17,7 +17,7 @@ public class DefaultEventBinding implements EventBinding {
 	private Object source;
 	private Object target;
 	private Set<EventTarget> boundTargets;
-
+	
 	/**
 	 * Creates a new instance of this event binding.
 	 * 
@@ -28,8 +28,7 @@ public class DefaultEventBinding implements EventBinding {
 	 * @param boundTargets
 	 *            the set of the bound targets.
 	 */
-	public DefaultEventBinding(Object source, Object target,
-			Set<EventTarget> boundTargets) {
+	public DefaultEventBinding(Object source, Object target, Set<EventTarget> boundTargets) {
 		if (source == null) {
 			throw new NullPointerException("Undefined event source object!");
 		}
@@ -43,12 +42,12 @@ public class DefaultEventBinding implements EventBinding {
 		}
 		this.boundTargets = new HashSet<EventTarget>(boundTargets);
 	}
-
+	
 	@Override
 	public Object getSource() {
 		return this.source;
 	}
-
+	
 	@Override
 	public Object getTarget() {
 		return this.target;
@@ -57,8 +56,7 @@ public class DefaultEventBinding implements EventBinding {
 	@Override
 	public void release() {
 		if (this.boundTargets == null) {
-			throw new IllegalStateException(
-					"The event binding has been already released!");
+			throw new IllegalStateException("The event binding has been already released!");
 		}
 		for (EventTarget target : this.boundTargets) {
 			target.unbindFromSources();
@@ -67,18 +65,17 @@ public class DefaultEventBinding implements EventBinding {
 		this.target = null;
 		this.boundTargets = null;
 	}
-
+	
 	@Override
 	public boolean isReleased() {
 		return this.boundTargets == null;
 	}
-
+	
 	/**
 	 * @return the unmodifiable set of the bound targets or <code>null</code> if
 	 *         this binding has been released.
 	 */
 	public Set<EventTarget> getBoundTargets() {
-		return this.boundTargets != null ? Collections
-				.unmodifiableSet(this.boundTargets) : null;
+		return this.boundTargets != null ? Collections.unmodifiableSet(this.boundTargets) : null;
 	}
 }

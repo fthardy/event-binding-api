@@ -15,9 +15,9 @@ import java.lang.annotation.Target;
  * @see EventSourceProvider
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(value = { ElementType.FIELD })
+@Target(value={ElementType.FIELD})
 public @interface EventSource {
-
+	
 	/**
 	 * @return the identifier of the event source.
 	 */
