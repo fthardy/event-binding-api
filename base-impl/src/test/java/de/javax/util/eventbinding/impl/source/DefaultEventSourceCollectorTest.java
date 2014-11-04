@@ -13,9 +13,11 @@ import de.javax.util.eventbinding.impl.source.testmodel.ContactEditorGui;
 import de.javax.util.eventbinding.impl.source.testmodel.PersonEditorGui;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
+import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
+import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 
 public class DefaultEventSourceCollectorTest {
 
@@ -24,21 +26,21 @@ public class DefaultEventSourceCollectorTest {
     private ContactEditorGui contactEditorGui;
     private EventSourceCollector eventSourceCollector;
 
-
     @Before
     public void prepare() throws Exception {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
+        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
+                new DefaultEventBindingConnectorFactory()), new SimpleClassInfoCache<EventSourceProviderClassInfo>());
     }
-    
-    @Test 
+
+    @Test
     public void collectEventSourcesFrom() throws Exception {
         Set<EventSource> collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
         Assert.assertEquals(8, collectedEventSources.size());
         Set<String> eventSourceIds = new HashSet<String>();
-        for(EventSource eventSource:collectedEventSources) {
+        for (EventSource eventSource : collectedEventSources) {
             eventSourceIds.add(eventSource.getId().toString());
         }
         Assert.assertTrue(eventSourceIds.contains("personEditor.firstNameField"));
@@ -50,6 +52,5 @@ public class DefaultEventSourceCollectorTest {
         Assert.assertTrue(eventSourceIds.contains("okButton"));
         Assert.assertTrue(eventSourceIds.contains("cancelButton"));
     }
-
 
 }
