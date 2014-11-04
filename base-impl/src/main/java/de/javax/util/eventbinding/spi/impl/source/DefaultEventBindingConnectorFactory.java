@@ -19,23 +19,28 @@ import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
  * @author Matthias Hanish
  * @author Frank Hardy
  */
-public class DefaultEventBindingConnectorFactory implements EventBindingConnectorFactory {
+public class DefaultEventBindingConnectorFactory implements
+		EventBindingConnectorFactory {
 
-    private ServiceLoader<EventBindingConnectorFactory> serviceLoader;
+	private ServiceLoader<EventBindingConnectorFactory> serviceLoader;
 
-    @Override
-    public EventBindingConnector createConnector(Object eventSource, Class<?> eventType) {
-        if (this.serviceLoader == null) {
-            this.serviceLoader = ServiceLoader.load(EventBindingConnectorFactory.class);
-        }
+	@Override
+	public EventBindingConnector createConnector(Object eventSource,
+			Class<?> eventType) {
+		if (this.serviceLoader == null) {
+			this.serviceLoader = ServiceLoader
+					.load(EventBindingConnectorFactory.class);
+		}
 
-        Iterator<EventBindingConnectorFactory> it = this.serviceLoader.iterator();
-        while (it.hasNext()) {
-            EventBindingConnector adapter = it.next().createConnector(eventSource, eventType);
-            if (adapter != null) {
-                return adapter;
-            }
-        }
-        return null;
-    }
+		Iterator<EventBindingConnectorFactory> it = this.serviceLoader
+				.iterator();
+		while (it.hasNext()) {
+			EventBindingConnector adapter = it.next().createConnector(
+					eventSource, eventType);
+			if (adapter != null) {
+				return adapter;
+			}
+		}
+		return null;
+	}
 }

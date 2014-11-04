@@ -10,7 +10,7 @@ import de.javax.util.eventbinding.spi.EventSourceId;
  * @author Matthias Hanisch
  *
  */
-class EventSourceProviderClassInfo {
+public class EventSourceProviderClassInfo {
     private Set<EventSourceFieldInfo> fieldInfos;
     private Set<EventSourceFieldInfo> nestedProviders;
     EventSourceProviderClassInfo(Set<EventSourceFieldInfo> fieldInfos, Set<EventSourceFieldInfo> nestedProviders) {
