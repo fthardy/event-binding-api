@@ -5,31 +5,28 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 /**
- * A Predicate methods apply to if their single parameter type has an
- * event method with the given type.
+ * A Predicate methods apply to if their single parameter type has an event
+ * method with the given type.
+ * 
  * @author Matthias Hanisch
  *
  */
-public class MethodParameterTypeHasEventMethodForTypePredicate implements
-    MethodPredicate {
+public class MethodParameterTypeHasEventMethodForTypePredicate implements MethodPredicate {
 
-  private final Class<?> eventType;
+    private final Class<?> eventType;
 
-  public MethodParameterTypeHasEventMethodForTypePredicate(Class<?> eventType) {
-    this.eventType = eventType;
-  }
+    public MethodParameterTypeHasEventMethodForTypePredicate(Class<?> eventType) {
+        this.eventType = eventType;
+    }
 
-  @Override
-  public boolean apply(Method element) {
-    Class<?> parameterType = element.getParameterTypes()[0];
-    Filter<Method> methods = 
-        new Filter<Method>(new HashSet<Method>(Arrays.asList(parameterType.getMethods())))
-        .filter(new PublicMethodPredicate())
-        .filter(new NotPredicate<Method>(new StaticMethodPredicate()))
-        .filter(new MethodParameterCountPredicate(1))
-        .filter(new MethodReturnTypePredicate(Void.TYPE))
-        .filter(new MethodParametersPredicate(eventType));
-    return methods.getElements().size()==1;
-  }
+    @Override
+    public boolean apply(Method element) {
+        Class<?> parameterType = element.getParameterTypes()[0];
+        Filter<Method> methods = new Filter<Method>(new HashSet<Method>(Arrays.asList(parameterType.getMethods())))
+                .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
+                .filter(new MethodParameterCountPredicate(1)).filter(new MethodReturnTypePredicate(Void.TYPE))
+                .filter(new MethodParametersPredicate(eventType));
+        return methods.getElements().size() == 1;
+    }
 
 }

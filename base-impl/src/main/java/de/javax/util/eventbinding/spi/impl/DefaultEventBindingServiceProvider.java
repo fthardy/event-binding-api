@@ -20,25 +20,25 @@ import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactor
  * @author Frank Hardy
  */
 public class DefaultEventBindingServiceProvider implements EventBindingServiceProvider {
-	
-	private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
-	        new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory() );
-	
-	private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
-	        new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
-	@Override
-	public EventTargetCollector getEventTargetCollector() {
-		return this.eventTargetCollector;
-	}
+    private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
+            new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory());
 
-	@Override
-	public EventSourceCollector getEventSourceCollector() {
-		return this.eventSourceCollector;
-	}
+    private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
+            new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
-	@Override
-	public EventBinding createEventBinding(Object source, Object target, Set<EventTarget> boundEventTargets) {
-		return new DefaultEventBinding(source, target, boundEventTargets);
-	}
+    @Override
+    public EventTargetCollector getEventTargetCollector() {
+        return this.eventTargetCollector;
+    }
+
+    @Override
+    public EventSourceCollector getEventSourceCollector() {
+        return this.eventSourceCollector;
+    }
+
+    @Override
+    public EventBinding createEventBinding(Object source, Object target, Set<EventTarget> boundEventTargets) {
+        return new DefaultEventBinding(source, target, boundEventTargets);
+    }
 }

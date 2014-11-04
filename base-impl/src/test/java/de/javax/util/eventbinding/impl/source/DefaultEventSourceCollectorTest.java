@@ -24,21 +24,21 @@ public class DefaultEventSourceCollectorTest {
     private ContactEditorGui contactEditorGui;
     private EventSourceCollector eventSourceCollector;
 
-
     @Before
     public void prepare() throws Exception {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
+        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
+                new DefaultEventBindingConnectorFactory()));
     }
-    
-    @Test 
+
+    @Test
     public void collectEventSourcesFrom() throws Exception {
         Set<EventSource> collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
         Assert.assertEquals(8, collectedEventSources.size());
         Set<String> eventSourceIds = new HashSet<String>();
-        for(EventSource eventSource:collectedEventSources) {
+        for (EventSource eventSource : collectedEventSources) {
             eventSourceIds.add(eventSource.getId().toString());
         }
         Assert.assertTrue(eventSourceIds.contains("personEditor.firstNameField"));
@@ -50,6 +50,5 @@ public class DefaultEventSourceCollectorTest {
         Assert.assertTrue(eventSourceIds.contains("okButton"));
         Assert.assertTrue(eventSourceIds.contains("cancelButton"));
     }
-
 
 }

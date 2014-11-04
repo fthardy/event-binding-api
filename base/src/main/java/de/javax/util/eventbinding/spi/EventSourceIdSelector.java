@@ -14,9 +14,10 @@ public interface EventSourceIdSelector {
     public static final String SEPARATOR = ".";
 
     /**
-     * The definition for the wildcard sequence which is used in selector expressions.<br/>
-     * It depends on the implementation of the selector where wildcards are allowed to be
-     * used.
+     * The definition for the wildcard sequence which is used in selector
+     * expressions.<br/>
+     * It depends on the implementation of the selector where wildcards are
+     * allowed to be used.
      */
     public static final String WILDCARD = "*";
 

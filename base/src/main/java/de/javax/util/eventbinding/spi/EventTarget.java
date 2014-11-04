@@ -41,7 +41,7 @@ public interface EventTarget {
      *         sources are bound to the receiving event target.
      */
     Set<EventSource> getBoundSources();
-    
+
     /**
      * Check if the receiving event target is bound to at least one event
      * source.
@@ -58,7 +58,9 @@ public interface EventTarget {
 
     /**
      * Removes a bound event source from this event target.
-     * @param eventSource The bound event source.
+     * 
+     * @param eventSource
+     *            The bound event source.
      */
     void removeBoundSource(EventSource eventSource);
 }

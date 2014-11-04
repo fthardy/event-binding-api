@@ -34,18 +34,17 @@ public class DefaultEventSourceTest {
     private EventDispatcher dispatcher;
     private Set<EventSource> collectedEventSources;
 
-
     @Before
     public void prepare() throws Exception {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
+        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
+                new DefaultEventBindingConnectorFactory()));
         dispatcher = Mockito.mock(EventDispatcher.class);
         collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
     }
 
-    
     @Test
     public void bindToTarget() throws Exception {
         checkBindToTarget("personEditor.firstNameField", TextChangeEvent.class, true);
@@ -61,7 +60,7 @@ public class DefaultEventSourceTest {
         checkBindToTarget("okButton", ButtonClickEvent.class, true);
         checkBindToTarget("cancelButton", ButtonClickEvent.class, true);
     }
-    
+
     @Test
     public void bindToTargetWildcard() throws Exception {
         checkBindToTarget("personEditor.firstNameField", "personEditor.*", TextChangeEvent.class, true);
@@ -70,7 +69,7 @@ public class DefaultEventSourceTest {
         checkBindToTarget("personEditor.firstNameField", "*", TextChangeEvent.class, true);
         checkBindToTarget("personEditor.lastNameField", "*", TextChangeEvent.class, true);
         checkBindToTarget("personEditor.birthDateField", "*", CalendarChangeEvent.class, true);
-        
+
         checkBindToTarget("personEditor.birthDateField", "personEditor.*", TextChangeEvent.class, false);
         checkBindToTarget("personEditor.birthDateField", "*", TextChangeEvent.class, false);
 
@@ -81,18 +80,19 @@ public class DefaultEventSourceTest {
         checkBindToTarget("addressEditor.zipField", "*", TextChangeEvent.class, true);
         checkBindToTarget("addressEditor.cityField", "*", TextChangeEvent.class, true);
 
-
         checkBindToTarget("okButton", "*", ButtonClickEvent.class, true);
         checkBindToTarget("cancelButton", "*", ButtonClickEvent.class, true);
         checkBindToTarget("okButton", "personEditor.*", ButtonClickEvent.class, false);
         checkBindToTarget("cancelButton", "personEditor.*", ButtonClickEvent.class, false);
     }
 
-    private void checkBindToTarget(String eventSourceIdSelectorExpression, Class<?> eventType, boolean expectedToBind) throws Exception {
+    private void checkBindToTarget(String eventSourceIdSelectorExpression, Class<?> eventType, boolean expectedToBind)
+            throws Exception {
         checkBindToTarget(eventSourceIdSelectorExpression, eventSourceIdSelectorExpression, eventType, expectedToBind);
     }
-    
-    private void checkBindToTarget(String eventSourceIdSelectorExpression, String eventTargetIdExpression, Class<?> eventType, boolean expectedToBind) throws Exception {
+
+    private void checkBindToTarget(String eventSourceIdSelectorExpression, String eventTargetIdExpression,
+            Class<?> eventType, boolean expectedToBind) throws Exception {
         EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorExpression);
         EventSourceIdSelector eventTargetIdSelector = new DefaultEventSourceIdSelector(eventTargetIdExpression);
         EventSource eventSource = getEventSource(collectedEventSources, eventSourceIdSelector);
@@ -100,21 +100,20 @@ public class DefaultEventSourceTest {
         EventTarget eventTarget = new DefaultEventTarget(eventTargetIdSelector, eventType, dispatcher);
         eventSource.bindTo(eventTarget);
         Assert.assertEquals(expectedToBind, eventTarget.isBound());
-        if(eventTarget.isBound()) {
+        if (eventTarget.isBound()) {
             eventTarget.unbindFromSources();
             Assert.assertFalse(eventTarget.isBound());
         }
     }
-    
-    private EventSource getEventSource(Set<EventSource> collectedEventSources, EventSourceIdSelector eventSourceIdSelector) {
-        for(EventSource eventSource:collectedEventSources) {
-            if(eventSourceIdSelector.matches(eventSource.getId())) {
+
+    private EventSource getEventSource(Set<EventSource> collectedEventSources,
+            EventSourceIdSelector eventSourceIdSelector) {
+        for (EventSource eventSource : collectedEventSources) {
+            if (eventSourceIdSelector.matches(eventSource.getId())) {
                 return eventSource;
             }
         }
         return null;
     }
-    
-
 
 }

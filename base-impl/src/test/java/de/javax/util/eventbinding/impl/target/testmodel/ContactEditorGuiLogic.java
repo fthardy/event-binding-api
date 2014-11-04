@@ -6,26 +6,27 @@ import de.javax.util.eventbinding.target.HandleEvent;
 
 public class ContactEditorGuiLogic {
 
-    @EventTargetProvider(from="personEditor") // short form of "personEditor.*"
+    @EventTargetProvider(from = "personEditor")
+    // short form of "personEditor.*"
     private final PersonEditorGuiLogic personEditorLogic;
-    
-    @EventTargetProvider(from="addressEditor.*")
+
+    @EventTargetProvider(from = "addressEditor.*")
     final AddressEditorGuiLogic addressEditorLogic;
-    
+
     public ContactEditorGuiLogic(PersonEditorGuiLogic personEditorLogic, AddressEditorGuiLogic addressEditorLogic) {
         this.personEditorLogic = personEditorLogic;
         this.addressEditorLogic = addressEditorLogic;
     }
 
-    public void onOk(@HandleEvent(from="okButton") ButtonClickEvent event) {
-        
+    public void onOk(@HandleEvent(from = "okButton") ButtonClickEvent event) {
+
     }
-    
-    public void onCancel(@HandleEvent(from="cancelButton") ButtonClickEvent event) {
-        
+
+    public void onCancel(@HandleEvent(from = "cancelButton") ButtonClickEvent event) {
+
     }
-    
-    public void onButtonClick(@HandleEvent(from="*") ButtonClickEvent event) {
-        
+
+    public void onButtonClick(@HandleEvent(from = "*") ButtonClickEvent event) {
+
     }
 }

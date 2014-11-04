@@ -5,12 +5,12 @@ import de.javax.util.eventbinding.target.HandleEvent;
 
 public class AddressEditorGuiLogic {
 
-    public void onZipChange(@HandleEvent(from="zipField") TextChangeEvent event) {
-        
+    public void onZipChange(@HandleEvent(from = "zipField") TextChangeEvent event) {
+
     }
-    
+
     // Short form of @HandleEvent(from="*")
     public void onAnyTextFieldChange(@HandleEvent TextChangeEvent event) {
-        
+
     }
 }

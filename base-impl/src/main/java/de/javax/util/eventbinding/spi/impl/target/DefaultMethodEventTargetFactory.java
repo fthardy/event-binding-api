@@ -13,11 +13,9 @@ import de.javax.util.eventbinding.spi.EventTarget;
 public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory {
 
     @Override
-    public EventTarget createEventTarget(
-            Object targetProvider, Method eventHandlerMethod, EventSourceIdSelector sourceIdSelector) {
-        return new DefaultEventTarget(
-                sourceIdSelector,
-                eventHandlerMethod.getParameterTypes()[0],
+    public EventTarget createEventTarget(Object targetProvider, Method eventHandlerMethod,
+            EventSourceIdSelector sourceIdSelector) {
+        return new DefaultEventTarget(sourceIdSelector, eventHandlerMethod.getParameterTypes()[0],
                 new MethodAdaptingEventDispatcher(eventHandlerMethod, targetProvider));
     }
 }

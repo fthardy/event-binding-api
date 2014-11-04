@@ -7,11 +7,11 @@ package de.javax.util.eventbinding.spi;
  */
 public interface EventDispatcher {
 
-	/**
-	 * Dispatch a given event to the encapsulated event handler.
-	 * 
-	 * @param event
-	 *            the event to be dispatched.
-	 */
-	void dispatchEvent(Object event);
+    /**
+     * Dispatch a given event to the encapsulated event handler.
+     * 
+     * @param event
+     *            the event to be dispatched.
+     */
+    void dispatchEvent(Object event);
 }

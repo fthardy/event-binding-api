@@ -24,6 +24,6 @@ public interface MethodEventTargetFactory {
      * 
      * @return the new event target instance.
      */
-    EventTarget createEventTarget(
-            Object targetProvider, Method eventHandlerMethod, EventSourceIdSelector sourceIdSelector);
+    EventTarget createEventTarget(Object targetProvider, Method eventHandlerMethod,
+            EventSourceIdSelector sourceIdSelector);
 }
