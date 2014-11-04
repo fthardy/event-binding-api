@@ -1,5 +1,6 @@
 package de.javax.util.eventbinding;
 
+
 /**
  * TODO Documentation
  *
@@ -7,6 +8,6 @@ package de.javax.util.eventbinding;
  */
 public class NoEventSourcesFoundException extends EventBindingException {
 
-    private static final long serialVersionUID = -8552157603922393646L;
+	private static final long serialVersionUID = -8552157603922393646L;
 
 }

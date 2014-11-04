@@ -13,28 +13,28 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelector;
  * @author Frank Hardy
  */
 public class DefaultEventSourceIdSelector implements EventSourceIdSelector {
-
+    
     static List<String> splitExpression(String expression) {
         assert expression != null;
-
+        
         boolean valid = true;
         List<String> parts = Arrays.asList(expression.split("\\" + SEPARATOR));
         for (int i = 0; i < (parts.size() - 1) && valid; i++) {
             valid = isValidPart(parts.get(i));
         }
-
+        
         if (valid) {
             String lastPart = parts.get(parts.size() - 1);
             valid = lastPart.equals(WILDCARD) || isValidPart(lastPart);
         }
-
+        
         if (!valid) {
             throw new IllegalArgumentException("Invalid event source identifier selector expression: " + expression);
         }
-
+            
         return parts;
     }
-
+    
     static boolean isValidPart(String part) {
         if (part.isEmpty()) {
             return false;

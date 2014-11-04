@@ -41,8 +41,7 @@ public class Filter<T> {
      * filter instance with the new collection of (filtered) elements.
      * 
      * @param predicate
-     *            The predicate used to check which elements are accepted by
-     *            this filter.
+     *            The predicate used to check which elements are accepted by this filter.
      * 
      * @return a new instance of a filter that contains all elements of this
      *         filter which are accepted by the given predicate.

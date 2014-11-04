@@ -16,16 +16,16 @@ import de.javax.util.eventbinding.spi.EventTarget;
  */
 public interface EventBindingConnector {
 
-    /**
-     * Establish the binding between an event source and event target.
-     * 
-     * @param eventDispatcher
-     *            the event dispatcher provided by the {@link EventTarget}.
-     */
-    void connect(EventDispatcher eventDispatcher);
+	/**
+	 * Establish the binding between an event source and event target.
+	 * 
+	 * @param eventDispatcher
+	 *            the event dispatcher provided by the {@link EventTarget}.
+	 */
+	void connect(EventDispatcher eventDispatcher);
 
-    /**
-     * Disconnect the binding between the event source and event target.
-     */
-    void disconnect();
+	/**
+	 * Disconnect the binding between the event source and event target.
+	 */
+	void disconnect();
 }

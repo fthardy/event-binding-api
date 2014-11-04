@@ -41,11 +41,12 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * @param idSelectorFactory
      *            the identifier selector factory.
      */
-    public DefaultEventTargetCollector(MethodEventTargetFactory targetfactory,
-            EventSourceIdSelectorFactory idSelectorFactory) {
+    public DefaultEventTargetCollector(
+            MethodEventTargetFactory targetfactory, EventSourceIdSelectorFactory idSelectorFactory) {
         this(targetfactory, idSelectorFactory, new CascadedEventSourceIdSelectorFactory() {
             @Override
-            public EventSourceIdSelector createCascadedIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post) {
+            public EventSourceIdSelector createCascadedIdSelector(
+                    EventSourceIdSelector pre, EventSourceIdSelector post) {
                 return new CascadedEventSourceIdSelector(pre, post);
             }
         });
@@ -62,7 +63,8 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
      * @param cascadedIdSelectorFactory
      *            the cascaded identifier selector factory.
      */
-    DefaultEventTargetCollector(MethodEventTargetFactory targetfactory, EventSourceIdSelectorFactory isSelectorFactory,
+    DefaultEventTargetCollector(MethodEventTargetFactory targetfactory,
+            EventSourceIdSelectorFactory isSelectorFactory,
             CascadedEventSourceIdSelectorFactory cascadedIdSelectorFactory) {
         if (targetfactory == null) {
             throw new NullPointerException("Undefined method event target factory!");
@@ -104,10 +106,10 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
         Set<EventTarget> targets = new HashSet<EventTarget>();
         for (HandlerMethodInfo handlerMethodInfo : info.getHandlerMethods()) {
             EventSourceIdSelector idSelector = handlerMethodInfo.getIdSelector();
-            EventSourceIdSelector combinedSelector = parentIdSelector == null ? idSelector
-                    : this.cascadedIdSelectorFactory.createCascadedIdSelector(parentIdSelector, idSelector);
-            targets.add(this.targetFactory.createEventTarget(targetProvider, handlerMethodInfo.getMethod(),
-                    combinedSelector));
+            EventSourceIdSelector combinedSelector = parentIdSelector == null ?
+                    idSelector : this.cascadedIdSelectorFactory.createCascadedIdSelector(parentIdSelector, idSelector);
+            targets.add(this.targetFactory.createEventTarget(
+                    targetProvider, handlerMethodInfo.getMethod(), combinedSelector));
         }
 
         try { // drill recursively down the target provider structure
@@ -127,9 +129,9 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
                 }
 
                 EventSourceIdSelector nestedProviderIdSelector = nestedProviderFieldInfo.getIdSelector();
-                EventSourceIdSelector newParentIdSelector = parentIdSelector == null ? nestedProviderIdSelector
-                        : this.cascadedIdSelectorFactory.createCascadedIdSelector(parentIdSelector,
-                                nestedProviderIdSelector);
+                EventSourceIdSelector newParentIdSelector = parentIdSelector == null ?
+                        nestedProviderIdSelector : this.cascadedIdSelectorFactory.createCascadedIdSelector(
+                                parentIdSelector, nestedProviderIdSelector);
 
                 // --- this is an indirect, recursive call ---
                 targets.addAll(this.collectTargetsFrom(nestedTargetProvider, newParentIdSelector));

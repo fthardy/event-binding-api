@@ -13,7 +13,7 @@ import java.util.List;
  * @author Frank Hardy
  */
 public class EventSourceId {
-
+    
     private final List<String> names;
 
     /**
@@ -25,7 +25,7 @@ public class EventSourceId {
     public EventSourceId(String name) {
         this(Arrays.asList(new String[] { name }));
     }
-
+    
     /**
      * Creates a new event source identifier.
      * 
@@ -36,7 +36,7 @@ public class EventSourceId {
         this.validateNames(names);
         this.names = Collections.unmodifiableList(new ArrayList<String>(names));
     }
-
+    
     @Override
     public int hashCode() {
         return this.names.hashCode();
@@ -46,26 +46,26 @@ public class EventSourceId {
     public boolean equals(Object other) {
         return this.names.equals(other);
     }
-
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (String name : names) {
-            if (sb.length() > 0) {
+        for(String name:names) {
+            if(sb.length()>0) {
                 sb.append('.');
             }
             sb.append(name);
         }
         return sb.toString();
     }
-
+    
     /**
      * @return the list of names.
      */
     public List<String> getNames() {
         return this.names;
     }
-
+    
     private void validateNames(List<String> names) {
         if (names == null || names.size() == 0) {
             throw new IllegalArgumentException("Undefined identifier names!");
@@ -74,7 +74,7 @@ public class EventSourceId {
             this.validateName(name);
         }
     }
-
+    
     private void validateName(String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Undefined identifier name!");
@@ -89,4 +89,4 @@ public class EventSourceId {
             throw new IllegalArgumentException("Invalid event source identifier name: " + name);
         }
     }
-}
+ }

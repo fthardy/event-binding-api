@@ -11,7 +11,7 @@ public abstract class EventBindingException extends RuntimeException {
 
     public EventBindingException() {
     }
-
+    
     /**
      * Initialise this exception with a message.
      * 

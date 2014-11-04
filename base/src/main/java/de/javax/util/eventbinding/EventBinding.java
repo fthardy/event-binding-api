@@ -11,27 +11,27 @@ package de.javax.util.eventbinding;
  */
 public interface EventBinding {
 
-    /**
-     * @return the object which is the source of events in the receiving event
-     *         binding. <code>null</code> when the binding has been released.
-     */
-    Object getSource();
+	/**
+	 * @return the object which is the source of events in the receiving event
+	 *         binding. <code>null</code> when the binding has been released.
+	 */
+	Object getSource();
 
-    /**
-     * @return the object which is the target of events in the receiving event
-     *         binding. <code>null</code> when the binding has been released.
-     */
-    Object getTarget();
-
-    /**
-     * Releases the receiving event binding instance.
-     */
-    void release();
-
-    /**
-     * Check if the receiving binding instance has been released.
-     *
-     * @return <code>true</code> if the binding has been released.
-     */
-    boolean isReleased();
+	/**
+	 * @return the object which is the target of events in the receiving event
+	 *         binding. <code>null</code> when the binding has been released.
+	 */
+	Object getTarget();
+	
+	/**
+	 * Releases the receiving event binding instance.
+	 */
+	void release();
+	
+	/**
+	 * Check if the receiving binding instance has been released.
+	 *
+	 * @return <code>true</code> if the binding has been released.
+	 */
+	boolean isReleased();
 }

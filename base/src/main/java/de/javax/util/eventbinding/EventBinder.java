@@ -10,34 +10,33 @@ package de.javax.util.eventbinding;
  */
 public interface EventBinder {
 
-    /**
-     * Create an event binding between a given event source and target.
-     * 
-     * @param source
-     *            the object representing a source of events.
-     * @param target
-     *            the object representing the target of the events from the
-     *            source.
-     * 
-     * @return an object which represents the event binding between the given
-     *         source and target object.
-     * 
-     * @throws EventBindingException
-     *             when the binding between the source and target fails for some
-     *             reason.
-     */
-    EventBinding bind(Object source, Object target) throws EventBindingException;
+	/**
+	 * Create an event binding between a given event source and target.
+	 * 
+	 * @param source
+	 *            the object representing a source of events.
+	 * @param target
+	 *            the object representing the target of the events from the
+	 *            source.
+	 * 
+	 * @return an object which represents the event binding between the given
+	 *         source and target object.
+	 * 
+	 * @throws EventBindingException
+	 *             when the binding between the source and target fails for some
+	 *             reason.
+	 */
+	EventBinding bind(Object source, Object target) throws EventBindingException;
 
-    /**
-     * @return <code>true</code> when this event binder is in strict binding
-     *         mode. Otherwise <code>false</code>.
-     */
-    boolean isStrictBindingMode();
+	/**
+	 * @return <code>true</code> when this event binder is in strict binding mode. Otherwise <code>false</code>. 
+	 */
+	boolean isStrictBindingMode();
 
-    /**
-     * @param strictBinding
-     *            set to <code>true</code> to activate the strict binding mode.
-     */
-    void setStrictBindingMode(boolean strictBinding);
+	/**
+	 * @param strictBinding
+	 *            set to <code>true</code> to activate the strict binding mode.
+	 */
+	void setStrictBindingMode(boolean strictBinding);
 
 }

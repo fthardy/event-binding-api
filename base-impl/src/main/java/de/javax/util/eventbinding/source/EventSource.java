@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Target(value = { ElementType.FIELD })
 public @interface EventSource {
 
-    /**
-     * @return the identifier of the event source.
-     */
-    String value() default "";
+	/**
+	 * @return the identifier of the event source.
+	 */
+	String value() default "";
 }

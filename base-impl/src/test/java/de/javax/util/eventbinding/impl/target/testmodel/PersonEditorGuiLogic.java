@@ -5,7 +5,7 @@ import de.javax.util.eventbinding.target.HandleEvent;
 
 public class PersonEditorGuiLogic {
 
-    public void onBirthDateChange(@HandleEvent(from = "birthDateField") CalendarChangeEvent event) {
-
+    public void onBirthDateChange(@HandleEvent(from="birthDateField") CalendarChangeEvent event) {
+        
     }
 }

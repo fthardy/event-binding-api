@@ -15,134 +15,137 @@ import java.util.regex.Pattern;
  */
 public interface MethodPredicate extends Predicate<Method> {
 
-    /**
-     * A predicate public methods will apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class PublicMethodPredicate implements MethodPredicate {
-        @Override
-        public boolean apply(Method element) {
-            return Modifier.isPublic(element.getModifiers());
-        }
-    }
+	/**
+	 * A predicate public methods will apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class PublicMethodPredicate implements MethodPredicate {
+		@Override
+		public boolean apply(Method element) {
+			return Modifier.isPublic(element.getModifiers());
+		}
+	}
 
-    /**
-     * A predicate static methods will apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class StaticMethodPredicate implements MethodPredicate {
-        @Override
-        public boolean apply(Method element) {
-            return Modifier.isStatic(element.getModifiers());
-        }
-    }
+	/**
+	 * A predicate static methods will apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class StaticMethodPredicate implements MethodPredicate {
+		@Override
+		public boolean apply(Method element) {
+			return Modifier.isStatic(element.getModifiers());
+		}
+	}
 
-    /**
-     * A predicate methods with a certain number of method parameters will apply
-     * to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class MethodParameterCountPredicate implements MethodPredicate {
+	/**
+	 * A predicate methods with a certain number of method parameters will apply
+	 * to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class MethodParameterCountPredicate implements
+			MethodPredicate {
 
-        private final int parameterCount;
+		private final int parameterCount;
 
-        public MethodParameterCountPredicate(int parameterCount) {
-            this.parameterCount = parameterCount;
+		public MethodParameterCountPredicate(int parameterCount) {
+			this.parameterCount = parameterCount;
 
-        }
+		}
 
-        @Override
-        public boolean apply(Method element) {
-            return element.getParameterTypes().length == parameterCount;
-        }
+		@Override
+		public boolean apply(Method element) {
+			return element.getParameterTypes().length == parameterCount;
+		}
 
-    }
+	}
 
-    /**
-     * A predicate methods with a certain return type will apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class MethodReturnTypePredicate implements MethodPredicate {
+	/**
+	 * A predicate methods with a certain return type will apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class MethodReturnTypePredicate implements MethodPredicate {
 
-        private final Class<?> returnType;
+		private final Class<?> returnType;
 
-        public MethodReturnTypePredicate(Class<?> returnType) {
-            this.returnType = returnType;
-        }
+		public MethodReturnTypePredicate(Class<?> returnType) {
+			this.returnType = returnType;
+		}
 
-        @Override
-        public boolean apply(Method element) {
-            return returnType.equals(element.getReturnType());
-        }
+		@Override
+		public boolean apply(Method element) {
+			return returnType.equals(element.getReturnType());
+		}
 
-    }
+	}
 
-    /**
-     * A predicate methods with matching method parameter types will apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class MethodParametersPredicate implements MethodPredicate {
-        private Class<?>[] parameterTypes;
+	/**
+	 * A predicate methods with matching method parameter types will apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class MethodParametersPredicate implements MethodPredicate {
+		private Class<?>[] parameterTypes;
 
-        public MethodParametersPredicate(Class<?>... parameterTypes) {
-            this.parameterTypes = parameterTypes;
-        }
+		public MethodParametersPredicate(Class<?>... parameterTypes) {
+			this.parameterTypes = parameterTypes;
+		}
 
-        @Override
-        public boolean apply(Method element) {
-            Class<?>[] methodParameterTypes = element.getParameterTypes();
-            if (parameterTypes.length != methodParameterTypes.length) {
-                return false;
-            }
-            for (int i = 0; i < parameterTypes.length; i++) {
-                if (!parameterTypes[i].equals(methodParameterTypes[i])) {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
+		@Override
+		public boolean apply(Method element) {
+			Class<?>[] methodParameterTypes = element.getParameterTypes();
+			if (parameterTypes.length != methodParameterTypes.length) {
+				return false;
+			}
+			for (int i = 0; i < parameterTypes.length; i++) {
+				if (!parameterTypes[i].equals(methodParameterTypes[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+	}
 
-    /**
-     * A predicate methods with a method name matching a regular expression will
-     * apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class MethodNamePredicate implements MethodPredicate {
-        private final Pattern pattern;
+	/**
+	 * A predicate methods with a method name matching a regular expression will
+	 * apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class MethodNamePredicate implements MethodPredicate {
+		private final Pattern pattern;
 
-        public MethodNamePredicate(String regex) {
-            this.pattern = Pattern.compile(regex);
-        }
+		public MethodNamePredicate(String regex) {
+			this.pattern = Pattern.compile(regex);
+		}
 
-        @Override
-        public boolean apply(Method element) {
-            Matcher matcher = pattern.matcher(element.getName());
-            return matcher.matches();
-        }
-    }
+		@Override
+		public boolean apply(Method element) {
+			Matcher matcher = pattern.matcher(element.getName());
+			return matcher.matches();
+		}
+	}
 
-    /**
-     * A predicate methods with a certain annotation will apply to.
-     * 
-     * @author Matthias Hanisch
-     */
-    public static class MethodWithAnnotationPredicate implements MethodPredicate {
-        private final Class<? extends Annotation> annotationType;
+	/**
+	 * A predicate methods with a certain annotation will apply to.
+	 * 
+	 * @author Matthias Hanisch
+	 */
+	public static class MethodWithAnnotationPredicate implements
+			MethodPredicate {
+		private final Class<? extends Annotation> annotationType;
 
-        public MethodWithAnnotationPredicate(Class<? extends Annotation> annotationType) {
-            this.annotationType = annotationType;
-        }
+		public MethodWithAnnotationPredicate(
+				Class<? extends Annotation> annotationType) {
+			this.annotationType = annotationType;
+		}
 
-        @Override
-        public boolean apply(Method element) {
-            return element.getAnnotation(annotationType) != null;
-        }
-    }
+		@Override
+		public boolean apply(Method element) {
+			return element.getAnnotation(annotationType) != null;
+		}
+	}
 }

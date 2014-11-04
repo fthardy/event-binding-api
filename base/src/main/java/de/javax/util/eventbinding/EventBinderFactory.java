@@ -7,10 +7,10 @@ package de.javax.util.eventbinding;
  */
 public interface EventBinderFactory {
 
-    /**
-     * Create a new event binder.
-     *
-     * @return the new event binder instance.
-     */
-    EventBinder createEventBinder();
+	/**
+	 * Create a new event binder.
+	 *
+	 * @return the new event binder instance.
+	 */
+	EventBinder createEventBinder();
 }
