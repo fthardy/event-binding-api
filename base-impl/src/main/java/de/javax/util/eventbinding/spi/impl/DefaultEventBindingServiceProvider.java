@@ -2,8 +2,10 @@ package de.javax.util.eventbinding.spi.impl;
 
 import java.util.Set;
 
+import de.javax.util.eventbinding.EventBinder;
 import de.javax.util.eventbinding.EventBinding;
 import de.javax.util.eventbinding.impl.DefaultEventBinding;
+import de.javax.util.eventbinding.impl.RebuildableEventBindingDecorator;
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -42,7 +44,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
     }
 
     @Override
-    public EventBinding createEventBinding(Object source, Object target, Set<EventTarget> boundEventTargets) {
-        return new DefaultEventBinding(source, target, boundEventTargets);
+    public EventBinding createEventBinding(EventBinder binder, Object source, Object target,
+            Set<EventTarget> boundEventTargets) {
+        return new RebuildableEventBindingDecorator(binder, new DefaultEventBinding(source, target, boundEventTargets));
     }
 }

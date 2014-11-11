@@ -9,10 +9,9 @@ import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
  * The default implementation of an event binder.<br/>
- * This implementation defines the top level event binding process. The concrete
- * implementation is based on the interfaces of the SPI. The
- * {@link EventBindingServiceProvider} provides the implementations of the
- * services for the event binding.
+ * This implementation defines the top level event binding process. The concrete implementation is based on the
+ * interfaces of the SPI. The {@link EventBindingServiceProvider} provides the implementations of the services for the
+ * event binding.
  * 
  * @author Frank Hardy
  */
@@ -26,8 +25,7 @@ public class DefaultEventBinder implements EventBinder {
      * Creates a new instance of an event binder.
      * 
      * @param serviceProvider
-     *            the implementation instance of a
-     *            {@link EventBindingServiceProvider}.
+     *            the implementation instance of a {@link EventBindingServiceProvider}.
      */
     public DefaultEventBinder(EventBindingServiceProvider serviceProvider) {
         if (serviceProvider == null) {
@@ -37,20 +35,17 @@ public class DefaultEventBinder implements EventBinder {
     }
 
     /**
-     * Create an event binding between a given event source provider and event
-     * target provider.
+     * Create an event binding between a given event source provider and event target provider.
      * 
      * @param sourceProvider
      *            the provider of event sources for binding.
      * @param targetProvider
      *            the provider of event targets for binding.
      * 
-     * @return an object which represents the event binding between the given
-     *         source and target object.
+     * @return an object which represents the event binding between the given source and target object.
      * 
      * @throws EventBindingException
-     *             when the binding between the source and target fails for some
-     *             reason.
+     *             when the binding between the source and target fails for some reason.
      */
     @Override
     public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
@@ -66,13 +61,12 @@ public class DefaultEventBinder implements EventBinder {
             throw new NoEventTargetsFoundException();
         }
 
-        return this.serviceProvider.createEventBinding(sourceProvider, targetProvider,
+        return this.serviceProvider.createEventBinding(this, sourceProvider, targetProvider,
                 this.bindTargetsToSources(foundTargets, foundSources));
     }
 
     /**
-     * @return <code>true</code> when this event binder is in strict binding
-     *         mode. Otherwise <code>false</code>.
+     * @return <code>true</code> when this event binder is in strict binding mode. Otherwise <code>false</code>.
      */
     @Override
     public boolean isStrictBindingMode() {
@@ -89,8 +83,8 @@ public class DefaultEventBinder implements EventBinder {
     }
 
     /**
-     * Implements the process of binding the found event targets to the event
-     * sources from the given event source provider object.
+     * Implements the process of binding the found event targets to the event sources from the given event source
+     * provider object.
      * 
      * @param eventTargets
      *            the found event targets.
