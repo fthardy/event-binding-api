@@ -32,10 +32,10 @@ project('base-impl') {
 	}
 }
 
-project('vaadin-impl') {
+project('javafx-impl') {
 	dependencies {
 		compile project(':base')
+		compile project(':base-impl')
 		
-		compile 'com.vaadin:vaadin-server:7.3.2'
 	}
 }
