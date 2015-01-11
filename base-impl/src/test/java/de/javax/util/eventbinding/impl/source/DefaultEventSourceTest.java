@@ -13,6 +13,7 @@ import de.javax.util.eventbinding.impl.source.testmodel.ContactEditorGui;
 import de.javax.util.eventbinding.impl.source.testmodel.PersonEditorGui;
 import de.javax.util.eventbinding.impl.testmodel.ButtonClickEvent;
 import de.javax.util.eventbinding.impl.testmodel.CalendarChangeEvent;
+import de.javax.util.eventbinding.impl.testmodel.ParentComponentEvent;
 import de.javax.util.eventbinding.impl.testmodel.TextChangeEvent;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
@@ -61,6 +62,7 @@ public class DefaultEventSourceTest {
 
         checkBindToTarget("okButton", ButtonClickEvent.class, true);
         checkBindToTarget("cancelButton", ButtonClickEvent.class, true);
+        checkBindToTarget("/", ParentComponentEvent.class, true);
     }
 
     @Test

@@ -1,7 +1,6 @@
-package de.javax.util.eventbinding.impl.target.testmodel;
+package de.javax.util.eventbinding.spi.javafx.target.testmodel;
 
-import de.javax.util.eventbinding.impl.testmodel.ButtonClickEvent;
-import de.javax.util.eventbinding.impl.testmodel.ParentComponentEvent;
+import javafx.event.ActionEvent;
 import de.javax.util.eventbinding.target.EventTargetProvider;
 import de.javax.util.eventbinding.target.HandleEvent;
 
@@ -19,20 +18,15 @@ public class ContactEditorGuiLogic {
         this.addressEditorLogic = addressEditorLogic;
     }
 
-    public void onOk(@HandleEvent(from = "okButton") ButtonClickEvent event) {
+    public void onOk(@HandleEvent(from = "okButton") ActionEvent event) {
 
     }
 
-    public void onCancel(@HandleEvent(from = "cancelButton") ButtonClickEvent event) {
+    public void onCancel(@HandleEvent(from = "cancelButton") ActionEvent event) {
 
     }
 
-    public void onButtonClick(@HandleEvent(from = "*") ButtonClickEvent event) {
+    public void onButtonClick(@HandleEvent(from = "*") ActionEvent event) {
 
     }
-
-    public void onParentComponent(@HandleEvent ParentComponentEvent event) {
-
-    }
-
 }
