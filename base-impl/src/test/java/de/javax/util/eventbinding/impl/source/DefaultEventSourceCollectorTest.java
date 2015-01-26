@@ -13,6 +13,7 @@ import de.javax.util.eventbinding.impl.source.testmodel.ContactEditorGui;
 import de.javax.util.eventbinding.impl.source.testmodel.PersonEditorGui;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
+import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
@@ -38,7 +39,7 @@ public class DefaultEventSourceCollectorTest {
     @Test
     public void collectEventSourcesFrom() throws Exception {
         Set<EventSource> collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
-        Assert.assertEquals(8, collectedEventSources.size());
+        Assert.assertEquals(9, collectedEventSources.size());
         Set<String> eventSourceIds = new HashSet<String>();
         for (EventSource eventSource : collectedEventSources) {
             eventSourceIds.add(eventSource.getId().toString());
@@ -51,6 +52,7 @@ public class DefaultEventSourceCollectorTest {
         Assert.assertTrue(eventSourceIds.contains("addressEditor.cityField"));
         Assert.assertTrue(eventSourceIds.contains("okButton"));
         Assert.assertTrue(eventSourceIds.contains("cancelButton"));
+        Assert.assertTrue(eventSourceIds.contains(EventSourceId.ROOT));
     }
 
 }

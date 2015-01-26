@@ -1,10 +1,9 @@
 package de.javax.util.eventbinding;
 
 /**
- * An event binding is a context object which represents an event binding between a source and a target object.<br/>
- * An event binding provides access to the object which represents source and target of the event binding and allows to
- * release the binding between those two by calling {@link #release()}.
- * 
+ * An even binding is returned by an {@link de.javax.util.eventbinding.EventBinder} and represents the binding between
+ * a source of events and a target for processing the events.<br/>
+ *
  * @author Frank Hardy
  */
 public interface EventBinding {
@@ -22,7 +21,9 @@ public interface EventBinding {
     Object getTarget();
 
     /**
-     * Releases the receiving event binding instance.
+     * Releases the receiving event binding instance.<br/>
+     * Once an event binding is released all references to the source and target object are cleared. Hence after a
+     * release it can can never be rebuilt or used in any way.
      */
     void release();
 
@@ -34,9 +35,10 @@ public interface EventBinding {
     boolean isReleased();
 
     /**
-     * Rebuilds the event binding by releasing it first and re-creating the event binding for the source and target of
-     * this event binding.
+     * Rebuilds the receiving event binding between the source and target object.<br/>
+     * This is an optional method.
+     *
+     * @throws java.lang.UnsupportedOperationException when the rebuilding is not supported by the receiving binding instance.
      */
     void rebuild();
-
 }

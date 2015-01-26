@@ -46,7 +46,11 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 
     @Override
     public Set<EventSource> collectEventSourcesFrom(Object eventSourceProvider) {
-        return this.findEventSources(eventSourceProvider, null);
+        Set<EventSource> collectedSources = new HashSet<EventSource>();
+        collectedSources.add(this.eventSourceFactory.createEventSource(new EventSourceId(EventSourceId.ROOT),
+                eventSourceProvider));
+        collectedSources.addAll(this.findEventSources(eventSourceProvider, null));
+        return collectedSources;
     }
 
     private Set<EventSource> findEventSources(Object eventSourceProvider, EventSourceId providerId) {

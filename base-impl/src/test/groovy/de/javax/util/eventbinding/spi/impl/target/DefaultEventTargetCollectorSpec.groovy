@@ -72,59 +72,61 @@ class DefaultEventTargetCollectorSpec extends Specification {
         def addressEditorLogic = new AddressEditorGuiLogic()
         def personEditorLogic = new PersonEditorGuiLogic()
         def contactEditorLogic = new ContactEditorGuiLogic(personEditorLogic, addressEditorLogic);
-        EventSourceIdSelector selectorMock1 = Mock()
-        EventSourceIdSelector selectorMock2 = Mock()
-        EventSourceIdSelector selectorMock3 = Mock()
-        EventSourceIdSelector selectorMock4 = Mock()
-        EventSourceIdSelector selectorMock5 = Mock()
-        EventSourceIdSelector selectorMock6 = Mock()
-        EventSourceIdSelector selectorMock7 = Mock()
-        EventSourceIdSelector selectorMock8 = Mock()
-        EventSourceIdSelector selectorMock9 = Mock()
-        EventSourceIdSelector selectorMock10 = Mock()
-        EventSourceIdSelector selectorMock11 = Mock()
+        EventSourceIdSelector onOkSelectorMock = Mock()
+        EventSourceIdSelector onCancelSelectorMock = Mock()
+        EventSourceIdSelector onZipChangeSelectorMock = Mock()
+        EventSourceIdSelector onBirthDateChangeSelectorMock = Mock()
+        EventSourceIdSelector personEditorSelectorMock = Mock()
+        EventSourceIdSelector addressEditorSelectorMock = Mock()
+        EventSourceIdSelector wildcardSelectorMock1 = Mock()
+        EventSourceIdSelector wildcardSelectorMock2 = Mock()
+        EventSourceIdSelector wildcardSelectorMock3 = Mock()
+        EventSourceIdSelector cascadedSelectorMock1 = Mock()
+        EventSourceIdSelector cascadedSelectorMock2 = Mock()
+        EventSourceIdSelector cascadedSelectorMock3 = Mock()
+        EventTarget onOkEventTargetMock = Mock()
+        EventTarget onCancelEventTargetMock = Mock()
+        EventTarget onBirthDateChangeEventTargetMock = Mock()
         EventTarget eventTargetMock1 = Mock()
         EventTarget eventTargetMock2 = Mock()
         EventTarget eventTargetMock3 = Mock()
         EventTarget eventTargetMock4 = Mock()
-        EventTarget eventTargetMock5 = Mock()
-        EventTarget eventTargetMock6 = Mock()
 
         when:
         def eventTargets = this.collector.collectEventTargetsFrom(contactEditorLogic)
 
         then:
-        this.selectorFactoryMock.createEventSourceIdSelector("okButton") >> selectorMock1
-        this.selectorFactoryMock.createEventSourceIdSelector("cancelButton") >> selectorMock2
-        2 * this.selectorFactoryMock.createEventSourceIdSelector("*") >>> [selectorMock3, selectorMock7]
-        this.selectorFactoryMock.createEventSourceIdSelector("personEditor.*") >> selectorMock4
-        this.selectorFactoryMock.createEventSourceIdSelector("addressEditor.*") >> selectorMock5
-        this.selectorFactoryMock.createEventSourceIdSelector("zipField") >> selectorMock6
-        this.selectorFactoryMock.createEventSourceIdSelector("birthDateField") >> selectorMock8
+        this.selectorFactoryMock.createEventSourceIdSelector("okButton") >> onOkSelectorMock
+        this.selectorFactoryMock.createEventSourceIdSelector("cancelButton") >> onCancelSelectorMock
+        this.selectorFactoryMock.createEventSourceIdSelector("zipField") >> onZipChangeSelectorMock
+        this.selectorFactoryMock.createEventSourceIdSelector("birthDateField") >> onBirthDateChangeSelectorMock
+        this.selectorFactoryMock.createEventSourceIdSelector("personEditor.*") >> personEditorSelectorMock
+        this.selectorFactoryMock.createEventSourceIdSelector("addressEditor.*") >> addressEditorSelectorMock
+        3 * this.selectorFactoryMock.createEventSourceIdSelector("*") >>> [wildcardSelectorMock1, wildcardSelectorMock2, wildcardSelectorMock3]
         0 * this.selectorFactoryMock._
 
-        this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(selectorMock4, selectorMock8) >> selectorMock9
-        this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(selectorMock5, selectorMock6) >> selectorMock10
-        this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(selectorMock5, selectorMock7) >> selectorMock11
+        this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(personEditorSelectorMock, onBirthDateChangeSelectorMock) >> cascadedSelectorMock1
+        2 * this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(addressEditorSelectorMock, _) >>> [cascadedSelectorMock2, cascadedSelectorMock3]
         0 * this.cascadedIdSelectorFactoryMock._
 
-        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, selectorMock1) >> eventTargetMock1
-        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, selectorMock2) >> eventTargetMock2
-        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, selectorMock3) >> eventTargetMock3
-        this.targetFactoryMock.createEventTarget(personEditorLogic, _, selectorMock9) >> eventTargetMock4
-        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, selectorMock10) >> eventTargetMock5
-        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, selectorMock11) >> eventTargetMock6
+        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, onOkSelectorMock) >> onOkEventTargetMock
+        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, onCancelSelectorMock) >> onCancelEventTargetMock
+        this.targetFactoryMock.createEventTarget(personEditorLogic, _, cascadedSelectorMock1) >> onBirthDateChangeEventTargetMock
+        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, cascadedSelectorMock2) >> eventTargetMock1
+        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, cascadedSelectorMock3) >> eventTargetMock2
+        2 * this.targetFactoryMock.createEventTarget(contactEditorLogic, _, _) >>> [eventTargetMock3, eventTargetMock4]
         0 * this.targetFactoryMock._
 
         expect:
-        6 == eventTargets.size()
+        7 == eventTargets.size()
         eventTargets.containsAll([
+            onOkEventTargetMock,
+            onCancelEventTargetMock,
+            onBirthDateChangeEventTargetMock,
             eventTargetMock1,
             eventTargetMock2,
             eventTargetMock3,
-            eventTargetMock4,
-            eventTargetMock5,
-            eventTargetMock6
+			eventTargetMock4
         ])
     }
 }

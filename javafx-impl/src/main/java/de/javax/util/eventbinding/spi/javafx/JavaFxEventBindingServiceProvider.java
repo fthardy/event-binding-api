@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.impl;
+package de.javax.util.eventbinding.spi.javafx;
 
 import java.util.Set;
 
@@ -9,28 +9,30 @@ import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
+import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelectorFactory;
+import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
-import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
 import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo;
+import de.javax.util.eventbinding.spi.javafx.source.JavaFxEventSourceCollector;
 
 /**
- * The default implementation of the event binding service.
+ * The JavaFxEventBindingServiceProvider is using a specific {@link JavaFxEventSourceCollector instance} to collect the
+ * event sources. For collecting event targets and creating the event binding the default implementations are used.
+ * 
+ * @author Matthias Hanisch
  *
- * @author Frank Hardy
  */
-public class DefaultEventBindingServiceProvider implements EventBindingServiceProvider {
+public class JavaFxEventBindingServiceProvider implements EventBindingServiceProvider {
 
     private final EventTargetCollector eventTargetCollector = new DefaultEventTargetCollector(
             new DefaultMethodEventTargetFactory(), new DefaultEventSourceIdSelectorFactory(),
             new SimpleClassInfoCache<TargetProviderClassInfo>());
 
-    private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
-            new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()),
-            new SimpleClassInfoCache<EventSourceProviderClassInfo>());
+    private final EventSourceCollector eventSourceCollector = new JavaFxEventSourceCollector(
+            new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
     @Override
     public EventTargetCollector getEventTargetCollector() {
@@ -43,8 +45,8 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
     }
 
     @Override
-    public EventBinding createEventBinding(
-            EventBinder binder, Object source, Object target, Set<EventTarget> boundEventTargets) {
-        return new DefaultEventBinding(binder, source, target, boundEventTargets);
+    public EventBinding createEventBinding(EventBinder binder, Object source, Object target,
+            Set<EventTarget> boundEventTargets) {
+    	return new DefaultEventBinding(binder, source, target, boundEventTargets);
     }
 }

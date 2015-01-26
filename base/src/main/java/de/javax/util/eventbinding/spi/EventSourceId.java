@@ -7,13 +7,15 @@ import java.util.List;
 
 /**
  * Represents an identifier for an event source object.<br/>
- * An event source identifier consist of one or more names. Each name has to
- * conform to the naming rules of Java identifiers.
+ * An event source identifier consist of one or more names. Each name has to conform to the naming rules of Java
+ * identifiers.
  * 
  * @author Frank Hardy
  */
 public class EventSourceId {
-    
+
+    public static final String ROOT = "/";
+
     private final List<String> names;
 
     /**
@@ -25,7 +27,7 @@ public class EventSourceId {
     public EventSourceId(String name) {
         this(Arrays.asList(new String[] { name }));
     }
-    
+
     /**
      * Creates a new event source identifier.
      * 
@@ -36,7 +38,7 @@ public class EventSourceId {
         this.validateNames(names);
         this.names = Collections.unmodifiableList(new ArrayList<String>(names));
     }
-    
+
     @Override
     public int hashCode() {
         return this.names.hashCode();
@@ -46,26 +48,26 @@ public class EventSourceId {
     public boolean equals(Object other) {
         return this.names.equals(other);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(String name:names) {
-            if(sb.length()>0) {
+        for (String name : names) {
+            if (sb.length() > 0) {
                 sb.append('.');
             }
             sb.append(name);
         }
         return sb.toString();
     }
-    
+
     /**
      * @return the list of names.
      */
     public List<String> getNames() {
         return this.names;
     }
-    
+
     private void validateNames(List<String> names) {
         if (names == null || names.size() == 0) {
             throw new IllegalArgumentException("Undefined identifier names!");
@@ -74,12 +76,12 @@ public class EventSourceId {
             this.validateName(name);
         }
     }
-    
+
     private void validateName(String name) {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Undefined identifier name!");
         }
-        boolean valid = Character.isJavaIdentifierStart(name.charAt(0));
+        boolean valid = Character.isJavaIdentifierStart(name.charAt(0)) || ROOT.equals(name);
         if (valid && name.length() > 1) {
             for (int i = 1; i < name.length() && valid; i++) {
                 valid = Character.isJavaIdentifierPart(name.charAt(i));
@@ -89,4 +91,4 @@ public class EventSourceId {
             throw new IllegalArgumentException("Invalid event source identifier name: " + name);
         }
     }
- }
+}

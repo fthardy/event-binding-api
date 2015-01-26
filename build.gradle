@@ -1,6 +1,4 @@
 
-def vaadinVersion = '7.1+'
-
 subprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'groovy'
@@ -9,7 +7,7 @@ subprojects {
 
 	version = '1.0-SNAPSHOT'
 
-	sourceCompatibility = 1.6
+	sourceCompatibility = 1.7
 
 	repositories {
 		mavenCentral()
@@ -32,10 +30,10 @@ project('base-impl') {
 	}
 }
 
-project('vaadin-impl') {
+project('javafx-impl') {
 	dependencies {
 		compile project(':base')
+		compile project(':base-impl')
 		
-		compile 'com.vaadin:vaadin-server:7.3.2'
 	}
 }

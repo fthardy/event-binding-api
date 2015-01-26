@@ -4,7 +4,7 @@ import de.javax.util.eventbinding.spi.EventSourceId;
 
 /**
  * The interface definition for a factory which is responsible to create
- * instances of {@link EventSource}.
+ * instances of {@link de.javax.util.eventbinding.spi.EventSource}.
  * 
  * @author Frank Hardy
  */
@@ -20,6 +20,5 @@ public interface EventSourceFactory {
 	 * 
 	 * @return the new instance.
 	 */
-	de.javax.util.eventbinding.spi.EventSource createEventSource(
-			EventSourceId eventSourceId, Object eventSourceObject);
+	de.javax.util.eventbinding.spi.EventSource createEventSource(EventSourceId eventSourceId, Object eventSourceObject);
 }
