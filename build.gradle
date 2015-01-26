@@ -1,4 +1,3 @@
-
 subprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'groovy'

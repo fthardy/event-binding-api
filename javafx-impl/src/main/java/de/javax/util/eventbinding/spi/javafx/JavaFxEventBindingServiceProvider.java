@@ -45,8 +45,7 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
     }
 
     @Override
-    public EventBinding createEventBinding(EventBinder binder, Object source, Object target,
-            Set<EventTarget> boundEventTargets) {
+    public EventBinding createEventBinding(EventBinder binder, Object source, Object target, Set<EventTarget> boundEventTargets) {
     	return new DefaultEventBinding(binder, source, target, boundEventTargets);
     }
 }
