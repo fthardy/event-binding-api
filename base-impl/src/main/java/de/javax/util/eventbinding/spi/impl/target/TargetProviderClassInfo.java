@@ -40,10 +40,12 @@ public class TargetProviderClassInfo {
 
         private final Method method;
         private final EventSourceIdSelector idSelector;
-
-        public HandlerMethodInfo(Method method, EventSourceIdSelector idSelector) {
-            this.method = method;
-            this.idSelector = idSelector;
+        private final Object metaData;
+        
+        public HandlerMethodInfo(Method method, EventSourceIdSelector idSelector, Object metaData) {
+        	this.method = method;
+        	this.idSelector = idSelector;
+        	this.metaData = metaData;
         }
 
         public Method getMethod() {
@@ -53,6 +55,10 @@ public class TargetProviderClassInfo {
         public EventSourceIdSelector getIdSelector() {
             return this.idSelector;
         }
+        
+        public Object getMetaData() {
+			return this.metaData;
+		}
     }
     
     /**

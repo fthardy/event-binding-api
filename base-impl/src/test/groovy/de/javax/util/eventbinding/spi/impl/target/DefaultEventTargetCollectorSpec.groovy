@@ -9,6 +9,7 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory
 import de.javax.util.eventbinding.spi.EventTarget
 import de.javax.util.eventbinding.spi.EventTargetCollector
 import de.javax.util.eventbinding.spi.impl.ClassInfoCache
+import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector.CascadedEventSourceIdSelectorFactory
 
 class DefaultEventTargetCollectorSpec extends Specification {
@@ -17,33 +18,47 @@ class DefaultEventTargetCollectorSpec extends Specification {
     EventSourceIdSelectorFactory selectorFactoryMock = Mock()
     CascadedEventSourceIdSelectorFactory cascadedIdSelectorFactoryMock = Mock()
     ClassInfoCache<TargetProviderClassInfo> cacheMock = Mock();
+	HandlerMethodInfoCollector handlerMethodInfoCollectorMock = Mock();
 
     EventTargetCollector collector = new DefaultEventTargetCollector(
-    this.targetFactoryMock, this.selectorFactoryMock, this.cascadedIdSelectorFactoryMock, this.cacheMock)
+		this.targetFactoryMock,
+		this.selectorFactoryMock,
+		this.cascadedIdSelectorFactoryMock,
+		new DefaultHandlerMethodInfoCollector(this.selectorFactoryMock),
+		new SimpleClassInfoCache<TargetProviderClassInfo>())
 
     def 'A target factory must be set on creation'() {
         when:
-        new DefaultEventTargetCollector(null, this.selectorFactoryMock, this.cacheMock)
+        	new DefaultEventTargetCollector(null, this.selectorFactoryMock, this.handlerMethodInfoCollectorMock, this.cacheMock)
 
         then:
-        thrown(NullPointerException)
+        	thrown(NullPointerException)
     }
 
     def 'A selector factory must be set on creation'() {
         when:
-        new DefaultEventTargetCollector(this.targetFactoryMock, null, this.cacheMock)
+        	new DefaultEventTargetCollector(this.targetFactoryMock, null, this.handlerMethodInfoCollectorMock, this.cacheMock)
 
         then:
-        thrown(NullPointerException)
+			thrown(NullPointerException)
+    }
+    
+    def 'A handler method info collector must be set on creation'() {
+    	when:
+    		new DefaultEventTargetCollector(this.targetFactoryMock, this.selectorFactoryMock, null, this.cacheMock)
+    
+	    then:
+	    	thrown(NullPointerException)
     }
 
     def 'A cache must be set on creation'() {
         when:
-        new DefaultEventTargetCollector(this.targetFactoryMock, this.selectorFactoryMock, null)
+        	new DefaultEventTargetCollector(this.targetFactoryMock, this.selectorFactoryMock, this.handlerMethodInfoCollectorMock, null)
 
         then:
-        thrown(NullPointerException)
+        	thrown(NullPointerException)
     }
+	
 
     def 'Collect event targets from provider without nested providers'() {
         given:
