@@ -14,10 +14,8 @@ import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFa
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
 import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
-import de.javax.util.eventbinding.spi.impl.target.DefaultHandlerMethodInfoCollector;
-import de.javax.util.eventbinding.spi.impl.target.DefaultCandidateMethodFilter;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.target.DefaultHandlerMethodInfoExtractor;
+import de.javax.util.eventbinding.spi.impl.target.DefaultHandlerMethodInfoCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
 import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo;
 
