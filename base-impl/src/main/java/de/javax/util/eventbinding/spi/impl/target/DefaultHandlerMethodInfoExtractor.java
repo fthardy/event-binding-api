@@ -1,49 +1,33 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
-import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
-import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo.HandlerMethodInfo;
 import de.javax.util.eventbinding.target.HandleEvent;
 
-public class DefaultHandlerMethodInfoExtractor implements HandlerMethodInfoExtractor {
+/**
+ * The default implementation of a {@link HandlerMethodInfoExtractor} which
+ * expects and evaluates {@link HandleEvent} annotations at the event handler methods.
+ *
+ * @author Frank Hardy
+ */
+public class DefaultHandlerMethodInfoExtractor extends AbstractHandlerMethodInfoExtractor<HandleEvent> {
 	
-	private final EventSourceIdSelectorFactory idSelectorFactory;
-	
-	public DefaultHandlerMethodInfoExtractor(EventSourceIdSelectorFactory idSelectorFactory) {
-		this.idSelectorFactory= idSelectorFactory;
+	/**
+	 * Creates a new instance of this class.
+	 * 
+	 * @param idSelectorFactory
+	 *            the ID selector factory.
+	 */
+	public DefaultHandlerMethodInfoExtractor(Class<HandleEvent> annotationTypeClass, EventSourceIdSelectorFactory idSelectorFactory) {
+		super(annotationTypeClass, idSelectorFactory);
 	}
 	
 	@Override
-	public HandlerMethodInfo extractHandlerMethodInfo(Method method) {
-		Annotation[] parameterAnnotations = method.getParameterAnnotations()[0];
-		for (Annotation annotation : parameterAnnotations) {
-			if (annotation.annotationType() == HandleEvent.class) {
-				HandleEvent handleEventAnnotation = (HandleEvent) annotation;
-				String selectorExpression = handleEventAnnotation.from().trim();
-				if (selectorExpression.isEmpty()) {
-					selectorExpression = EventSourceIdSelector.WILDCARD;
-				}
-				return new HandlerMethodInfo(
-						method,
-						this.idSelectorFactory.createEventSourceIdSelector(selectorExpression),
-						this.getMetaDataFromHandleEventAnnotation(handleEventAnnotation));
-			}
-		}
-		return null;
+	protected String getIdSelectorExpressionFromAnnotation(HandleEvent annotation) {
+		return annotation.from().trim();
 	}
-	
-	/**
-	 * Extract the meta data from the given annotation.
-	 * 
-	 * @param annotation
-	 *            the parameter annotation of the event handler method.
-	 * 
-	 * @return the meta data object or <code>null</code> if there is none.
-	 */
-	protected Object getMetaDataFromHandleEventAnnotation(HandleEvent annotation) {
+
+	@Override
+	protected Object getMetaDataFromAnnotation(HandleEvent annotation) {
 		return null;
 	}
 }
