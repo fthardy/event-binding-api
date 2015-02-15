@@ -17,8 +17,8 @@ public class DefaultHandlerMethodInfoExtractor extends AbstractHandlerMethodInfo
 	 * @param idSelectorFactory
 	 *            the ID selector factory.
 	 */
-	public DefaultHandlerMethodInfoExtractor(Class<HandleEvent> annotationTypeClass, EventSourceIdSelectorFactory idSelectorFactory) {
-		super(annotationTypeClass, idSelectorFactory);
+	public DefaultHandlerMethodInfoExtractor(EventSourceIdSelectorFactory idSelectorFactory) {
+		super(HandleEvent.class, idSelectorFactory);
 	}
 	
 	@Override

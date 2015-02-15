@@ -6,7 +6,6 @@ import java.util.Set;
 
 import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo.HandlerMethodInfo;
-import de.javax.util.eventbinding.target.HandleEvent;
 
 /**
  * This default candidate method collector implementation gets all public
@@ -31,7 +30,7 @@ public class DefaultHandlerMethodInfoCollector implements HandlerMethodInfoColle
 	 *            the ID selector factory.
 	 */
 	public DefaultHandlerMethodInfoCollector(EventSourceIdSelectorFactory idSelectorFactory) {
-		this(new DefaultCandidateMethodFilter(), new DefaultHandlerMethodInfoExtractor(HandleEvent.class, idSelectorFactory));
+		this(new DefaultCandidateMethodFilter(), new DefaultHandlerMethodInfoExtractor(idSelectorFactory));
 	}
 	
 	/**
