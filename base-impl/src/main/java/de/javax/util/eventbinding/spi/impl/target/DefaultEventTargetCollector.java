@@ -25,7 +25,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 
 	private final MethodEventTargetFactory targetFactory;
 	private final EventSourceIdSelectorFactory idSelectorFactory;
-	private final CascadedEventSourceIdSelectorFactory cascadedIdSelectorFactory;
+	private final ChainedEventSourceIdSelectorFactory chainedIdSelectorFactory;
 	private final HandlerMethodInfoCollector handlerMethodInfoCollector;
 	private final ClassInfoCache<TargetProviderClassInfo> cache;
 
@@ -46,13 +46,13 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 			EventSourceIdSelectorFactory idSelectorFactory,
 			HandlerMethodInfoCollector handlerMethodInfoCollector,
 			ClassInfoCache<TargetProviderClassInfo> cache) {
-		this(targetfactory, idSelectorFactory, new DefaultCascadedEventSourceIdSelectorFactory(), handlerMethodInfoCollector, cache);
+		this(targetfactory, idSelectorFactory, null, handlerMethodInfoCollector, cache);
 	}
 
 	DefaultEventTargetCollector(
 			MethodEventTargetFactory targetfactory,
 			EventSourceIdSelectorFactory idSelectorFactory,
-			CascadedEventSourceIdSelectorFactory cascadedIdSelectorFactory,
+			ChainedEventSourceIdSelectorFactory chainedIdSelectorFactory,
 			HandlerMethodInfoCollector handlerMethodInfoCollector,
 			ClassInfoCache<TargetProviderClassInfo> cache) {
 		if (targetfactory == null) {
@@ -64,11 +64,8 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 			throw new NullPointerException("Undefined event source identifier selector factory!");
 		}
 		this.idSelectorFactory = idSelectorFactory;
-		
-		if (cascadedIdSelectorFactory == null) {
-			throw new NullPointerException("Undefined cascaded ID selector factory!");
-		}
-		this.cascadedIdSelectorFactory = cascadedIdSelectorFactory;
+		this.chainedIdSelectorFactory = chainedIdSelectorFactory == null ? 
+				new DefaultChainedEventSourceIdSelectorFactory() : chainedIdSelectorFactory;
 		
 		if (handlerMethodInfoCollector == null) {
 			throw new NullPointerException("Undefined handler method info collector!");
@@ -87,7 +84,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	}
 
 	/**
-	 * Collect all event targets from a given target provider object.
+	 * Collect all event targets from a given target provider object and all its nested target provider objects.
 	 * 
 	 * @param targetProvider
 	 *            the target provider object.
@@ -100,45 +97,59 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	private Set<EventTarget> collectTargetsFrom(Object targetProvider, EventSourceIdSelector parentIdSelector) {
 		Class<? extends Object> targetProviderClass = targetProvider.getClass();
 
-		TargetProviderClassInfo info = this.getTargetProviderClassInfoFor(targetProviderClass);
+		TargetProviderClassInfo targetProviderClassInfo = this.getTargetProviderClassInfoFor(targetProviderClass);
 
-		Set<EventTarget> targets = new HashSet<EventTarget>();
-		for (HandlerMethodInfo handlerMethodInfo : info.getHandlerMethods()) {
+		Set<EventTarget> eventTargets = new HashSet<EventTarget>();
+		for (HandlerMethodInfo handlerMethodInfo : targetProviderClassInfo.getHandlerMethodInfos()) {
 			EventSourceIdSelector idSelector = handlerMethodInfo.getIdSelector();
-			EventSourceIdSelector combinedSelector = parentIdSelector == null ? 
-					idSelector : this.cascadedIdSelectorFactory.createCascadedIdSelector(parentIdSelector, idSelector);
-			targets.add(this.targetFactory.createEventTarget(targetProvider, handlerMethodInfo.getMethod(), combinedSelector));
+			if (parentIdSelector != null) {
+				idSelector = this.chainedIdSelectorFactory.createChainedIdSelector(parentIdSelector, idSelector);
+			}
+			eventTargets.add(this.targetFactory.createEventTarget(targetProvider, handlerMethodInfo.getMethod(), idSelector));
 		}
 
-		try { // drill recursively down the target provider structure
-			for (NestedProviderFieldInfo nestedProviderFieldInfo : info.getNestedProviderFieldInfos()) {
-				Field nestedProviderField = nestedProviderFieldInfo.getField();
-				nestedProviderField.setAccessible(true);
-				Object nestedTargetProvider;
+		eventTargets.addAll(this.collectEventTargetsFromNestedTargetProviders(
+				targetProvider, parentIdSelector, targetProviderClass, targetProviderClassInfo));
+		return eventTargets;
+	}
+
+	private Set<EventTarget> collectEventTargetsFromNestedTargetProviders(
+			Object targetProvider, EventSourceIdSelector parentIdSelector,
+			Class<? extends Object> targetProviderClass, TargetProviderClassInfo targetProviderClassInfo) {
+		Set<EventTarget> eventTargets = new HashSet<EventTarget>();
+		
+		// drill recursively down the target provider structure
+		for (NestedProviderFieldInfo nestedProviderFieldInfo : targetProviderClassInfo.getNestedProviderFieldInfos()) {
+			Field nestedProviderField = nestedProviderFieldInfo.getField();
+			nestedProviderField.setAccessible(true); // TODO Handle SecurityException? Configure this or not?
+			Object nestedTargetProvider;
+			try {
 				try {
 					nestedTargetProvider = nestedProviderField.get(targetProvider);
-					if (nestedTargetProvider == null) {
-						throw new EventTargetAccessException("The value of field '"
-								+ nestedProviderField.toGenericString()
-								+ "' in class '" + targetProviderClass
-								+ "' is null!");
-					}
-				} finally {
-					nestedProviderField.setAccessible(false);
+				} catch (Exception e) {
+					throw new EventTargetAccessException("Failed to access field in class '" + targetProviderClass + "'!", e);
 				}
-
-				EventSourceIdSelector nestedProviderIdSelector = nestedProviderFieldInfo
-						.getIdSelector();
-				EventSourceIdSelector newParentIdSelector = parentIdSelector == null ? nestedProviderIdSelector
-						: this.cascadedIdSelectorFactory.createCascadedIdSelector(parentIdSelector, nestedProviderIdSelector);
-
-				// --- this is an indirect, recursive call ---
-				targets.addAll(this.collectTargetsFrom(nestedTargetProvider, newParentIdSelector));
+				if (nestedTargetProvider == null) {
+					// TODO Maybe ignore nested target provider fields that are null? Or make it at least configurable.
+					throw new EventTargetAccessException("The value of field '"
+							+ nestedProviderField.toGenericString()
+							+ "' in class '" + targetProviderClass
+							+ "' is null!");
+				}
+			} finally {
+				nestedProviderField.setAccessible(false); // TODO Handle SecurityException? Configure this or not?
 			}
-		} catch (Exception e) {
-			throw new EventTargetAccessException( "Failed to access field in class '" + targetProviderClass + "'!", e);
+
+			EventSourceIdSelector nestedProviderIdSelector = nestedProviderFieldInfo.getIdSelector();
+			if (parentIdSelector != null) {
+				nestedProviderIdSelector = this.chainedIdSelectorFactory.createChainedIdSelector(parentIdSelector, nestedProviderIdSelector);
+			}
+
+			// An indirect, recursive call!
+			eventTargets.addAll(this.collectTargetsFrom(nestedTargetProvider, nestedProviderIdSelector));
 		}
-		return targets;
+		
+		return eventTargets;
 	}
 
 	private TargetProviderClassInfo getTargetProviderClassInfoFor(Class<?> targetProviderClass) {
@@ -155,8 +166,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	private Set<NestedProviderFieldInfo> collectNestedTargetProviderFieldInfos(Class<?> targetProviderClass) {
 		Set<NestedProviderFieldInfo> infos = new HashSet<NestedProviderFieldInfo>();
 		for (Field field : targetProviderClass.getDeclaredFields()) {
-			EventTargetProvider annotation = field
-					.getAnnotation(EventTargetProvider.class);
+			EventTargetProvider annotation = field.getAnnotation(EventTargetProvider.class);
 			if (annotation != null) {
 				String selectorExpression = annotation.from();
 				if (selectorExpression.isEmpty()) {
@@ -164,71 +174,68 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 				} else if (!selectorExpression.endsWith(SEPARATOR_WILDCARD)) {
 					selectorExpression += SEPARATOR_WILDCARD;
 				}
-
-				infos.add(new NestedProviderFieldInfo(
-						field,
-						this.idSelectorFactory
-								.createEventSourceIdSelector(selectorExpression)));
+				infos.add(new NestedProviderFieldInfo(field, this.idSelectorFactory.createEventSourceIdSelector(selectorExpression)));
 			}
 		}
 		return infos;
 	}
 
 	/**
+	 * Creates instances of {@link ChainedEventSourceIdSelector}.<br/>
 	 * This interface is only internally used for the purpose of unit testing.
 	 * 
 	 * @author Frank Hardy
 	 */
-	static interface CascadedEventSourceIdSelectorFactory {
+	static interface ChainedEventSourceIdSelectorFactory {
 		
 		/**
 		 * Creates a new cascaded ID selector.
 		 * 
-		 * @param pre
-		 *            the pre selector instance.
-		 * @param post
-		 *            the post selector instance.
+		 * @param first
+		 *            the first selector instance.
+		 * @param next
+		 *            the next selector instance.
 		 * 
 		 * @return the new cascaded ID selector.
 		 */
-		EventSourceIdSelector createCascadedIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post);
+		EventSourceIdSelector createChainedIdSelector(EventSourceIdSelector first, EventSourceIdSelector next);
 	}
 	
 	/**
-	 * Default implementation.
+	 * Default implementation.<br/>
+	 * Simply creates an instance of {@link ChainedEventSourceIdSelector}.
 	 *
 	 * @author Frank Hardy
 	 */
-	static class DefaultCascadedEventSourceIdSelectorFactory implements CascadedEventSourceIdSelectorFactory {
+	static class DefaultChainedEventSourceIdSelectorFactory implements ChainedEventSourceIdSelectorFactory {
 		
 		@Override
-		public EventSourceIdSelector createCascadedIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post) {
-			return new CascadedEventSourceIdSelector(pre, post);
+		public EventSourceIdSelector createChainedIdSelector(EventSourceIdSelector first, EventSourceIdSelector next) {
+			return new ChainedEventSourceIdSelector(first, next);
 		}
 	}
 
-	private static class CascadedEventSourceIdSelector implements EventSourceIdSelector {
+	private static class ChainedEventSourceIdSelector implements EventSourceIdSelector {
 
-		private final EventSourceIdSelector preSelector;
-		private final EventSourceIdSelector postSelector;
+		private final EventSourceIdSelector firstSelector;
+		private final EventSourceIdSelector nextSelector;
 
 		/**
-		 * Creates a new instance of this selector.
+		 * Creates a new instance of a chained selector.
 		 * 
-		 * @param pre
-		 *            the pre selector.
-		 * @param post
-		 *            the post selector.
+		 * @param first
+		 *            the first selector.
+		 * @param next
+		 *            the next selector.
 		 */
-		public CascadedEventSourceIdSelector(EventSourceIdSelector pre, EventSourceIdSelector post) {
-			this.preSelector = pre;
-			this.postSelector = post;
+		public ChainedEventSourceIdSelector(EventSourceIdSelector first, EventSourceIdSelector next) {
+			this.firstSelector = first;
+			this.nextSelector = next;
 		}
 
 		@Override
 		public boolean matches(EventSourceId sourceId) {
-			return this.preSelector.matches(sourceId)
-					&& this.postSelector.matches(sourceId);
+			return this.firstSelector.matches(sourceId) && this.nextSelector.matches(sourceId);
 		}
 	}
 }

@@ -10,13 +10,13 @@ import de.javax.util.eventbinding.spi.EventTarget
 import de.javax.util.eventbinding.spi.EventTargetCollector
 import de.javax.util.eventbinding.spi.impl.ClassInfoCache
 import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
-import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector.CascadedEventSourceIdSelectorFactory
+import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector.ChainedEventSourceIdSelectorFactory
 
 class DefaultEventTargetCollectorSpec extends Specification {
 
     MethodEventTargetFactory targetFactoryMock = Mock()
     EventSourceIdSelectorFactory selectorFactoryMock = Mock()
-    CascadedEventSourceIdSelectorFactory cascadedIdSelectorFactoryMock = Mock()
+    ChainedEventSourceIdSelectorFactory cascadedIdSelectorFactoryMock = Mock()
     ClassInfoCache<TargetProviderClassInfo> cacheMock = Mock();
 	HandlerMethodInfoCollector handlerMethodInfoCollectorMock = Mock();
 
@@ -120,8 +120,8 @@ class DefaultEventTargetCollectorSpec extends Specification {
         3 * this.selectorFactoryMock.createEventSourceIdSelector("*") >>> [wildcardSelectorMock1, wildcardSelectorMock2, wildcardSelectorMock3]
         0 * this.selectorFactoryMock._
 
-        this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(personEditorSelectorMock, onBirthDateChangeSelectorMock) >> cascadedSelectorMock1
-        2 * this.cascadedIdSelectorFactoryMock.createCascadedIdSelector(addressEditorSelectorMock, _) >>> [cascadedSelectorMock2, cascadedSelectorMock3]
+        this.cascadedIdSelectorFactoryMock.createChainedIdSelector(personEditorSelectorMock, onBirthDateChangeSelectorMock) >> cascadedSelectorMock1
+        2 * this.cascadedIdSelectorFactoryMock.createChainedIdSelector(addressEditorSelectorMock, _) >>> [cascadedSelectorMock2, cascadedSelectorMock3]
         0 * this.cascadedIdSelectorFactoryMock._
 
         this.targetFactoryMock.createEventTarget(contactEditorLogic, _, onOkSelectorMock) >> onOkEventTargetMock

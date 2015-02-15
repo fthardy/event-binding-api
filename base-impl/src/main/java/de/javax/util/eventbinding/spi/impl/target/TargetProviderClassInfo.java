@@ -14,17 +14,17 @@ import de.javax.util.eventbinding.spi.EventSourceIdSelector;
  */
 public class TargetProviderClassInfo {
 
-    private final Set<HandlerMethodInfo> handlerMethods;
+    private final Set<HandlerMethodInfo> handlerMethodInfos;
     private final Set<NestedProviderFieldInfo> nestedProviderFieldInfos;
 
     public TargetProviderClassInfo(
             Set<HandlerMethodInfo> handlerMethods, Set<NestedProviderFieldInfo> nestedProviderFieldInfos) {
-        this.handlerMethods = handlerMethods;
+        this.handlerMethodInfos = handlerMethods;
         this.nestedProviderFieldInfos = nestedProviderFieldInfos;
     }
 
-    public Set<HandlerMethodInfo> getHandlerMethods() {
-        return this.handlerMethods == null ? null : Collections.unmodifiableSet(this.handlerMethods);
+    public Set<HandlerMethodInfo> getHandlerMethodInfos() {
+        return this.handlerMethodInfos == null ? null : Collections.unmodifiableSet(this.handlerMethodInfos);
     }
     
     public Set<NestedProviderFieldInfo> getNestedProviderFieldInfos() {
