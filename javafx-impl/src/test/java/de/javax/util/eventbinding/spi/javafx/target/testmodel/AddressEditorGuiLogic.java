@@ -1,16 +1,16 @@
 package de.javax.util.eventbinding.spi.javafx.target.testmodel;
 
 import javafx.scene.input.InputEvent;
-import de.javax.util.eventbinding.target.HandleEvent;
+import de.javax.util.eventbinding.target.HandleJfxEvent;
 
 public class AddressEditorGuiLogic {
-
-    public void onZipChange(@HandleEvent(from = "zipField") InputEvent event) {
+	
+    public void onZipChange(@HandleJfxEvent(from = "zipField") InputEvent event) {
 
     }
-
+    
     // Short form of @HandleEvent(from="*")
-    public void onAnyTextFieldChange(@HandleEvent InputEvent event) {
+    public void onAnyTextFieldChange(@HandleJfxEvent(eventType = "ANY") InputEvent event) {
 
     }
 }
