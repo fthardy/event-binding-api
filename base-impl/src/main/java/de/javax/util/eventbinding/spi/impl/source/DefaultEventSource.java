@@ -65,7 +65,7 @@ public class DefaultEventSource implements EventSource {
 		}
 
 		EventBindingConnector connector = this.connectorFactory
-				.createConnector(this.eventSource, eventTarget.getEventType());
+				.createConnector(this.eventSource, eventTarget.getEventClass());
 		if (connector != null) {
 			connector.connect(eventTarget.getEventDispatcher());
 			this.connectorMapping.put(eventTarget, connector);

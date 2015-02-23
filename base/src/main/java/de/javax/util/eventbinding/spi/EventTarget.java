@@ -12,9 +12,9 @@ import java.util.Set;
 public interface EventTarget {
 
     /**
-     * @return the type of events supported by the receiving event target.
+     * @return the event type class which the receiving event target can handle.
      */
-    Class<?> getEventType();
+    Class<?> getEventClass();
 
     /**
      * @return the event source identifier selector which is used to select the

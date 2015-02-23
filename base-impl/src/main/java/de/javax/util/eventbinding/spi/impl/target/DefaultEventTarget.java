@@ -16,7 +16,7 @@ import de.javax.util.eventbinding.spi.EventTarget;
  */
 public class DefaultEventTarget implements EventTarget {
 
-    private final Class<?> eventType;
+    private final Class<?> eventClass;
     private final EventSourceIdSelector sourceIdSelector;
     private final EventDispatcher eventDispatcher;
 
@@ -45,7 +45,7 @@ public class DefaultEventTarget implements EventTarget {
         if (eventType == null) {
             throw new NullPointerException("Undefined event type!");
         }
-        this.eventType = eventType;
+        this.eventClass = eventType;
         if (dispatcher == null) {
             throw new NullPointerException("Undefined event dispatcher!");
         }
@@ -58,8 +58,8 @@ public class DefaultEventTarget implements EventTarget {
     }
 
     @Override
-    public Class<?> getEventType() {
-        return this.eventType;
+    public Class<?> getEventClass() {
+        return this.eventClass;
     }
 
     @Override
