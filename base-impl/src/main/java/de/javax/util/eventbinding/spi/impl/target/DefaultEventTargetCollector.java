@@ -1,9 +1,11 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSourceId;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
@@ -82,6 +84,17 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	public Set<EventTarget> collectEventTargetsFrom(Object targetProvider) {
 		return this.collectTargetsFrom(targetProvider, null);
 	}
+	
+	/**
+	 * TODO Documentation
+	 * 
+	 * @param method
+	 * @param target
+	 * @return
+	 */
+	protected EventDispatcher createMethodEventDispatcher(Method method, Object target) {
+		return new MethodAdaptingEventDispatcher(method, target);
+	}
 
 	/**
 	 * Collect all event targets from a given target provider object and all its nested target provider objects.
@@ -105,7 +118,14 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 			if (parentIdSelector != null) {
 				idSelector = this.chainedIdSelectorFactory.createChainedIdSelector(parentIdSelector, idSelector);
 			}
-			eventTargets.add(this.targetFactory.createEventTarget(targetProvider, handlerMethodInfo.getMethod(), idSelector));
+			
+			Method handlerMethod = handlerMethodInfo.getMethod();
+			
+			eventTargets.add(this.targetFactory.createEventTarget(
+					idSelector,
+					handlerMethod.getParameterTypes()[0],
+					handlerMethodInfo.getMetaData(),
+					this.createMethodEventDispatcher(handlerMethod, targetProvider)));
 		}
 
 		eventTargets.addAll(this.collectEventTargetsFromNestedTargetProviders(

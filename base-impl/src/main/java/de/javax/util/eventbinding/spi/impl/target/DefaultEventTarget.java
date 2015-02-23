@@ -32,20 +32,20 @@ public class DefaultEventTarget implements EventTarget {
      * 
      * @param sourceIdSelector
      *            the selector for the source identifiers.
-     * @param eventType
-     *            the type of the event which this target wants to handle.
+     * @param eventClass
+     *            the class of the event which this target wants to handle.
      * @param dispatcher
      *            the event dispatcher.
      */
-    public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventType, EventDispatcher dispatcher) {
+    public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, EventDispatcher dispatcher) {
         if (sourceIdSelector == null) {
             throw new NullPointerException("Undefined event source identifier pattern!");
         }
         this.sourceIdSelector = sourceIdSelector;
-        if (eventType == null) {
-            throw new NullPointerException("Undefined event type!");
+        if (eventClass == null) {
+            throw new NullPointerException("Undefined event class!");
         }
-        this.eventClass = eventType;
+        this.eventClass = eventClass;
         if (dispatcher == null) {
             throw new NullPointerException("Undefined event dispatcher!");
         }

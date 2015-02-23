@@ -4,6 +4,10 @@ import spock.lang.Specification
 import de.javax.util.eventbinding.impl.target.testmodel.AddressEditorGuiLogic
 import de.javax.util.eventbinding.impl.target.testmodel.ContactEditorGuiLogic
 import de.javax.util.eventbinding.impl.target.testmodel.PersonEditorGuiLogic
+import de.javax.util.eventbinding.impl.testmodel.ButtonClickEvent;
+import de.javax.util.eventbinding.impl.testmodel.CalendarChangeEvent;
+import de.javax.util.eventbinding.impl.testmodel.ParentComponentEvent;
+import de.javax.util.eventbinding.impl.testmodel.TextChangeEvent;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector
 import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory
 import de.javax.util.eventbinding.spi.EventTarget
@@ -74,8 +78,8 @@ class DefaultEventTargetCollectorSpec extends Specification {
         then:
         this.selectorFactoryMock.createEventSourceIdSelector("zipField") >> selectorMock1
         this.selectorFactoryMock.createEventSourceIdSelector("*") >> selectorMock2
-        this.targetFactoryMock.createEventTarget(targetProvider, _, selectorMock1) >> eventTargetMock1
-        this.targetFactoryMock.createEventTarget(targetProvider, _, selectorMock2) >> eventTargetMock2
+        this.targetFactoryMock.createEventTarget(selectorMock1, _, null, _) >> eventTargetMock1
+        this.targetFactoryMock.createEventTarget(selectorMock2, _, null, _) >> eventTargetMock2
 
         expect:
         2 == eventTargets.size()
@@ -124,12 +128,12 @@ class DefaultEventTargetCollectorSpec extends Specification {
         2 * this.cascadedIdSelectorFactoryMock.createChainedIdSelector(addressEditorSelectorMock, _) >>> [cascadedSelectorMock2, cascadedSelectorMock3]
         0 * this.cascadedIdSelectorFactoryMock._
 
-        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, onOkSelectorMock) >> onOkEventTargetMock
-        this.targetFactoryMock.createEventTarget(contactEditorLogic, _, onCancelSelectorMock) >> onCancelEventTargetMock
-        this.targetFactoryMock.createEventTarget(personEditorLogic, _, cascadedSelectorMock1) >> onBirthDateChangeEventTargetMock
-        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, cascadedSelectorMock2) >> eventTargetMock1
-        this.targetFactoryMock.createEventTarget(addressEditorLogic, _, cascadedSelectorMock3) >> eventTargetMock2
-        2 * this.targetFactoryMock.createEventTarget(contactEditorLogic, _, _) >>> [eventTargetMock3, eventTargetMock4]
+        this.targetFactoryMock.createEventTarget(onOkSelectorMock, ButtonClickEvent.class, null, _) >> onOkEventTargetMock
+        this.targetFactoryMock.createEventTarget(onCancelSelectorMock, ButtonClickEvent.class, null, _) >> onCancelEventTargetMock
+        this.targetFactoryMock.createEventTarget(cascadedSelectorMock1, CalendarChangeEvent.class, null, _) >> onBirthDateChangeEventTargetMock
+        this.targetFactoryMock.createEventTarget(cascadedSelectorMock2, TextChangeEvent.class, null, _) >> eventTargetMock1
+        this.targetFactoryMock.createEventTarget(cascadedSelectorMock3, TextChangeEvent.class, null, _) >> eventTargetMock2
+        2 * this.targetFactoryMock.createEventTarget(_, _, null, _) >>> [eventTargetMock3, eventTargetMock4]
         0 * this.targetFactoryMock._
 
         expect:
