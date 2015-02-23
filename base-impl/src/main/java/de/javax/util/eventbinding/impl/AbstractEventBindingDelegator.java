@@ -1,11 +1,14 @@
 package de.javax.util.eventbinding.impl;
 
+import java.util.Set;
+
 import de.javax.util.eventbinding.EventBinding;
+import de.javax.util.eventbinding.spi.EventTarget;
 
 /**
- * A abstract base class for delegating implementations like decorators and proxies.
- * Delegates every operation to the delegate. When no delegate is set all operations will throw an IllegalStateException
- * accept #isReleased which will return true.
+ * A abstract base class for delegating implementations like decorators and proxies. Delegates every operation to the
+ * delegate. When no delegate is set all operations will throw an IllegalStateException accept #isReleased which will
+ * return true.
  *
  * @author Frank Hardy
  */
@@ -16,7 +19,8 @@ public abstract class AbstractEventBindingDelegator implements EventBinding {
     /**
      * Initializes the delegator with a delegate binding instance.
      *
-     * @param delegateBinding the delegate binding instance.
+     * @param delegateBinding
+     *            the delegate binding instance.
      */
     public AbstractEventBindingDelegator(EventBinding delegateBinding) {
         if (delegateBinding == null) {
@@ -69,4 +73,6 @@ public abstract class AbstractEventBindingDelegator implements EventBinding {
     protected void setDelegateBinding(EventBinding newBinding) {
         this.delegateBinding = newBinding;
     }
+
+    public abstract Set<EventTarget> getBoundTargets();
 }
