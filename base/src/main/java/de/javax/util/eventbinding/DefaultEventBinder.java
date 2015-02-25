@@ -3,6 +3,9 @@ package de.javax.util.eventbinding;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -16,6 +19,8 @@ import de.javax.util.eventbinding.spi.EventTarget;
  * @author Frank Hardy
  */
 public class DefaultEventBinder implements EventBinder {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private final EventBindingServiceProvider serviceProvider;
 
@@ -49,6 +54,7 @@ public class DefaultEventBinder implements EventBinder {
      */
     @Override
     public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
+        logger.debug("bind source={} with target={}", sourceProvider, targetProvider);
         Set<EventSource> foundSources = this.serviceProvider.getEventSourceCollector().collectEventSourcesFrom(
                 sourceProvider);
         if (foundSources.isEmpty()) {
@@ -106,6 +112,8 @@ public class DefaultEventBinder implements EventBinder {
                 boundTargets.add(eventTarget);
             } else if (this.strictBindingMode) {
                 unboundTargets.add(eventTarget);
+            } else {
+                logger.warn("target={} not bound", eventTarget);
             }
         }
 

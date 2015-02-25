@@ -81,6 +81,10 @@ public class DefaultEventBinding extends AbstractEventBindingDelegator {
         public void rebuild() {
             throw new UnsupportedOperationException();
         }
+
+        public Set<EventTarget> getBoundTargets() {
+            return this.boundTargets;
+        }
     }
 
     /**
@@ -117,5 +121,15 @@ public class DefaultEventBinding extends AbstractEventBindingDelegator {
 
             oldBinding.release();
         }
+
+        @Override
+        public Set<EventTarget> getBoundTargets() {
+            return ((ImmutableBindingImpl) getDelegateBinding()).getBoundTargets();
+        }
+    }
+
+    @Override
+    public Set<EventTarget> getBoundTargets() {
+        return ((RebuildableBindingDecorator) getDelegateBinding()).getBoundTargets();
     }
 }

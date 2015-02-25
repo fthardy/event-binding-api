@@ -19,14 +19,14 @@ public class ContactEditorGuiLogic {
     }
 
     public void onOk(@HandleJfxEvent(from = "okButton") ActionEvent event) {
-
+        JavaFxEventCollector.addEvent(event);
     }
 
     public void onCancel(@HandleJfxEvent(from = "cancelButton") ActionEvent event) {
-
+        JavaFxEventCollector.addEvent(event);
     }
 
     public void onButtonClick(@HandleJfxEvent(from = "*") ActionEvent event) {
-
+        JavaFxEventCollector.addEvent(event);
     }
 }
