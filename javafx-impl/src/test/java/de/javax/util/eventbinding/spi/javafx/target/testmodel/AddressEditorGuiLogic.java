@@ -4,7 +4,6 @@ import javafx.scene.input.InputEvent;
 import de.javax.util.eventbinding.target.HandleJfxEvent;
 
 public class AddressEditorGuiLogic {
-
     public void onZipChange(@HandleJfxEvent(from = "zipField") InputEvent event) {
         JavaFxEventCollector.addEvent(event);
     }
