@@ -17,9 +17,11 @@ public interface HandlerMethodInfoExtractor {
 	/**
 	 * Extract the handler method informations from the given method.
 	 * 
-	 * @param method the method to analyze.
+	 * @param method
+	 *            the method to analyze.
 	 * 
-	 * @return the handler method info object or <code>null</code>.
+	 * @return the handler method info object or <code>null</code> when the
+	 *         given method is not an event handler method.
 	 */
 	HandlerMethodInfo extractHandlerMethodInfo(Method method);
 }
