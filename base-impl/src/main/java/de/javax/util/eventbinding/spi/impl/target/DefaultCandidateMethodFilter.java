@@ -14,8 +14,7 @@ public class DefaultCandidateMethodFilter implements CandidateMethodFilter {
 	@Override
 	public boolean acceptMethod(Method method) {
 		int modifiers = method.getModifiers();
-		return Modifier.isPublic(modifiers)
-				&& !Modifier.isAbstract(modifiers)
+		return !Modifier.isAbstract(modifiers)
 				&& method.getParameterTypes().length == 1
 				&& method.getReturnType() == Void.TYPE;
 	}
