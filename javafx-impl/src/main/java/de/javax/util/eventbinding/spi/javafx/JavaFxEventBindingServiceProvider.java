@@ -7,20 +7,16 @@ import de.javax.util.eventbinding.EventBinding;
 import de.javax.util.eventbinding.impl.DefaultEventBinding;
 import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
-import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelectorFactory;
-import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.target.DefaultHandlerMethodInfoCollector;
-import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo;
+import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
+import de.javax.util.eventbinding.spi.impl.target.metadata.DefaultTargetProviderClassAnalyzer;
 import de.javax.util.eventbinding.spi.javafx.source.JavaFxEventSourceCollector;
-import de.javax.util.eventbinding.spi.javafx.target.JfxHandlerMethodInfoExtractor;
-import de.javax.util.eventbinding.spi.javafx.target.JfxCandidateMethodFilter;
-import de.javax.util.eventbinding.spi.javafx.target.JfxMethodEventTargetFactory;
+import de.javax.util.eventbinding.spi.javafx.target.metadata.JfxMethodHandlerDescriptorCollector;
 
 /**
  * The JavaFxEventBindingServiceProvider is using a specific {@link JavaFxEventSourceCollector instance} to collect the
@@ -35,11 +31,10 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
             new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
     public JavaFxEventBindingServiceProvider() {
-    	EventSourceIdSelectorFactory idSelectorFactory = new DefaultEventSourceIdSelectorFactory();
-		this.eventTargetCollector = new DefaultEventTargetCollector(
-	            new JfxMethodEventTargetFactory(), idSelectorFactory,
-	            new DefaultHandlerMethodInfoCollector(new JfxCandidateMethodFilter(), new JfxHandlerMethodInfoExtractor(idSelectorFactory)),
-	            new SimpleClassInfoCache<TargetProviderClassInfo>());
+		this.eventTargetCollector =
+				new DefaultEventTargetCollector(
+			            new DefaultTargetProviderClassAnalyzer(new JfxMethodHandlerDescriptorCollector()),
+			            new DefaultMethodEventTargetFactory(new DefaultEventSourceIdSelectorFactory()));
 	}
     
     @Override

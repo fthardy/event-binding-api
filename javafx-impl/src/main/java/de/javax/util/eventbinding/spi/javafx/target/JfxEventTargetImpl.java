@@ -4,6 +4,7 @@ import javafx.event.EventType;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
+import de.javax.util.eventbinding.spi.javafx.JfxEventTarget;
 
 /**
  * The implementation for JavaFX event targets.

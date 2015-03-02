@@ -1,83 +1,33 @@
 package de.javax.util.eventbinding.spi.javafx.target;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
-import javafx.event.EventType;
-import de.javax.util.eventbinding.EventBindingException;
-import de.javax.util.eventbinding.spi.EventDispatcher;
-import de.javax.util.eventbinding.spi.EventSourceIdSelector;
+import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.target.MethodEventTargetFactory;
+import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
+import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescriptor;
+import de.javax.util.eventbinding.spi.javafx.target.metadata.JfxHandlerMethodDescriptor;
 
 /**
  * Creates instances of {@link JfxEventTargetImpl}.
  *
  * @author Frank Hardy
  */
-public class JfxMethodEventTargetFactory implements MethodEventTargetFactory {
+public class JfxMethodEventTargetFactory extends DefaultMethodEventTargetFactory {
 
+	public JfxMethodEventTargetFactory(EventSourceIdSelectorFactory idSelectorFactory) {
+		super(idSelectorFactory);
+	}
+	
 	@Override
-	public EventTarget createEventTarget(
-			EventSourceIdSelector sourceIdSelector, Class<?> eventClass, Object eventTypeFieldName, EventDispatcher dispatcher) {
+	public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix, HandlerMethodDescriptor handlerMethodDescriptor) {
 		return new JfxEventTargetImpl(
-				sourceIdSelector, eventClass, this.getEventTypeFromFieldName(eventTypeFieldName.toString(), eventClass), dispatcher);
-	}
-
-	EventType<?> getEventTypeFromFieldName(String eventTypeFieldName, Class<?> eventClass) {
-		Field field;
-		try {
-			field = eventClass.getField(eventTypeFieldName);
-		} catch (NoSuchFieldException e) {
-			throw new InvalidEventTypeFieldException(
-					"Cound not find a public static field with the specified name '"
-							+ eventTypeFieldName + "' in class "
-							+ eventClass.getName() + " or in any of its ancestors!");
-		}
-		
-		if (Modifier.isStatic(field.getModifiers())) {
-			if (EventType.class.isAssignableFrom(field.getType())) {
-				EventType<?> eventType;
-				try {
-					eventType = (EventType<?>) field.get(null);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new EventTypeFieldAccessException(e);
-				}
-				if (eventType == null) {
-					throw new InvalidEventTypeFieldException(this.createInvalidFieldExceptionMessage(field, "is null"));
-				}
-				return eventType;
-			} else {
-				throw new InvalidEventTypeFieldException(
-						this.createInvalidFieldExceptionMessage(field, "is not of type " + EventType.class.getName()));
-			}
-		} else {
-			throw new InvalidEventTypeFieldException(this.createInvalidFieldExceptionMessage(field, "is not a static field"));
-		}
+				idSelectorFactory.createEventSourceIdSelector(
+						this.buildIdSelectorExpression(idSelectorPrefix, handlerMethodDescriptor.getIdSelectorExpression())),
+				handlerMethodDescriptor.getHandlerMethod().getParameterTypes()[0],
+				((JfxHandlerMethodDescriptor) handlerMethodDescriptor).getEventType(),
+				this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(), handlerMethodOwner));
 	}
 	
-	private String createInvalidFieldExceptionMessage(Field field, String reason) {
-		return new StringBuilder("The specified field '")
-				.append(field.getName()).append("' found in class ")
-				.append(field.getType().getName()).append(" ").append(reason).append("!")
-				.toString();
-	}
-	
-	public static class EventTypeFieldAccessException extends EventBindingException {
-		
-		private static final long serialVersionUID = -105984619129334001L;
-
-		public EventTypeFieldAccessException(Throwable cause) {
-			super("", cause);
-		}
-	}
-	
-	public static class InvalidEventTypeFieldException extends EventBindingException {
-		
-		private static final long serialVersionUID = -2515888454563743934L;
-
-		public InvalidEventTypeFieldException(String message) {
-			super(message);
-		}
+	private String buildIdSelectorExpression(String prefix, String selectorExpression) {
+		return prefix + (prefix.isEmpty() ? "" : ".") + selectorExpression;
 	}
 }

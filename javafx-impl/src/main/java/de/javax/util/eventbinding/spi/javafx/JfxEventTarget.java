@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.spi.javafx.target;
+package de.javax.util.eventbinding.spi.javafx;
 
 import javafx.event.EventType;
 import de.javax.util.eventbinding.spi.EventTarget;
