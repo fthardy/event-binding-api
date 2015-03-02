@@ -17,8 +17,6 @@ public class DefaultHandlerMethodDescriptorCollector extends AbstractAnnotationB
 
 	@Override
 	protected HandlerMethodDescriptor createHandlerMethodDescriptor(Method method, HandleEvent annotation) {
-		// TODO Validate the ID-selector expression
-		String idSelectorExpression = annotation.from();
-		return new HandlerMethodDescriptor(method, idSelectorExpression);
+		return new HandlerMethodDescriptor(method, annotation.from());
 	}
 }

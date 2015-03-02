@@ -17,6 +17,7 @@ public class HandlerMethodDescriptor {
 	public HandlerMethodDescriptor(Method method, String idSelectorExpression) {
 		this.handlerMethod = method;
 		String expression = idSelectorExpression.trim();
+		// TODO Validate expression
 		if (expression == null || expression.isEmpty()) {
 			expression = EventSourceIdSelector.WILDCARD;
 		}

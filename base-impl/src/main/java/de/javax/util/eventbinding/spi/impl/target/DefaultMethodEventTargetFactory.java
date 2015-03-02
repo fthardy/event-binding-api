@@ -22,7 +22,7 @@ import de.javax.util.eventbinding.spi.impl.target.MethodAdaptingEventDispatcher;
  */
 public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory {
 
-	private final EventSourceIdSelectorFactory idSelectorFactory;
+	protected final EventSourceIdSelectorFactory idSelectorFactory;
 	
 	public DefaultMethodEventTargetFactory(EventSourceIdSelectorFactory idSelectorFactory) {
 		this.idSelectorFactory = idSelectorFactory;
