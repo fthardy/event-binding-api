@@ -17,7 +17,7 @@ import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.javafx.source.testmodel.AddressEditorGui;
 import de.javax.util.eventbinding.spi.javafx.source.testmodel.ContactEditorGui;
 import de.javax.util.eventbinding.spi.javafx.source.testmodel.PersonEditorGui;
-import de.javax.util.eventbinding.spi.javafx.target.JfxEventTarget;
+import de.javax.util.eventbinding.spi.javafx.JfxEventTarget;
 import de.javax.util.eventbinding.spi.javafx.target.testmodel.AddressEditorGuiLogic;
 import de.javax.util.eventbinding.spi.javafx.target.testmodel.ContactEditorGuiLogic;
 import de.javax.util.eventbinding.spi.javafx.target.testmodel.PersonEditorGuiLogic;
