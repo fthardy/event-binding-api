@@ -41,4 +41,15 @@ public interface ClassInfoCache<T> {
 	 *         given key.
 	 */
 	boolean hasKey(Class<? extends Object> key);
+	
+	/**
+	 * Check if the receiving cache instance has no value for the given key.
+	 * 
+	 * @param key
+	 *            the key to check for.
+	 * 
+	 * @return <code>true</code> if no value exists in the receiving cache for
+	 *         the given key.
+	 */
+	boolean hasNotKey(Class<?> key);
 }

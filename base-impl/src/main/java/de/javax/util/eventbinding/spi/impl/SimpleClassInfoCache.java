@@ -26,4 +26,9 @@ public class SimpleClassInfoCache<T> implements ClassInfoCache<T> {
     public boolean hasKey(Class<? extends Object> key) {
     	return this.cache.containsKey(key);
     }
+    
+    @Override
+    public boolean hasNotKey(Class<?> key) {
+    	return !this.cache.containsKey(key);
+    }
 }

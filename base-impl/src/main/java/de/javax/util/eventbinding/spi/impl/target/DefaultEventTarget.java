@@ -22,30 +22,17 @@ public class DefaultEventTarget implements EventTarget {
 
     private final Set<EventSource> boundEventSources = new HashSet<EventSource>();
 
-    /**
-     * Creates a new instance of this event target implementation. If source
-     * identifier is set to a non-null value the created target instance is
-     * intended to be bound to exactly one event souce which sends events of the
-     * given event type. If the source identifier is <code>null</code> then the
-     * created target instance is intended to be bound to one or more event
-     * sources which send events of the given event type.
-     * 
-     * @param sourceIdSelector
-     *            the selector for the source identifiers.
-     * @param eventClass
-     *            the class of the event which this target wants to handle.
-     * @param dispatcher
-     *            the event dispatcher.
-     */
     public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, EventDispatcher dispatcher) {
         if (sourceIdSelector == null) {
             throw new NullPointerException("Undefined event source identifier pattern!");
         }
         this.sourceIdSelector = sourceIdSelector;
+        
         if (eventClass == null) {
             throw new NullPointerException("Undefined event class!");
         }
         this.eventClass = eventClass;
+        
         if (dispatcher == null) {
             throw new NullPointerException("Undefined event dispatcher!");
         }

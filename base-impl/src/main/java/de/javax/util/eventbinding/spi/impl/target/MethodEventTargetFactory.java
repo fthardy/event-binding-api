@@ -1,27 +1,27 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
-import de.javax.util.eventbinding.spi.EventDispatcher;
-import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
+import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescriptor;
+
 
 /**
- * Creates new event targets.
- * 
+ * This factory creates event target instances.
+ *
  * @author Frank Hardy
  */
 public interface MethodEventTargetFactory {
-
-    /**
-     * Creates a new event target from an event handler method.
-     * 
-     * @param sourceIdSelector
-     *            the source identifier selector.
-     * @param targetClass
-     *            the supported event class.
-     * @param dispatcher
-     *            the event dispatcher.
-     * 
-     * @return the new event target instance.
-     */
-    EventTarget createEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, Object metaData, EventDispatcher dispatcher);
+	
+	/**
+	 * Create a new instance of an event target.
+	 * 
+	 * @param handlerMethodOwner
+	 *            the event target provider instance.
+	 * @param idSelectorPrefix
+	 *            the ID-selector prefix expression.
+	 * @param handlerMethodDescriptor
+	 *            the handler method descriptor instance.
+	 * 
+	 * @return a new event target instance.
+	 */
+	EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix, HandlerMethodDescriptor handlerMethodDescriptor);
 }

@@ -15,9 +15,9 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.FIELD)
 public @interface EventTargetProvider {
 
-    /**
-     * @return the expression that defines from which event source(s) the events
-     *         are delegated to the event target provider.
-     */
-    String from() default "*";
+	/**
+	 * @return a prefix which is used for all ID-selector expressions for the event targets of
+	 *         the annotated event target provider.
+	 */
+    String from() default "";
 }

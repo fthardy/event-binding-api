@@ -63,7 +63,7 @@ public class MethodAdaptingEventDispatcher implements EventDispatcher {
 	 *            the event to be dispatched to the target.
 	 * 
 	 * @throws EventDispatchingFailedException
-	 *             when the invokation of the event receiver method fails.
+	 *             when the invocation of the event receiver method fails.
 	 */
 	public void dispatchEvent(Object event) {
 		try {
@@ -76,7 +76,7 @@ public class MethodAdaptingEventDispatcher implements EventDispatcher {
 	/**
 	 * Will be thrown by
 	 * {@link MethodAdaptingEventDispatcher#dispatchEvent(Object)} when
-	 * the invokation of the event receiver method fails.
+	 * the invocation of the event receiver method fails.
 	 * 
 	 * @author Frank Hardy
 	 */
