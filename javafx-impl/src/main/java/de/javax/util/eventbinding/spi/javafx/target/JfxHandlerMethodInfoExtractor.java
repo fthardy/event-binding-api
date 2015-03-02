@@ -9,7 +9,7 @@ import de.javax.util.eventbinding.target.HandleJfxEvent;
  *
  * @author Frank Hardy
  */
-public class JavaFxHandlerMethodInfoExtractor extends AbstractHandlerMethodInfoExtractor<HandleJfxEvent> {
+public class JfxHandlerMethodInfoExtractor extends AbstractHandlerMethodInfoExtractor<HandleJfxEvent> {
 	
 	/**
 	 * Creates a new instance of this class.
@@ -17,7 +17,7 @@ public class JavaFxHandlerMethodInfoExtractor extends AbstractHandlerMethodInfoE
 	 * @param idSelectorFactory
 	 *            the ID selector factory.
 	 */
-	public JavaFxHandlerMethodInfoExtractor(EventSourceIdSelectorFactory idSelectorFactory) {
+	public JfxHandlerMethodInfoExtractor(EventSourceIdSelectorFactory idSelectorFactory) {
 		super(HandleJfxEvent.class, idSelectorFactory);
 	}
 

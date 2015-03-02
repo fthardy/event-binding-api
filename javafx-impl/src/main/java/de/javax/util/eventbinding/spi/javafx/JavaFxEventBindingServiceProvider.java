@@ -14,12 +14,12 @@ import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.target.DefaultCandidateMethodFilter;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultHandlerMethodInfoCollector;
 import de.javax.util.eventbinding.spi.impl.target.TargetProviderClassInfo;
 import de.javax.util.eventbinding.spi.javafx.source.JavaFxEventSourceCollector;
-import de.javax.util.eventbinding.spi.javafx.target.JavaFxHandlerMethodInfoExtractor;
+import de.javax.util.eventbinding.spi.javafx.target.JfxHandlerMethodInfoExtractor;
+import de.javax.util.eventbinding.spi.javafx.target.JfxCandidateMethodFilter;
 import de.javax.util.eventbinding.spi.javafx.target.JfxMethodEventTargetFactory;
 
 /**
@@ -38,7 +38,7 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
     	EventSourceIdSelectorFactory idSelectorFactory = new DefaultEventSourceIdSelectorFactory();
 		this.eventTargetCollector = new DefaultEventTargetCollector(
 	            new JfxMethodEventTargetFactory(), idSelectorFactory,
-	            new DefaultHandlerMethodInfoCollector(new DefaultCandidateMethodFilter(), new JavaFxHandlerMethodInfoExtractor(idSelectorFactory)),
+	            new DefaultHandlerMethodInfoCollector(new JfxCandidateMethodFilter(), new JfxHandlerMethodInfoExtractor(idSelectorFactory)),
 	            new SimpleClassInfoCache<TargetProviderClassInfo>());
 	}
     
