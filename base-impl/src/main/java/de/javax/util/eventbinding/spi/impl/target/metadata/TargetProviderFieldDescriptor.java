@@ -14,7 +14,7 @@ public class TargetProviderFieldDescriptor {
 	
 	public TargetProviderFieldDescriptor(Field field, String prefix) {
 		this.field = field;
-		this.prefix = prefix;
+		this.prefix = prefix.trim();
 	}
 	
 	public Field getField() {

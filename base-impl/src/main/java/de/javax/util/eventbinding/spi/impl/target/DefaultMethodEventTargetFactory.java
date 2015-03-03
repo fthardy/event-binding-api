@@ -31,7 +31,8 @@ public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory
 	@Override
 	public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix, HandlerMethodDescriptor handlerMethodDescriptor) {
 		return new DefaultEventTarget(
-				this.idSelectorFactory.createEventSourceIdSelector(idSelectorPrefix + '.' + handlerMethodDescriptor.getIdSelectorExpression()),
+				this.idSelectorFactory.createEventSourceIdSelector(
+						buildIdSelectorExpression(idSelectorPrefix, handlerMethodDescriptor.getIdSelectorExpression())),
 				handlerMethodDescriptor.getHandlerMethod().getParameterTypes()[0],
 				this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(), handlerMethodOwner));
 	}
@@ -48,5 +49,9 @@ public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory
 	 */
 	protected EventDispatcher createEventDispatcher(Method method, Object methodOwner) {
 		return new MethodAdaptingEventDispatcher(method, methodOwner);
+	}
+	
+	private String buildIdSelectorExpression(String prefix, String expression) {
+		return prefix.isEmpty() ? expression : (prefix + "." + expression);
 	}
 }

@@ -18,17 +18,17 @@ import de.javax.util.eventbinding.spi.impl.target.metadata.TargetProviderDescrip
  */
 public class DefaultEventTargetCollector implements EventTargetCollector {
 
-	private TargetProviderClassAnalyzer metaDataProvider;
-	private MethodEventTargetFactory eventTargetFactory;
+	private final TargetProviderClassAnalyzer targetProviderClassAnalyzer;
+	private final MethodEventTargetFactory eventTargetFactory;
 	
-	public DefaultEventTargetCollector(TargetProviderClassAnalyzer metaDataProvider, MethodEventTargetFactory eventTargetFactory) {
-		this.metaDataProvider = metaDataProvider;
+	public DefaultEventTargetCollector(TargetProviderClassAnalyzer targetProviderClassAnalyzer, MethodEventTargetFactory eventTargetFactory) {
+		this.targetProviderClassAnalyzer = targetProviderClassAnalyzer;
 		this.eventTargetFactory = eventTargetFactory;
 	}
 	
 	@Override
 	public Set<EventTarget> collectEventTargetsFrom(Object eventTargetProvider) {
-		return this.collectEventTargets(eventTargetProvider, null);
+		return this.collectEventTargets(eventTargetProvider, "");
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 	protected Set<EventTarget> collectEventTargets(Object eventTargetProvider, String idSelectorPrefix) {
 		Set<EventTarget> eventTargets = new HashSet<EventTarget>();
 		if (eventTargetProvider != null) {
-			TargetProviderDescriptor targetProviderDescriptor = this.metaDataProvider.getDescriptorFor(eventTargetProvider.getClass());
+			TargetProviderDescriptor targetProviderDescriptor = this.targetProviderClassAnalyzer.getDescriptorFor(eventTargetProvider.getClass());
 			
 			for (HandlerMethodDescriptor descriptor : targetProviderDescriptor.getHandlerMethodDescriptors()) {
 				eventTargets.add(this.eventTargetFactory.createMethodEventTarget(eventTargetProvider, idSelectorPrefix, descriptor));
@@ -57,10 +57,20 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 			for (TargetProviderFieldDescriptor descriptor : targetProviderDescriptor.getNestedTargetProviderDescriptors()) {
 				eventTargets.addAll(this.collectEventTargets(
 						this.getNestedTargetProviderFromField(descriptor.getField(), eventTargetProvider),
-						idSelectorPrefix + '.' +  descriptor.getPrefix()));
+						buildIdPrefix(idSelectorPrefix, descriptor.getPrefix())));
 			}
 		}
 		return eventTargets;
+	}
+	
+	private String buildIdPrefix(String parentPrefix, String prefix) {
+		if (parentPrefix.isEmpty()) {
+			return prefix;
+		} else if (prefix.isEmpty()) {
+			return parentPrefix;
+		} else {
+			return parentPrefix + '.' + prefix;
+		}
 	}
 
 	private Object getNestedTargetProviderFromField(Field field, Object fieldOwner) {
