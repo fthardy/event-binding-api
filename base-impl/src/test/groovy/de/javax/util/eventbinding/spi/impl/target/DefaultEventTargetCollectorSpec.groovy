@@ -30,7 +30,7 @@ class DefaultEventTargetCollectorSpec extends Specification {
 			Set eventTargets = collector.collectEventTargetsFrom(targetProvider)
 		
 		then:
-			methodEventTargetFactoryMock.createMethodEventTarget(targetProvider, null, _) >>> [eventTarget1, eventTarget2]
+			methodEventTargetFactoryMock.createMethodEventTarget(targetProvider, "", _) >>> [eventTarget1, eventTarget2]
 			methodEventTargetFactoryMock.createMethodEventTarget(targetProvider.nested, "foo", _) >>> [eventTarget3, eventTarget4]
 			
 		expect:
