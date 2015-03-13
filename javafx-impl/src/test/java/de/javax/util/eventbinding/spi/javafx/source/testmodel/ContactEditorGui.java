@@ -5,13 +5,13 @@ import javafx.scene.layout.VBox;
 
 public class ContactEditorGui extends VBox {
 
-    private final PersonEditorGui personEditor;
+    public final PersonEditorGui personEditor;
 
-    private final AddressEditorGui addressEditor;
+    public final AddressEditorGui addressEditor;
 
-    private final Button okButton = new Button();
+    public final Button okButton = new Button();
 
-    private final Button cancelButton = new Button();
+    public final Button cancelButton = new Button();
 
     public ContactEditorGui(PersonEditorGui personEditor, AddressEditorGui addressEditor) {
         this.personEditor = personEditor;

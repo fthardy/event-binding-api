@@ -5,9 +5,9 @@ import javafx.scene.text.Text;
 
 public class AddressEditorGui extends VBox {
 
-    private Text street = new Text();
-    private Text zip = new Text();
-    private Text cityField = new Text();
+    public Text street = new Text();
+    public Text zip = new Text();
+    public Text cityField = new Text();
 
     public AddressEditorGui() {
         street.setId("streetField");

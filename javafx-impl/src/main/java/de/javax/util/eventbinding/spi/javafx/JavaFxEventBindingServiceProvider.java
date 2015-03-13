@@ -13,9 +13,9 @@ import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
 import de.javax.util.eventbinding.spi.impl.target.metadata.DefaultTargetProviderClassAnalyzer;
 import de.javax.util.eventbinding.spi.javafx.source.JavaFxEventSourceCollector;
+import de.javax.util.eventbinding.spi.javafx.target.JfxMethodEventTargetFactory;
 import de.javax.util.eventbinding.spi.javafx.target.metadata.JfxMethodHandlerDescriptorCollector;
 
 /**
@@ -31,12 +31,11 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
             new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
 
     public JavaFxEventBindingServiceProvider() {
-		this.eventTargetCollector =
-				new DefaultEventTargetCollector(
-			            new DefaultTargetProviderClassAnalyzer(new JfxMethodHandlerDescriptorCollector()),
-			            new DefaultMethodEventTargetFactory(new DefaultEventSourceIdSelectorFactory()));
-	}
-    
+        this.eventTargetCollector = new DefaultEventTargetCollector(new DefaultTargetProviderClassAnalyzer(
+                new JfxMethodHandlerDescriptorCollector()), new JfxMethodEventTargetFactory(
+                new DefaultEventSourceIdSelectorFactory()));
+    }
+
     @Override
     public EventTargetCollector getEventTargetCollector() {
         return this.eventTargetCollector;
@@ -48,7 +47,8 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
     }
 
     @Override
-    public EventBinding createEventBinding(EventBinder binder, Object source, Object target, Set<EventTarget> boundEventTargets) {
-    	return new DefaultEventBinding(binder, source, target, boundEventTargets);
+    public EventBinding createEventBinding(EventBinder binder, Object source, Object target,
+            Set<EventTarget> boundEventTargets) {
+        return new DefaultEventBinding(binder, source, target, boundEventTargets);
     }
 }

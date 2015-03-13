@@ -1,21 +1,46 @@
 package de.javax.util.eventbinding.spi.javafx.target.testmodel;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 public class JavaFxEventCollector {
-    private static List<Object> events = new ArrayList<Object>();
 
-    public static void addEvent(Object event) {
-        events.add(event);
+    public static class Entry {
+        String id;
+        Object event;
+
+        public String getId() {
+            return id;
+        }
+
+        public Object getEvent() {
+            return event;
+        }
     }
 
-    public static List<Object> getEvents() {
-        return Collections.unmodifiableList(events);
+    private static LinkedList<Entry> events = new LinkedList<Entry>();
+
+    public static void addEvent(String id, Object event) {
+        Entry e = new Entry();
+        e.event = event;
+        e.id = id;
+        events.add(e);
     }
 
-    public void clear() {
-        this.clear();
+    public static boolean hasMoreElements() {
+        synchronized (JavaFxEventCollector.class) {
+            return !events.isEmpty();
+        }
+    }
+
+    public static void clear() {
+        events.clear();
+    }
+
+    public static Entry getElement() {
+        if (events.isEmpty()) {
+            return null;
+        } else {
+            return events.poll();
+        }
     }
 }

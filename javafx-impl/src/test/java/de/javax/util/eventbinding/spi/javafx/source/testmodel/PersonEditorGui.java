@@ -6,9 +6,9 @@ import javafx.scene.text.Text;
 
 public class PersonEditorGui extends VBox {
 
-    private Text firstName = new Text();
-    private Text lastName = new Text();
-    private DatePicker birthDate = new DatePicker();
+    public Text firstName = new Text();
+    public Text lastName = new Text();
+    public DatePicker birthDate = new DatePicker();
 
     public PersonEditorGui() {
         firstName.setId("firstNameField");

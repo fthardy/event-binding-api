@@ -75,4 +75,9 @@ public class DefaultEventSourceIdSelector implements EventSourceIdSelector {
         }
         return match;
     }
+
+    @Override
+    public String toString() {
+        return this.parts.toString();
+    }
 }

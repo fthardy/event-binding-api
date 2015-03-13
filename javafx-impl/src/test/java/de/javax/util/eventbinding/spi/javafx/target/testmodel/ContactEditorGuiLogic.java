@@ -6,11 +6,15 @@ import de.javax.util.eventbinding.target.HandleJfxEvent;
 
 public class ContactEditorGuiLogic {
 
+    public static final String METHOD_ID_OK = "onOk";
+    public static final String METHOD_ID_CANCEL = "onCancel";
+    public static final String METHOD_ID_BUTTON_CLICK = "onButtonClick";
+
     @EventTargetProvider(from = "personEditor")
     // short form of "personEditor.*"
     private final PersonEditorGuiLogic personEditorLogic;
 
-    @EventTargetProvider(from = "addressEditor.*")
+    @EventTargetProvider(from = "addressEditor")
     final AddressEditorGuiLogic addressEditorLogic;
 
     public ContactEditorGuiLogic(PersonEditorGuiLogic personEditorLogic, AddressEditorGuiLogic addressEditorLogic) {
@@ -19,14 +23,14 @@ public class ContactEditorGuiLogic {
     }
 
     public void onOk(@HandleJfxEvent(from = "okButton") ActionEvent event) {
-        JavaFxEventCollector.addEvent(event);
+        JavaFxEventCollector.addEvent(METHOD_ID_OK, event);
     }
 
     public void onCancel(@HandleJfxEvent(from = "cancelButton") ActionEvent event) {
-        JavaFxEventCollector.addEvent(event);
+        JavaFxEventCollector.addEvent(METHOD_ID_CANCEL, event);
     }
 
     public void onButtonClick(@HandleJfxEvent(from = "*") ActionEvent event) {
-        JavaFxEventCollector.addEvent(event);
+        JavaFxEventCollector.addEvent(METHOD_ID_BUTTON_CLICK, event);
     }
 }
