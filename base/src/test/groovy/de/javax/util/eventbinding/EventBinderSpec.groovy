@@ -74,8 +74,8 @@ class EventBinderSpec extends Specification {
         given:
         def targetProvider = new Object()
         def sourceProvider = new Object()
-        EventSourceIdSelector eventTarget1IdSelector = Mock()
-        EventSourceIdSelector eventTarget2IdSelector = Mock()
+        EventSourceIdSelector eventTarget1IdSelector = new EventSourceIdSelector("foo")
+        EventSourceIdSelector eventTarget2IdSelector = new EventSourceIdSelector("bar")
         EventTarget eventTargetMock1 = Mock()
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()
@@ -123,8 +123,8 @@ class EventBinderSpec extends Specification {
 
         def targetProvider = new Object()
         def sourceProvider = new Object()
-        EventSourceIdSelector eventTarget1IdSelector = Mock()
-        EventSourceIdSelector eventTarget2IdSelector = Mock()
+        EventSourceIdSelector eventTarget1IdSelector = new EventSourceIdSelector("foo")
+        EventSourceIdSelector eventTarget2IdSelector = new EventSourceIdSelector("bar")
         EventTarget eventTargetMock1 = Mock()
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()
@@ -175,8 +175,8 @@ class EventBinderSpec extends Specification {
 
         def targetProvider = new Object()
         def sourceProvider = new Object()
-        EventSourceIdSelector eventTarget1IdSelector = Mock()
-        EventSourceIdSelector eventTarget2IdSelector = Mock()
+        EventSourceIdSelector eventTarget1IdSelector = new EventSourceIdSelector("foo")
+        EventSourceIdSelector eventTarget2IdSelector = new EventSourceIdSelector("bar")
         EventTarget eventTargetMock1 = Mock()
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()
@@ -232,8 +232,8 @@ class EventBinderSpec extends Specification {
         given:
         def targetProvider = new Object()
         def sourceProvider = new Object()
-        EventSourceIdSelector eventTarget1IdSelector = Mock()
-        EventSourceIdSelector eventTarget2IdSelector = Mock()
+        EventSourceIdSelector eventTarget1IdSelector = new EventSourceIdSelector("foo")
+        EventSourceIdSelector eventTarget2IdSelector = new EventSourceIdSelector("bar")
         EventTarget eventTargetMock1 = Mock()
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()

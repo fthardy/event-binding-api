@@ -1,14 +1,14 @@
-package de.javax.util.eventbinding.spi.impl
+package de.javax.util.eventbinding.spi
 
 import spock.lang.Specification
 import de.javax.util.eventbinding.spi.EventSourceId
 import de.javax.util.eventbinding.spi.EventSourceIdSelector
 
-class DefaultEventSourceIdSelectorSpec extends Specification {
+class EventSourceIdSelectorSpec extends Specification {
         
     def 'check expression splitting'() {
         expect:
-        result == DefaultEventSourceIdSelector.splitExpression(expression)
+        result == EventSourceIdSelector.splitExpression(expression)
         
         where:
         expression       | result
@@ -19,7 +19,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
     
     def 'check part validation'() {
         expect:
-        result == DefaultEventSourceIdSelector.isValidPart(part)
+        result == EventSourceIdSelector.isValidPart(part)
         
         where:
         part | result
@@ -38,7 +38,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
     
     def 'should match any source identifier when only a wildcard is set'() {
         given:
-        EventSourceIdSelector selector = new DefaultEventSourceIdSelector('*')
+        EventSourceIdSelector selector = new EventSourceIdSelector('*')
         
         expect:
         true == selector.matches(sourceId)
@@ -53,7 +53,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
     
     def 'wildcard at end matches only source identifiers with the given prefix'() {
         given:
-        EventSourceIdSelector selector = new DefaultEventSourceIdSelector('foo.bar.*');
+        EventSourceIdSelector selector = new EventSourceIdSelector('foo.bar.*');
         
         expect:
         result == selector.matches(sourceId)
@@ -69,7 +69,7 @@ class DefaultEventSourceIdSelectorSpec extends Specification {
     
     def 'should match exactly'() {
         given:
-        EventSourceIdSelector selector = new DefaultEventSourceIdSelector('foo.bar.baz');
+        EventSourceIdSelector selector = new EventSourceIdSelector('foo.bar.baz');
         
         expect:
         result == selector.matches(sourceId)

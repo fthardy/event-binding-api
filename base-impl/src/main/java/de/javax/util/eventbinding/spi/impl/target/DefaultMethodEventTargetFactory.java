@@ -3,11 +3,9 @@ package de.javax.util.eventbinding.spi.impl.target;
 import java.lang.reflect.Method;
 
 import de.javax.util.eventbinding.spi.EventDispatcher;
-import de.javax.util.eventbinding.spi.EventSourceIdSelectorFactory;
+import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescriptor;
-import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
-import de.javax.util.eventbinding.spi.impl.target.MethodAdaptingEventDispatcher;
 
 /**
  * This default implementation creates instances of {@link DefaultEventTarget}.<br/>
@@ -22,16 +20,10 @@ import de.javax.util.eventbinding.spi.impl.target.MethodAdaptingEventDispatcher;
  */
 public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory {
 
-	protected final EventSourceIdSelectorFactory idSelectorFactory;
-	
-	public DefaultMethodEventTargetFactory(EventSourceIdSelectorFactory idSelectorFactory) {
-		this.idSelectorFactory = idSelectorFactory;
-	}
-	
 	@Override
 	public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix, HandlerMethodDescriptor handlerMethodDescriptor) {
 		return new DefaultEventTarget(
-				this.idSelectorFactory.createEventSourceIdSelector(
+				new EventSourceIdSelector(
 						buildIdSelectorExpression(idSelectorPrefix, handlerMethodDescriptor.getIdSelectorExpression())),
 				handlerMethodDescriptor.getHandlerMethod().getParameterTypes()[0],
 				this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(), handlerMethodOwner));

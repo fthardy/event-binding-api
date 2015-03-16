@@ -2,8 +2,7 @@ package de.javax.util.eventbinding.impl.source;
 
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,7 +19,6 @@ import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelector;
 import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
@@ -97,8 +95,8 @@ public class DefaultEventSourceTest {
 
     private void checkBindToTarget(String eventSourceIdSelectorExpression, String eventTargetIdExpression,
             Class<?> eventType, boolean expectedToBind) throws Exception {
-        EventSourceIdSelector eventSourceIdSelector = new DefaultEventSourceIdSelector(eventSourceIdSelectorExpression);
-        EventSourceIdSelector eventTargetIdSelector = new DefaultEventSourceIdSelector(eventTargetIdExpression);
+        EventSourceIdSelector eventSourceIdSelector = new EventSourceIdSelector(eventSourceIdSelectorExpression);
+        EventSourceIdSelector eventTargetIdSelector = new EventSourceIdSelector(eventTargetIdExpression);
         EventSource eventSource = getEventSource(collectedEventSources, eventSourceIdSelector);
         Assert.assertNotNull(eventSource);
         EventTarget eventTarget = new DefaultEventTarget(eventTargetIdSelector, eventType, dispatcher);

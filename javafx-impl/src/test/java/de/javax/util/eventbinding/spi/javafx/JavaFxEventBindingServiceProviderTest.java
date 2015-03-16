@@ -10,8 +10,8 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.input.InputMethodEvent;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +45,8 @@ public class JavaFxEventBindingServiceProviderTest extends AbstractJavaFXTest {
         eventBinder = new DefaultEventBinderFactory().createEventBinder();
     }
 
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void bind() throws Exception {
         EventBinding eventBinding = eventBinder.bind(gui, logic);
         Set<EventTarget> boundTargets = getBoundTargets(eventBinding);

@@ -34,7 +34,7 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
     public DefaultEventBindingServiceProvider() {
 		this.eventTargetCollector = new DefaultEventTargetCollector(
 	            new DefaultTargetProviderClassAnalyzer(new DefaultHandlerMethodDescriptorCollector()),
-	            new DefaultMethodEventTargetFactory(new DefaultEventSourceIdSelectorFactory()));
+	            new DefaultMethodEventTargetFactory());
 	}
 
     @Override

@@ -9,7 +9,6 @@ import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.DefaultEventSourceIdSelectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
@@ -32,8 +31,7 @@ public class JavaFxEventBindingServiceProvider implements EventBindingServicePro
 
     public JavaFxEventBindingServiceProvider() {
         this.eventTargetCollector = new DefaultEventTargetCollector(new DefaultTargetProviderClassAnalyzer(
-                new JfxMethodHandlerDescriptorCollector()), new JfxMethodEventTargetFactory(
-                new DefaultEventSourceIdSelectorFactory()));
+                new JfxMethodHandlerDescriptorCollector()), new JfxMethodEventTargetFactory());
     }
 
     @Override
