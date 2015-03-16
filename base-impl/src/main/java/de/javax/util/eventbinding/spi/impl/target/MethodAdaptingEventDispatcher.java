@@ -34,12 +34,13 @@ public class MethodAdaptingEventDispatcher implements EventDispatcher {
 		this.method = method;
 		if (Modifier.isStatic(method.getModifiers())) {
 			this.instance = null;
-		} else {
-			if (instance != null) {
-				assert this.method.getDeclaringClass().isInstance(instance) : 
-					"The given method is not a method of the given object instance!";
+		} else if (instance != null) {
+			if (!this.method.getDeclaringClass().isInstance(instance)) {
+				throw new IllegalArgumentException("The given method is not a method of the given object instance!");
 			}
 			this.instance = instance;
+		} else {
+			throw new NullPointerException("Undefined instance!");
 		}
 	}
 	
