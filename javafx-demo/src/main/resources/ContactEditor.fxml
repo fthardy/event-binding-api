@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TabPane id="contactEditorPane" fx:id="contactEditorPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <Tab id="addressTab" fx:id="addressTab" text="Address">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0">
+                     <children>
+                        <GridPane fx:id="AddressPanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
+                           <children>
+                              <Label id="firstNameLBL" fx:id="firstNameLBL" text="Vorname" />
+                              <TextField id="firstNameTF" fx:id="firstNameTF" GridPane.columnIndex="1" />
+                              <Label id="lastNameLBL" fx:id="lastNameLBL" text="Nachname" GridPane.rowIndex="1" />
+                              <Label id="streetAndNoLBL" fx:id="streetAndNoLBL" text="Straße / Hausnummer" GridPane.rowIndex="2" />
+                              <TextField id="lastNameTF" fx:id="lastNameTF" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <children>
+                                    <TextField id="streetTF" fx:id="streetTF" prefHeight="22.0" prefWidth="417.0" />
+                                    <TextField id="streetNoTF" fx:id="streetNoTF" prefHeight="22.0" prefWidth="120.0" />
+                                 </children>
+                              </HBox>
+                              <Label id="cityAndZipLBL" fx:id="cityAndZipLBL" text="Ort / PLZ" GridPane.rowIndex="3" />
+                              <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <children>
+                                    <TextField id="cityTF" fx:id="cityTF" prefHeight="22.0" prefWidth="337.0" />
+                                    <TextField id="zipTF" fx:id="zipTF" prefHeight="22.0" prefWidth="102.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="378.0" minWidth="10.0" prefWidth="117.0" />
+                              <ColumnConstraints hgrow="ALWAYS" maxWidth="429.0" minWidth="10.0" prefWidth="429.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab id="contactTab" fx:id="contactTab" text="Contact">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="186.0" prefWidth="600.0">
+                     <children>
+                        <GridPane fx:id="contactPanel" layoutX="-2.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity">
+                           <children>
+                              <Label id="mobileLBL" fx:id="mobileLBL" text="Mobile" />
+                              <Label id="landlineLBL" fx:id="landlineLBL" text="Landline" GridPane.rowIndex="1" />
+                              <Label id="eMailAddressLBL" fx:id="eMailAddressLBL" text="eMail-Address" GridPane.rowIndex="2" />
+                              <TextField id="mobileTF" fx:id="mobileTF" GridPane.columnIndex="1" />
+                              <TextField id="landlineTF" fx:id="landlineTF" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField id="eMailAddressTF" fx:id="eMailAddressTF" prefHeight="0.0" prefWidth="452.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="293.0" minWidth="10.0" prefWidth="80.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="524.0" minWidth="10.0" prefWidth="460.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </center>
+   <bottom>
+      <BorderPane prefHeight="0.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <right>
+            <HBox spacing="10.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button id="okBTN" fx:id="okBTN" mnemonicParsing="false" text="Ok" />
+                  <Button id="cancelBTN" fx:id="cancelBTN" mnemonicParsing="false" text="Cancel" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+               </padding>
+            </HBox>
+         </right>
+      </BorderPane>
+   </bottom>
+</BorderPane>

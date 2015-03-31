@@ -33,6 +33,5 @@ project('javafx-impl') {
 	dependencies {
 		compile project(':base')
 		compile project(':base-impl')
-		
 	}
 }

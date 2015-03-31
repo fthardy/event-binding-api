@@ -1,3 +1,1 @@
-include 'base'
-include 'base-impl'
-include 'javafx-impl'
+include 'base', 'base-impl', 'javafx-impl', 'javafx-demo'
