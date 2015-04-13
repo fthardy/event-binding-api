@@ -5,12 +5,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
-import de.javax.util.eventbinding.spi.impl.ClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo.EventSourceFieldInfo;
 
 /**
@@ -24,23 +28,16 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 
     private final EventSourceFactory eventSourceFactory;
 
-    private final ClassInfoCache<EventSourceProviderClassInfo> cache;
+    private final Cache<Class<?>, EventSourceProviderClassInfo> cache;
 
-    /**
-     * Creates a new instance of this event source collector.
-     * 
-     * @param eventSourceFactory
-     *            the event source factory.
-     */
-    public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory,
-            ClassInfoCache<EventSourceProviderClassInfo> cache) {
-        if (eventSourceFactory == null) {
-            throw new NullPointerException("Undefined event source factory!");
-        }
+    public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory) {
+    	this(eventSourceFactory, CacheBuilder.newBuilder().<Class<?>, EventSourceProviderClassInfo>build());
+    }
+    
+    public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory, Cache<Class<?>, EventSourceProviderClassInfo> cache) {
+    	assert eventSourceFactory != null : "Undefined event source factory!";
+    	assert cache != null : "Undefined cache!";
         this.eventSourceFactory = eventSourceFactory;
-        if (cache == null) {
-            throw new NullPointerException("Undefined cache");
-        }
         this.cache = cache;
     }
 
@@ -53,14 +50,21 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
         return collectedSources;
     }
 
-    private Set<EventSource> findEventSources(Object eventSourceProvider, EventSourceId providerId) {
-        Class<?> eventSourceProviderClass = eventSourceProvider.getClass();
-        EventSourceProviderClassInfo info = this.cache.get(eventSourceProviderClass);
-        if (info == null) {
-            info = new EventSourceProviderClassInfo(this.collectFieldInfos(eventSourceProviderClass, providerId),
-                    collectNestedEventSourceProviders(eventSourceProviderClass, providerId));
-            cache.put(eventSourceProviderClass, info);
-        }
+    private Set<EventSource> findEventSources(Object eventSourceProvider, final EventSourceId providerId) {
+        EventSourceProviderClassInfo info;
+		try {
+			final Class<?> eventSourceProviderClass = eventSourceProvider.getClass();
+			info = this.cache.get(eventSourceProviderClass, new Callable<EventSourceProviderClassInfo>() {
+				@Override
+				public EventSourceProviderClassInfo call() throws Exception {
+			    	return new EventSourceProviderClassInfo(collectFieldInfos(eventSourceProviderClass, providerId),
+			                collectNestedEventSourceProviders(eventSourceProviderClass, providerId));
+			    
+				}
+			});
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e);
+		}
         Set<EventSource> collectedSources = new HashSet<EventSource>();
         for (EventSourceFieldInfo fieldInfo : info.getFieldInfos()) {
             Object fieldValue = this.getFieldValue(fieldInfo.getField(), eventSourceProvider);

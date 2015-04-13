@@ -3,9 +3,12 @@ package de.javax.util.eventbinding.spi.impl.target.metadata;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
-import de.javax.util.eventbinding.spi.impl.ClassInfoCache;
-import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import de.javax.util.eventbinding.target.EventTargetProvider;
 
 /**
@@ -15,29 +18,35 @@ import de.javax.util.eventbinding.target.EventTargetProvider;
  */
 public class DefaultTargetProviderClassAnalyzer implements TargetProviderClassAnalyzer {
 
-	private final ClassInfoCache<TargetProviderDescriptor> cache;
+	private final Cache<Class<?>, TargetProviderDescriptor> cache;
 	private final HandlerMethodDescriptorCollector handlerMethodMetaDataCollector;
-	
+		
 	public DefaultTargetProviderClassAnalyzer(HandlerMethodDescriptorCollector collectorImpl) {
-		this(collectorImpl, new SimpleClassInfoCache<TargetProviderDescriptor>());
+		this(collectorImpl, CacheBuilder.newBuilder().<Class<?>, TargetProviderDescriptor>build());
 	}
 	
-	public DefaultTargetProviderClassAnalyzer(HandlerMethodDescriptorCollector collectorImpl, ClassInfoCache<TargetProviderDescriptor> cacheImpl) {
+	public DefaultTargetProviderClassAnalyzer(HandlerMethodDescriptorCollector collectorImpl, Cache<Class<?>, TargetProviderDescriptor> cacheImpl) {
+		assert collectorImpl != null : "No collector implementation defined!";
+		assert cacheImpl != null : "No cache implementation defined!";
 		this.handlerMethodMetaDataCollector = collectorImpl;
 		this.cache = cacheImpl;
 	}
 	
 	@Override
-	public TargetProviderDescriptor getDescriptorFor(Class<?> targetProviderClass) {
+	public TargetProviderDescriptor getDescriptorFor(final Class<?> targetProviderClass) {
 		// because of the caching a reference from to nested target provider of the same class is no problem (no recursive calls with stack overflow!)
-		if (this.cache.hasNotKey(targetProviderClass)) {
-			this.cache.put(
-					targetProviderClass,
-					new TargetProviderDescriptor(
-							this.handlerMethodMetaDataCollector.collectHandlerMethodDescriptorsFrom(targetProviderClass),
-							this.collectTargetProviderFieldDescriptors(targetProviderClass)));
+		try {
+			return this.cache.get(targetProviderClass, new Callable<TargetProviderDescriptor>() {
+				@Override
+				public TargetProviderDescriptor call() throws Exception {
+					return new TargetProviderDescriptor(
+							handlerMethodMetaDataCollector.collectHandlerMethodDescriptorsFrom(targetProviderClass),
+							collectTargetProviderFieldDescriptors(targetProviderClass));
+				}
+			});
+		} catch (ExecutionException e) {
+			throw new TargetProviderDescriptorCreateException(e);
 		}
-		return this.cache.get(targetProviderClass);
 	}
 	
 	private Set<TargetProviderFieldDescriptor> collectTargetProviderFieldDescriptors(Class<?> targetProviderClass) {
@@ -49,5 +58,14 @@ public class DefaultTargetProviderClassAnalyzer implements TargetProviderClassAn
 			}
 		}
 		return descriptors;
+	}
+	
+	public static class TargetProviderDescriptorCreateException extends RuntimeException {
+		
+		private static final long serialVersionUID = 6650624968622050228L;
+
+		public TargetProviderDescriptorCreateException(Exception e) {
+			super(e);
+		}
 	}
 }

@@ -12,7 +12,6 @@ import de.javax.util.eventbinding.spi.EventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
 import de.javax.util.eventbinding.spi.impl.target.metadata.DefaultHandlerMethodDescriptorCollector;
@@ -28,8 +27,7 @@ public class DefaultEventBindingServiceProvider implements EventBindingServicePr
     private final EventTargetCollector eventTargetCollector;
 
     private final EventSourceCollector eventSourceCollector = new DefaultEventSourceCollector(
-            new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()),
-            new SimpleClassInfoCache<EventSourceProviderClassInfo>());
+            new DefaultEventSourceFactory(new DefaultEventBindingConnectorFactory()));
     
     public DefaultEventBindingServiceProvider() {
 		this.eventTargetCollector = new DefaultEventTargetCollector(

@@ -13,11 +13,9 @@ import de.javax.util.eventbinding.impl.source.testmodel.PersonEditorGui;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceId;
-import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 
 public class DefaultEventSourceCollectorTest {
 
@@ -32,7 +30,7 @@ public class DefaultEventSourceCollectorTest {
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
         eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
-                new DefaultEventBindingConnectorFactory()), new SimpleClassInfoCache<EventSourceProviderClassInfo>());
+                new DefaultEventBindingConnectorFactory()));
     }
 
     @Test

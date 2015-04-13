@@ -19,11 +19,9 @@ import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.SimpleClassInfoCache;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
-import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
 
 public class DefaultEventSourceTest {
@@ -41,7 +39,7 @@ public class DefaultEventSourceTest {
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
         eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
-                new DefaultEventBindingConnectorFactory()), new SimpleClassInfoCache<EventSourceProviderClassInfo>());
+                new DefaultEventBindingConnectorFactory()));
         dispatcher = Mockito.mock(EventDispatcher.class);
         collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
     }
