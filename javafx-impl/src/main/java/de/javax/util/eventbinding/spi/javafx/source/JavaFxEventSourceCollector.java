@@ -56,8 +56,10 @@ public class JavaFxEventSourceCollector implements EventSourceCollector {
             if (names.size() == 1 && EventSourceId.ROOT.equals(names.get(0))) {
                 names.clear();
             }
-            names.add(id);
-            newId = new EventSourceId(names);
+            if (id != null) {
+                names.add(id);
+                newId = new EventSourceId(names);
+            }
         }
         if (newId != null) {
             collectedSources.add(this.eventSourceFactory.createEventSource(newId, eventSourceProvider));

@@ -2,24 +2,29 @@ package de.javax.util.eventbinding.spi.impl.source;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 import de.javax.util.eventbinding.source.EventBindingConnector;
-import de.javax.util.eventbinding.spi.impl.reflect.Filter;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodNamePredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodParameterCountPredicate;
 import de.javax.util.eventbinding.spi.impl.reflect.MethodParameterTypeHasEventMethodForTypePredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodNamePredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParameterCountPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParametersPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.PublicMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.StaticMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.NotPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodParametersPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.PublicMethodPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.StaticMethodPredicate;
 
 /**
  * This factory implementation creates instances {@link GenericEventBindingConnector}.
  * 
  * @author Matthias Hanisch
  */
+@SuppressWarnings("unchecked")
 public class GenericEventBindingConnectorFactory extends AbstractMethodBasedEventBindingConnectorFactory {
+
+    private Predicate<Method> fixedPredicates = Predicates.and(new MethodParameterCountPredicate(1),
+            Predicates.not(new StaticMethodPredicate()), new PublicMethodPredicate());
 
     public GenericEventBindingConnectorFactory() {
     }
@@ -67,14 +72,15 @@ public class GenericEventBindingConnectorFactory extends AbstractMethodBasedEven
      *         returned.
      */
     private Method findListenerMethod(Class<?> eventSourceType, Class<?> eventType, String methodNameRegEx) {
-        Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(eventSourceType.getMethods())))
-                .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
-                .filter(new MethodParameterCountPredicate(1)).filter(new MethodNamePredicate(methodNameRegEx))
-                .filter(new MethodParameterTypeHasEventMethodForTypePredicate(eventType));
-        if (filter.getElements().size() == 1) {
-            return filter.getElements().iterator().next();
+
+        Predicate<Method> predicates = Predicates.and(new MethodNamePredicate(methodNameRegEx),
+                new MethodParameterTypeHasEventMethodForTypePredicate(eventType), fixedPredicates);
+        Iterable<Method> methods = Iterables.filter(Arrays.asList(eventSourceType.getMethods()), predicates);
+        if (Iterables.size(methods) == 1) {
+            return methods.iterator().next();
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -88,12 +94,13 @@ public class GenericEventBindingConnectorFactory extends AbstractMethodBasedEven
      *         returned.
      */
     private Method findEventMethod(Class<?> listenerType, Class<?> eventType) {
-        Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(listenerType.getMethods())))
-                .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
-                .filter(new MethodParameterCountPredicate(1)).filter(new MethodParametersPredicate(eventType));
-        if (filter.getElements().size() == 1) {
-            return filter.getElements().iterator().next();
+
+        Predicate<Method> predicates = Predicates.and(new MethodParametersPredicate(eventType), fixedPredicates);
+        Iterable<Method> methods = Iterables.filter(Arrays.asList(listenerType.getMethods()), predicates);
+        if (Iterables.size(methods) == 1) {
+            return methods.iterator().next();
+        } else {
+            return null;
         }
-        return null;
     }
 }

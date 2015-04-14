@@ -17,6 +17,10 @@ public class ContactEditorGuiLogic {
     @EventTargetProvider(from = "addressEditor")
     final AddressEditorGuiLogic addressEditorLogic;
 
+    public ContactEditorGuiLogic() {
+        this(new PersonEditorGuiLogic(), new AddressEditorGuiLogic());
+    }
+
     public ContactEditorGuiLogic(PersonEditorGuiLogic personEditorLogic, AddressEditorGuiLogic addressEditorLogic) {
         this.personEditorLogic = personEditorLogic;
         this.addressEditorLogic = addressEditorLogic;

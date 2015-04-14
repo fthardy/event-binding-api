@@ -2,20 +2,21 @@ package de.javax.util.eventbinding.spi.javafx.source;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.scene.Node;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+
 import de.javax.util.eventbinding.source.EventBindingConnector;
-import de.javax.util.eventbinding.spi.impl.reflect.Filter;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodNamePredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParameterCountPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.MethodParametersPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.PublicMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.MethodPredicate.StaticMethodPredicate;
-import de.javax.util.eventbinding.spi.impl.reflect.NotPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodNamePredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.MethodParametersPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.PublicMethodPredicate;
+import de.javax.util.eventbinding.spi.impl.reflect.StaticMethodPredicate;
 import de.javax.util.eventbinding.spi.impl.source.AbstractMethodBasedEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.EventSourceAccessException;
 
@@ -27,7 +28,16 @@ import de.javax.util.eventbinding.spi.impl.source.EventSourceAccessException;
  * @author Matthias Hanisch
  *
  */
+@SuppressWarnings("unchecked")
 public class JavaFxEventBindingConnectorFactory extends AbstractMethodBasedEventBindingConnectorFactory {
+
+    private Predicate<Method> predicatesAddEventHandler = Predicates.and(new MethodNamePredicate("addEventHandler"),
+            new MethodParametersPredicate(EventType.class, EventHandler.class), new PublicMethodPredicate(),
+            Predicates.not(new StaticMethodPredicate()));
+
+    private Predicate<Method> predicatesRemoveEventHandler = Predicates.and(new MethodNamePredicate(
+            "removeEventHandler"), new MethodParametersPredicate(EventType.class, EventHandler.class),
+            new PublicMethodPredicate(), Predicates.not(new StaticMethodPredicate()));
 
     public JavaFxEventBindingConnectorFactory() {
     }
@@ -43,10 +53,10 @@ public class JavaFxEventBindingConnectorFactory extends AbstractMethodBasedEvent
     protected MethodBasedEventBindingConnectorFactoryInfo getInfo(Class<?> eventSourceType, Class<?> eventType) {
         // find method for registering event listeners of the given type
         Method registerEventBindingMethod = findRegisterUnregisterEventHandlerMethod(eventSourceType, eventType,
-                "addEventHandler");
+                predicatesAddEventHandler);
         // find method for unregistering event listeners of the given type
         Method unregisterEventBindingMethod = findRegisterUnregisterEventHandlerMethod(eventSourceType, eventType,
-                "removeEventHandler");
+                predicatesRemoveEventHandler);
         // there should be one addxxListener and one removexxxListener method
         if (registerEventBindingMethod != null && unregisterEventBindingMethod != null) {
             // the event listener types of both methods should match
@@ -69,21 +79,18 @@ public class JavaFxEventBindingConnectorFactory extends AbstractMethodBasedEvent
      *            The type of the event source object.
      * @param eventType
      *            The type of the event which should be method parameter type also.
-     * @param methodNameRegEx
-     *            The name of the method to find. (e.g. &quot;add.+Listener&quot; can be used to find regular methods
-     *            adding listener instances)
+     * @param predicates
+     *            The predicates defining the method to find.
      * @return A Method object if there is exactly one method matching all criteria otherwise <code>null</code> is
      *         returned.
      */
     private Method findRegisterUnregisterEventHandlerMethod(Class<?> eventSourceType, Class<?> eventType,
-            String methodNameRegEx) {
-        Filter<Method> filter = new Filter<Method>(new HashSet<Method>(Arrays.asList(eventSourceType.getMethods())))
-                .filter(new PublicMethodPredicate()).filter(new NotPredicate<Method>(new StaticMethodPredicate()))
-                .filter(new MethodParameterCountPredicate(2)).filter(new MethodNamePredicate(methodNameRegEx))
-                .filter(new MethodParametersPredicate(EventType.class, EventHandler.class));
-        if (filter.getElements().size() == 1) {
-            return filter.getElements().iterator().next();
+            Predicate<Method> predicates) {
+        Iterable<Method> methods = Iterables.filter(Arrays.asList(eventSourceType.getMethods()), predicates);
+        if (Iterables.size(methods) == 1) {
+            return methods.iterator().next();
+        } else {
+            return null;
         }
-        return null;
     }
 }
