@@ -18,9 +18,8 @@ public class MethodParameterTypeHasEventMethodForTypePredicate implements Predic
 
     private final Class<?> eventType;
 
-    private Predicate<Method> fixedPredicates = Predicates.and(new MethodParameterCountPredicate(1),
-            new MethodReturnTypePredicate(Void.TYPE), Predicates.not(new StaticMethodPredicate()),
-            new PublicMethodPredicate());
+    private Predicate<Method> fixedPredicates = Predicates.and(new MethodReturnTypePredicate(Void.TYPE),
+            Predicates.not(new StaticMethodPredicate()), new PublicMethodPredicate());
 
     public MethodParameterTypeHasEventMethodForTypePredicate(Class<?> eventType) {
         this.eventType = eventType;
