@@ -13,14 +13,13 @@ import de.javax.util.eventbinding.spi.EventTarget;
 /**
  * The default implementation of an event binder.<br/>
  * This implementation defines the top level event binding process. The concrete implementation is based on the
- * interfaces of the SPI. The {@link EventBindingServiceProvider} provides the implementations of the services for the
- * event binding.
+ * interfaces of the SPI.
  * 
  * @author Frank Hardy
  */
 public class DefaultEventBinder implements EventBinder {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final EventBindingServiceProvider serviceProvider;
 
@@ -39,32 +38,20 @@ public class DefaultEventBinder implements EventBinder {
         this.serviceProvider = serviceProvider;
     }
 
-    /**
-     * Create an event binding between a given event source provider and event target provider.
-     * 
-     * @param sourceProvider
-     *            the provider of event sources for binding.
-     * @param targetProvider
-     *            the provider of event targets for binding.
-     * 
-     * @return an object which represents the event binding between the given source and target object.
-     * 
-     * @throws EventBindingException
-     *             when the binding between the source and target fails for some reason.
-     */
     @Override
     public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
-        logger.debug("bind source={} with target={}", sourceProvider, targetProvider);
+        logger.debug("Binding sources of source provider [{}] with targets of target provider [{}]", sourceProvider, targetProvider);
+        
         Set<EventSource> foundSources = this.serviceProvider.getEventSourceCollector().collectEventSourcesFrom(
                 sourceProvider);
         if (foundSources.isEmpty()) {
-            throw new NoEventSourcesFoundException();
+            throw new EventBindingException("No event sources found!");
         }
 
         Set<EventTarget> foundTargets = this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(
                 targetProvider);
         if (foundTargets.isEmpty()) {
-            throw new NoEventTargetsFoundException();
+            throw new EventBindingException("No event targets found!");
         }
 
         return this.serviceProvider.createEventBinding(this, sourceProvider, targetProvider,
@@ -74,7 +61,6 @@ public class DefaultEventBinder implements EventBinder {
     /**
      * @return <code>true</code> when this event binder is in strict binding mode. Otherwise <code>false</code>.
      */
-    @Override
     public boolean isStrictBindingMode() {
         return this.strictBindingMode;
     }
@@ -83,23 +69,13 @@ public class DefaultEventBinder implements EventBinder {
      * @param strictBinding
      *            set to <code>true</code> to activate the strict binding mode.
      */
-    @Override
     public void setStrictBindingMode(boolean strictBinding) {
         this.strictBindingMode = strictBinding;
     }
 
-    /**
-     * Implements the process of binding the found event targets to the event sources from the given event source
-     * provider object.
-     * 
-     * @param eventTargets
-     *            the found event targets.
-     * @param eventSources
-     *            the found event sources.
-     * 
-     * @return the set of bound event targets. Never <code>null</code>.
-     */
-    protected Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Set<EventSource> eventSources) {
+    private Set<EventTarget> bindTargetsToSources(Set<EventTarget> eventTargets, Set<EventSource> eventSources) {
+    	logger.debug("Trying to bind {} sources with {} targets.", eventSources.size(), eventTargets.size());
+    	
         Set<EventTarget> boundTargets = new HashSet<EventTarget>();
         Set<EventTarget> unboundTargets = new HashSet<EventTarget>();
 
@@ -113,19 +89,16 @@ public class DefaultEventBinder implements EventBinder {
             } else if (this.strictBindingMode) {
                 unboundTargets.add(eventTarget);
             } else {
-                logger.warn("target={} not bound", eventTarget);
+                logger.warn("Target [{}] was not bound!", eventTarget);
             }
         }
 
         if (boundTargets.isEmpty()) {
-            throw new UnboundTargetsException(new HashSet<EventTarget>(eventTargets));
+            throw new UnboundEventTargetsException(eventTargets);
         }
-
         if (this.strictBindingMode && !unboundTargets.isEmpty()) {
-            throw new UnboundTargetsException(unboundTargets);
+            throw new UnboundEventTargetsException(unboundTargets);
         }
-
         return boundTargets;
     }
-
 }

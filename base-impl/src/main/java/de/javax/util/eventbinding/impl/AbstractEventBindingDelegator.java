@@ -30,19 +30,19 @@ public abstract class AbstractEventBindingDelegator implements EventBinding {
     }
 
     @Override
-    public Object getSource() {
+    public Object getSourceProvider() {
         if (this.delegateBinding == null) {
             throw new IllegalStateException("The binding has been released!");
         }
-        return this.delegateBinding.getSource();
+        return this.delegateBinding.getSourceProvider();
     }
 
     @Override
-    public Object getTarget() {
+    public Object getTargetProvider() {
         if (this.delegateBinding == null) {
             throw new IllegalStateException("The binding has been released!");
         }
-        return this.delegateBinding.getTarget();
+        return this.delegateBinding.getTargetProvider();
     }
 
     @Override

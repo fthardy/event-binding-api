@@ -13,10 +13,17 @@ public interface EventSource {
     EventSourceId getId();
 
     /**
+     * @return a textual description of the receiving event source.
+     */
+	String getDescription();
+
+    /**
      * Bind a given event target to the receiving event source.
      * 
      * @param eventTarget
      *            the event target to be bound to the source.
+     *            
+     * @return <code>true</code> when the receiving event source was bound to the given event target.
      */
     void bindTo(EventTarget eventTarget);
 

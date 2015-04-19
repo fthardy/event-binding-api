@@ -1,42 +1,27 @@
 package de.javax.util.eventbinding;
 
 /**
- * An event binder is a utility used to create an event binding between a source
- * of events to a target which can handle the events.<br/>
+ * An event binder is a utility used to create connections between sources which are sending events
+ * and targets which can process those events.<br/>
  * 
- * TODO Add further detailed documentation!
  * 
  * @author Frank Hardy
  */
 public interface EventBinder {
 
 	/**
-	 * Create an event binding between a given event source and target.
+	 * Make an event binding between event sources and event targets.
 	 * 
-	 * @param source
-	 *            the object representing a source of events.
-	 * @param target
-	 *            the object representing the target of the events from the
-	 *            source.
+	 * @param sourceProvider
+	 *            an object which provides event sources.
+	 * @param targetProvider
+	 *            an object which provides event targets.
 	 * 
-	 * @return an object which represents the event binding between the given
-	 *         source and target object.
+	 * @return the binding instance which represents the event binding between the event
+	 *         sources and targets.
 	 * 
 	 * @throws EventBindingException
-	 *             when the binding between the source and target fails for some
-	 *             reason.
+	 *             when the binding fails for some reason.
 	 */
-	EventBinding bind(Object source, Object target) throws EventBindingException;
-
-	/**
-	 * @return <code>true</code> when this event binder is in strict binding mode. Otherwise <code>false</code>. 
-	 */
-	boolean isStrictBindingMode();
-
-	/**
-	 * @param strictBinding
-	 *            set to <code>true</code> to activate the strict binding mode.
-	 */
-	void setStrictBindingMode(boolean strictBinding);
-
+	EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException;
 }

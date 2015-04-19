@@ -12,6 +12,11 @@ import java.util.Set;
 public interface EventTarget {
 
     /**
+	 * @return a simple textual description of the receiving target.
+	 */
+	String getDescription();
+
+	/**
      * @return the event type class which the receiving event target can handle.
      */
     Class<?> getEventClass();

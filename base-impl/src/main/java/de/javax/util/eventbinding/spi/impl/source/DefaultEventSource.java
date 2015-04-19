@@ -56,6 +56,12 @@ public class DefaultEventSource implements EventSource {
     public EventSourceId getId() {
         return this.id;
     }
+    
+    @Override
+    public String getDescription() {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
     @Override
     public void bindTo(EventTarget eventTarget) {

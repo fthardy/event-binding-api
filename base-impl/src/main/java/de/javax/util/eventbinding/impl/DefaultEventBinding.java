@@ -36,19 +36,19 @@ public class DefaultEventBinding extends AbstractEventBindingDelegator {
      */
     public static class ImmutableBindingImpl implements EventBinding {
 
-        private final Object source;
-        private final Object target;
+        private final Object sourceProvider;
+        private final Object targetProvider;
         private final Set<EventTarget> boundTargets;
 
         public ImmutableBindingImpl(Object source, Object target, Set<EventTarget> boundTargets) {
             if (source == null) {
                 throw new NullPointerException("Undefined event source object!");
             }
-            this.source = source;
+            this.sourceProvider = source;
             if (target == null) {
                 throw new NullPointerException("Undefined event target object!");
             }
-            this.target = target;
+            this.targetProvider = target;
             if (boundTargets == null || boundTargets.isEmpty()) {
                 throw new IllegalArgumentException("No or undefined event targets!");
             }
@@ -56,13 +56,13 @@ public class DefaultEventBinding extends AbstractEventBindingDelegator {
         }
 
         @Override
-        public Object getSource() {
-            return this.source;
+        public Object getSourceProvider() {
+            return this.sourceProvider;
         }
 
         @Override
-        public Object getTarget() {
-            return this.target;
+        public Object getTargetProvider() {
+            return this.targetProvider;
         }
 
         @Override
@@ -115,7 +115,7 @@ public class DefaultEventBinding extends AbstractEventBindingDelegator {
             }
 
             EventBinding oldBinding = this.getDelegateBinding();
-            EventBinding newBinding = this.binder.bind(this.getSource(), this.getTarget());
+            EventBinding newBinding = this.binder.bind(this.getSourceProvider(), this.getTargetProvider());
 
             this.setDelegateBinding(newBinding);
 

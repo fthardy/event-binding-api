@@ -40,7 +40,7 @@ public class DefaultEventTarget implements EventTarget {
     }
 
     @Override
-    public String toString() {
+    public String getDescription() {
         return this.eventDispatcher.toString();
     }
 

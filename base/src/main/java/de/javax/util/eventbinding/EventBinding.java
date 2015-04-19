@@ -9,21 +9,21 @@ package de.javax.util.eventbinding;
 public interface EventBinding {
 
     /**
-     * @return the object which is the source of events in the receiving event binding. <code>null</code> when the
-     *         binding has been released.
+     * @return the object which provided the event sources for the binding.
+     * <code>null</code> when the receiving binding instance has been released.
      */
-    Object getSource();
+    Object getSourceProvider();
 
     /**
-     * @return the object which is the target of events in the receiving event binding. <code>null</code> when the
-     *         binding has been released.
+     * @return the object which provided the event targets for the binding.
+     * <code>null</code> when the receiving binding instance has been released.
      */
-    Object getTarget();
+    Object getTargetProvider();
 
     /**
      * Releases the receiving event binding instance.<br/>
-     * Once an event binding is released all references to the source and target object are cleared. Hence after a
-     * release it can can never be rebuilt or used in any way.
+     * Once an event binding is released all references to the source provider and target provider object are cleared.
+     * This makes it impossible to rebuild the binding after a release.
      */
     void release();
 
@@ -35,10 +35,10 @@ public interface EventBinding {
     boolean isReleased();
 
     /**
-     * Rebuilds the receiving event binding between the source and target object.<br/>
+     * Rebuild the receiving event binding.<br/>
      * This is an optional method.
      *
-     * @throws java.lang.UnsupportedOperationException when the rebuilding is not supported by the receiving binding instance.
+     * @throws java.lang.UnsupportedOperationException when rebuilding is not supported by the receiving binding instance.
      */
     void rebuild();
 }

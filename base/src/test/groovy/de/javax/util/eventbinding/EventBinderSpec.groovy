@@ -44,7 +44,7 @@ class EventBinderSpec extends Specification {
         this.eventSourceCollectorMock.collectEventSourcesFrom(sourceProvider) >> ([] as Set)
 
         then:
-        thrown(NoEventSourcesFoundException)
+        thrown(EventBindingException)
     }
 
     def 'No event targets are found'() {
@@ -67,7 +67,7 @@ class EventBinderSpec extends Specification {
         this.eventTargetCollectorMock.collectEventTargetsFrom(targetProvider) >> ([] as Set)
 
         then:
-        thrown(NoEventTargetsFoundException)
+        thrown(EventBindingException)
     }
 
     def 'No event targets can be bound to any sources'() {
@@ -110,16 +110,16 @@ class EventBinderSpec extends Specification {
         eventTarget2IdSelector.matches(eventSource2Id) >> false
 
         then:
-        UnboundTargetsException e = thrown(UnboundTargetsException)
+        UnboundEventTargetsException e = thrown(UnboundEventTargetsException)
 
         expect:
-        e.unboundTargetInfos.length == 2
+        e.targetDescriptions.length == 2
         this.eventBinder.strictBindingMode == false
     }
 
     def 'Not all targets can be bound in strict binding mode'() {
         given:
-        this.eventBinder.setStrictBindingMode(true)
+        this.eventBinder.strictBindingMode = true
 
         def targetProvider = new Object()
         def sourceProvider = new Object()
@@ -162,16 +162,16 @@ class EventBinderSpec extends Specification {
         eventTargetMock2.isBound() >> true
 
         then:
-        UnboundTargetsException e = thrown(UnboundTargetsException)
+        UnboundEventTargetsException e = thrown(UnboundEventTargetsException)
 
         expect:
-        e.unboundTargetInfos.length == 1
+        e.targetDescriptions.length == 1
         this.eventBinder.strictBindingMode == true
     }
 
     def 'Binding succeeds in strict binding mode'() {
         given:
-        this.eventBinder.setStrictBindingMode(true)
+        this.eventBinder.strictBindingMode = true
 
         def targetProvider = new Object()
         def sourceProvider = new Object()

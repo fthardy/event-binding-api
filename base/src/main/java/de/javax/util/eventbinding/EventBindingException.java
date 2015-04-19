@@ -1,16 +1,14 @@
 package de.javax.util.eventbinding;
 
 /**
- * The base class of all exceptions thrown by the {@link DefaultEventBinder}.
+ * The base class for all exceptions thrown by an {@link EventBinder}.<br/>
+ * Indicates that the binding between a source provider and a target provider has failed for some reason.
  * 
  * @author Frank Hardy
  */
-public abstract class EventBindingException extends RuntimeException {
+public class EventBindingException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-
-    public EventBindingException() {
-    }
     
     /**
      * Initialise this exception with a message.
@@ -32,5 +30,9 @@ public abstract class EventBindingException extends RuntimeException {
      */
     public EventBindingException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    protected EventBindingException() {
+    	super();
     }
 }
