@@ -1,14 +1,22 @@
-package de.javax.util.eventbinding;
+package de.javax.util.eventbinding.impl;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.javax.util.eventbinding.spi.EventBindingServiceProvider;
+import de.javax.util.eventbinding.EventBinder;
+import de.javax.util.eventbinding.EventBinding;
+import de.javax.util.eventbinding.EventBindingException;
+import de.javax.util.eventbinding.UnboundEventTargetsException;
+import de.javax.util.eventbinding.spi.EventBindingFactory;
 import de.javax.util.eventbinding.spi.EventSource;
+import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTarget;
+import de.javax.util.eventbinding.spi.EventTargetCollector;
 
 /**
  * The default implementation of an event binder.<br/>
@@ -21,55 +29,47 @@ public class DefaultEventBinder implements EventBinder {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final EventBindingServiceProvider serviceProvider;
+    private final EventSourceCollector sourceCollector;
+    private final EventTargetCollector targetCollector;
+    private final EventBindingFactory bindingFactory;
 
     private boolean strictBindingMode;
 
-    /**
-     * Creates a new instance of an event binder.
-     * 
-     * @param serviceProvider
-     *            the implementation instance of a {@link EventBindingServiceProvider}.
-     */
-    public DefaultEventBinder(EventBindingServiceProvider serviceProvider) {
-        if (serviceProvider == null) {
-            throw new NullPointerException("Undefined event binder service implementation!");
-        }
-        this.serviceProvider = serviceProvider;
+    @Inject
+    public DefaultEventBinder(
+    		EventSourceCollector sourceCollector, EventTargetCollector targetCollector, EventBindingFactory eventBindingFactory) {
+        this.sourceCollector = sourceCollector;
+        this.targetCollector = targetCollector;
+        this.bindingFactory = eventBindingFactory;
     }
 
     @Override
     public EventBinding bind(Object sourceProvider, Object targetProvider) throws EventBindingException {
         logger.debug("Binding sources of source provider [{}] with targets of target provider [{}]", sourceProvider, targetProvider);
         
-        Set<EventSource> foundSources = this.serviceProvider.getEventSourceCollector().collectEventSourcesFrom(
+        Set<EventSource> foundSources = this.sourceCollector.collectEventSourcesFrom(
                 sourceProvider);
         if (foundSources.isEmpty()) {
             throw new EventBindingException("No event sources found!");
         }
 
-        Set<EventTarget> foundTargets = this.serviceProvider.getEventTargetCollector().collectEventTargetsFrom(
+        Set<EventTarget> foundTargets = this.targetCollector.collectEventTargetsFrom(
                 targetProvider);
         if (foundTargets.isEmpty()) {
             throw new EventBindingException("No event targets found!");
         }
 
-        return this.serviceProvider.createEventBinding(this, sourceProvider, targetProvider,
+        return this.bindingFactory.createEventBinding(this, sourceProvider, targetProvider,
                 this.bindTargetsToSources(foundTargets, foundSources));
     }
 
-    /**
-     * @return <code>true</code> when this event binder is in strict binding mode. Otherwise <code>false</code>.
-     */
-    public boolean isStrictBindingMode() {
+    @Override
+    public boolean isInStrictBindingMode() {
         return this.strictBindingMode;
     }
 
-    /**
-     * @param strictBinding
-     *            set to <code>true</code> to activate the strict binding mode.
-     */
-    public void setStrictBindingMode(boolean strictBinding) {
+    @Override
+    public void setInStrictBindingMode(boolean strictBinding) {
         this.strictBindingMode = strictBinding;
     }
 

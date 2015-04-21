@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -21,6 +23,7 @@ public class DefaultTargetProviderClassAnalyzer implements TargetProviderClassAn
 	private final Cache<Class<?>, TargetProviderDescriptor> cache;
 	private final HandlerMethodDescriptorCollector handlerMethodMetaDataCollector;
 		
+	@Inject
 	public DefaultTargetProviderClassAnalyzer(HandlerMethodDescriptorCollector collectorImpl) {
 		this(collectorImpl, CacheBuilder.newBuilder().<Class<?>, TargetProviderDescriptor>build());
 	}

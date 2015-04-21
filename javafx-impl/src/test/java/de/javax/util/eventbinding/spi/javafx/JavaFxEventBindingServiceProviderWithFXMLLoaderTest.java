@@ -18,8 +18,8 @@ import javafx.scene.input.InputMethodEvent;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.javax.util.eventbinding.DefaultEventBinderFactory;
 import de.javax.util.eventbinding.EventBinder;
+import de.javax.util.eventbinding.EventBinderInstanceFactory;
 import de.javax.util.eventbinding.EventBinding;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.javafx.target.testmodel.AddressEditorGuiLogic;
@@ -67,7 +67,7 @@ public class JavaFxEventBindingServiceProviderWithFXMLLoaderTest extends Abstrac
 
     @SuppressWarnings("unchecked")
     private void internalTest(Parent gui, Object logic) throws Exception {
-        eventBinder = new DefaultEventBinderFactory().createEventBinder();
+        eventBinder = EventBinderInstanceFactory.newEventBinderInstance();
         EventBinding eventBinding = eventBinder.bind(gui, logic);
         Set<EventTarget> boundTargets = getBoundTargets(eventBinding);
         Assert.assertEquals(6, boundTargets.size());

@@ -1,5 +1,7 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
+import javax.inject.Inject;
+
 import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventSource;
@@ -21,6 +23,7 @@ public class DefaultEventSourceFactory implements EventSourceFactory {
 	 * @param listenerAdapterFactory
 	 *            the listener adapter factory.
 	 */
+	@Inject
 	public DefaultEventSourceFactory(
 			EventBindingConnectorFactory listenerAdapterFactory) {
 		if (listenerAdapterFactory == null) {

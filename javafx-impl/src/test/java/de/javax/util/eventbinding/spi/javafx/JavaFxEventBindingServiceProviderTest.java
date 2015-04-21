@@ -15,8 +15,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.javax.util.eventbinding.DefaultEventBinderFactory;
 import de.javax.util.eventbinding.EventBinder;
+import de.javax.util.eventbinding.EventBinderInstanceFactory;
 import de.javax.util.eventbinding.EventBinding;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.javafx.source.testmodel.AddressEditorGui;
@@ -42,7 +42,7 @@ public class JavaFxEventBindingServiceProviderTest extends AbstractJavaFXTest {
         super.prepare();
         gui = new ContactEditorGui(new PersonEditorGui(), new AddressEditorGui());
         logic = new ContactEditorGuiLogic(new PersonEditorGuiLogic(), new AddressEditorGuiLogic());
-        eventBinder = new DefaultEventBinderFactory().createEventBinder();
+        eventBinder = EventBinderInstanceFactory.newEventBinderInstance();
     }
 
     @SuppressWarnings("unchecked")

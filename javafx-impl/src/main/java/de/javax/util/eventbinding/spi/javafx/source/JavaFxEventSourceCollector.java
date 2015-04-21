@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import de.javax.util.eventbinding.source.EventSourceFactory;
@@ -28,6 +30,7 @@ public class JavaFxEventSourceCollector implements EventSourceCollector {
      * @param eventSourceFactory
      *            the event source factory.
      */
+    @Inject
     public JavaFxEventSourceCollector(EventSourceFactory eventSourceFactory) {
         if (eventSourceFactory == null) {
             throw new NullPointerException("Undefined event source factory!");

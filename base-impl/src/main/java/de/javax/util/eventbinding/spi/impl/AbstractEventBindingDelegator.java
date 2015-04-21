@@ -1,4 +1,4 @@
-package de.javax.util.eventbinding.impl;
+package de.javax.util.eventbinding.spi.impl;
 
 import java.util.Set;
 

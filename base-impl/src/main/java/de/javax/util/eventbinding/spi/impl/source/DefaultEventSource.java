@@ -59,8 +59,7 @@ public class DefaultEventSource implements EventSource {
     
     @Override
     public String getDescription() {
-    	// TODO Auto-generated method stub
-    	return null;
+        return String.format("[DefaultEventSource id=%s", id.toString());
     }
 
     @Override
@@ -91,10 +90,5 @@ public class DefaultEventSource implements EventSource {
         this.connectorMapping.get(eventTarget).disconnect();
         this.connectorMapping.remove(eventTarget);
         eventTarget.removeBoundSource(this);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("[DefaultEventSource id=%s", id.toString());
     }
 }

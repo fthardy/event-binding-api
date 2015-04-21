@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -30,6 +32,7 @@ public class DefaultEventSourceCollector implements EventSourceCollector {
 
     private final Cache<Class<?>, EventSourceProviderClassInfo> cache;
 
+    @Inject
     public DefaultEventSourceCollector(EventSourceFactory eventSourceFactory) {
     	this(eventSourceFactory, CacheBuilder.newBuilder().<Class<?>, EventSourceProviderClassInfo>build());
     }

@@ -26,7 +26,8 @@ subprojects {
 project('base-impl') {
 	dependencies {
 		compile 'com.google.guava:guava:18.0'
-
+		compile 'com.google.inject:guice:3.0'
+		
 		compile project(':base')
 	}
 }
