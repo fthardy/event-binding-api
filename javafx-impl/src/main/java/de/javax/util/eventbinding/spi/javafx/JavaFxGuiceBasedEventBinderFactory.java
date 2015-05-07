@@ -8,10 +8,8 @@ import de.javax.util.eventbinding.impl.DefaultEventBinder;
 import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventBinderFactory;
-import de.javax.util.eventbinding.spi.EventBindingFactory;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.DefaultEventBindingFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTargetCollector;
@@ -42,7 +40,6 @@ public class JavaFxGuiceBasedEventBinderFactory implements EventBinderFactory {
 			bind(EventBinder.class).to(DefaultEventBinder.class);
 			bind(EventSourceCollector.class).to(JavaFxEventSourceCollector.class);
 			bind(EventTargetCollector.class).to(DefaultEventTargetCollector.class);
-			bind(EventBindingFactory.class).to(DefaultEventBindingFactory.class);
 			bind(TargetProviderClassAnalyzer.class).to(DefaultTargetProviderClassAnalyzer.class);
 			bind(MethodEventTargetFactory.class).to(JfxMethodEventTargetFactory.class);
 			bind(HandlerMethodDescriptorCollector.class).to(JfxMethodHandlerDescriptorCollector.class);

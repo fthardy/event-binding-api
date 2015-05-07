@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -26,6 +27,7 @@ import de.javax.util.eventbinding.spi.impl.source.EventSourceProviderClassInfo.E
  * 
  * @author Matthias Hanisch
  */
+@Singleton
 public class DefaultEventSourceCollector implements EventSourceCollector {
 
     private final EventSourceFactory eventSourceFactory;

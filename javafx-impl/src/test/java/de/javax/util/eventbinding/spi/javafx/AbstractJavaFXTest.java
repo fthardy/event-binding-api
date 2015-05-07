@@ -10,9 +10,8 @@ import javafx.stage.Stage;
 import org.junit.Before;
 
 import de.javax.util.eventbinding.EventBinding;
+import de.javax.util.eventbinding.impl.DefaultEventBinding;
 import de.javax.util.eventbinding.spi.EventTarget;
-import de.javax.util.eventbinding.spi.impl.AbstractEventBindingDelegator;
-import de.javax.util.eventbinding.spi.impl.DefaultEventBinding.ImmutableBindingImpl;
 
 /**
  * Base class for testing with javafx classes. Setup-method provides initialization of javafx runtime.
@@ -54,12 +53,6 @@ public class AbstractJavaFXTest {
     }
 
     protected final Set<EventTarget> getBoundTargets(EventBinding eventBinding) {
-        if (eventBinding instanceof ImmutableBindingImpl) {
-            return ((ImmutableBindingImpl) eventBinding).getBoundTargets();
-        } else if (eventBinding instanceof AbstractEventBindingDelegator) {
-            return ((AbstractEventBindingDelegator) eventBinding).getBoundTargets();
-        } else {
-            return null;
-        }
+    	return ((DefaultEventBinding) eventBinding).getBoundTargets();
     }
 }

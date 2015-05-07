@@ -7,10 +7,8 @@ import de.javax.util.eventbinding.EventBinder;
 import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventBinderFactory;
-import de.javax.util.eventbinding.spi.EventBindingFactory;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
-import de.javax.util.eventbinding.spi.impl.DefaultEventBindingFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceCollector;
 import de.javax.util.eventbinding.spi.impl.source.DefaultEventSourceFactory;
@@ -41,7 +39,6 @@ public class GuiceBasedEventBinderFactory implements EventBinderFactory {
 			bind(EventBinder.class).to(DefaultEventBinder.class);
 			bind(EventSourceCollector.class).to(DefaultEventSourceCollector.class);
 			bind(EventTargetCollector.class).to(DefaultEventTargetCollector.class);
-			bind(EventBindingFactory.class).to(DefaultEventBindingFactory.class);
 			bind(TargetProviderClassAnalyzer.class).to(DefaultTargetProviderClassAnalyzer.class);
 			bind(MethodEventTargetFactory.class).to(DefaultMethodEventTargetFactory.class);
 			bind(HandlerMethodDescriptorCollector.class).to(DefaultHandlerMethodDescriptorCollector.class);

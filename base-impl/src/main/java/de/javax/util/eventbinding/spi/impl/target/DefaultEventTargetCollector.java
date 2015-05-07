@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
@@ -18,6 +19,7 @@ import de.javax.util.eventbinding.spi.impl.target.metadata.TargetProviderDescrip
  *
  * @author Frank Hardy
  */
+@Singleton
 public class DefaultEventTargetCollector implements EventTargetCollector {
 
 	private final TargetProviderClassAnalyzer targetProviderClassAnalyzer;

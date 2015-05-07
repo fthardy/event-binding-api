@@ -16,10 +16,9 @@ class EventBinderSpec extends Specification {
 
     private EventTargetCollector eventTargetCollectorMock = Mock()
     private EventSourceCollector eventSourceCollectorMock = Mock()
-	private EventBindingFactory eventBindingFactoryMock = Mock()
 
     def setup() {
-        this.eventBinder = new DefaultEventBinder(this.eventSourceCollectorMock, this.eventTargetCollectorMock, this.eventBindingFactoryMock)
+        this.eventBinder = new DefaultEventBinder(this.eventSourceCollectorMock, this.eventTargetCollectorMock)
     }
 
     def 'No event sources are found'() {
@@ -160,7 +159,6 @@ class EventBinderSpec extends Specification {
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()
         EventSource eventSourceMock2 = Mock()
-        EventBinding eventBindingMock = Mock()
         EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
         EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
         eventSourceMock1.getId() >> eventSource1Id
@@ -190,16 +188,7 @@ class EventBinderSpec extends Specification {
         eventSourceMock1.bindTo(eventTargetMock2)
         eventTargetMock2.isBound() >> true
 
-        then:'a binding is created'
-		this.eventBindingFactoryMock.createEventBinding(
-                this.eventBinder,
-                sourceProvider, targetProvider, { givenSetOfBoundTargets ->
-                    givenSetOfBoundTargets.size() == 2 &&
-                            givenSetOfBoundTargets.containsAll([eventTargetMock1, eventTargetMock2])
-                }) >> eventBindingMock
-
         expect:
-        eventBinding == eventBindingMock
         this.eventBinder.inStrictBindingMode == true
     }
 
@@ -213,7 +202,6 @@ class EventBinderSpec extends Specification {
         EventTarget eventTargetMock2 = Mock()
         EventSource eventSourceMock1 = Mock()
         EventSource eventSourceMock2 = Mock()
-        EventBinding eventBindingMock = Mock()
         EventSourceId eventSource1Id = new EventSourceId(['addressEditor', 'okButton'])
         EventSourceId eventSource2Id = new EventSourceId(['addressEditor', 'cancelButton'])
         eventSourceMock1.getId() >> eventSource1Id
@@ -241,16 +229,7 @@ class EventBinderSpec extends Specification {
         eventSourceMock2.bindTo(eventTargetMock2)
         eventTargetMock2.isBound() >> true
 
-        then:'a binding is created'
-        this.eventBindingFactoryMock.createEventBinding(
-                this.eventBinder,
-                sourceProvider, targetProvider, { givenSetOfBoundTargets ->
-                    givenSetOfBoundTargets.size() == 1 &&
-                            givenSetOfBoundTargets.contains(eventTargetMock2)
-                }) >> eventBindingMock
-
         expect:
-        eventBinding == eventBindingMock
         this.eventBinder.inStrictBindingMode == false
     }
 }
