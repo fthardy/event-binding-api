@@ -8,7 +8,6 @@ import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.scene.input.InputMethodEvent;
 
 import org.junit.Assert;
@@ -46,7 +45,7 @@ public class JavaFxEventBindingServiceProviderTest extends AbstractJavaFXTest {
     }
 
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void bind() throws Exception {
         EventBinding eventBinding = eventBinder.bind(gui, logic);
         Set<EventTarget> boundTargets = getBoundTargets(eventBinding);
@@ -102,36 +101,6 @@ public class JavaFxEventBindingServiceProviderTest extends AbstractJavaFXTest {
             actualEventIdList.add(entry.getId());
         }
         Assert.assertTrue(actualEventIdList.containsAll(expectedEventIdList));
-    }
-
-    static class EventTargetInfo {
-        private Class<?> eventClass;
-        private String eventSourceId;
-        private EventType<?> eventType;
-
-        public EventTargetInfo(Class<?> eventClass, EventType<?> eventType, String eventSourceId) {
-            this.eventClass = eventClass;
-            this.eventType = eventType;
-            this.eventSourceId = eventSourceId;
-        }
-
-        static EventTargetInfo create(Class<?> eventClass, EventType<?> eventType, String eventSourceId) {
-            return new EventTargetInfo(eventClass, eventType, eventSourceId);
-        }
-
-        public void assertEqualsOneTarget(Set<EventTarget> eventTargets) {
-            for (EventTarget eventTarget : eventTargets) {
-                Assert.assertTrue(eventTarget instanceof JfxEventTarget);
-                JfxEventTarget jfxEventTarget = (JfxEventTarget) eventTarget;
-
-                if (jfxEventTarget.getEventClass().equals(eventClass)
-                        && jfxEventTarget.getEventSourceIdSelector().toString().equals(this.eventSourceId)
-                        && jfxEventTarget.getEventType().equals(this.eventType)) {
-                    return;
-                }
-            }
-            Assert.fail("no event target matches");
-        }
     }
 
 }
