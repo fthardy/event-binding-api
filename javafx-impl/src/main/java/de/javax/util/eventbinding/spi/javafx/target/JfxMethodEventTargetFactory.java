@@ -1,5 +1,6 @@
 package de.javax.util.eventbinding.spi.javafx.target;
 
+import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.target.DefaultMethodEventTargetFactory;
@@ -13,17 +14,17 @@ import de.javax.util.eventbinding.spi.javafx.target.metadata.JfxHandlerMethodDes
  */
 public class JfxMethodEventTargetFactory extends DefaultMethodEventTargetFactory {
 
-	@Override
-	public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix, HandlerMethodDescriptor handlerMethodDescriptor) {
-		return new JfxEventTargetImpl(
-				new EventSourceIdSelector(this.buildIdSelectorExpression(
-						idSelectorPrefix, handlerMethodDescriptor.getIdSelectorExpression())),
-				handlerMethodDescriptor.getHandlerMethod().getParameterTypes()[0],
-				((JfxHandlerMethodDescriptor) handlerMethodDescriptor).getEventType(),
-				this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(), handlerMethodOwner));
-	}
-	
-	private String buildIdSelectorExpression(String prefix, String selectorExpression) {
-		return prefix + (prefix.isEmpty() ? "" : ".") + selectorExpression;
-	}
+    @Override
+    public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix,
+            HandlerMethodDescriptor handlerMethodDescriptor, EventBindingConnectorFactory eventbindingConnectorFactory) {
+        return new JfxEventTargetImpl(new EventSourceIdSelector(this.buildIdSelectorExpression(idSelectorPrefix,
+                handlerMethodDescriptor.getIdSelectorExpression())), handlerMethodDescriptor.getHandlerMethod()
+                .getParameterTypes()[0], ((JfxHandlerMethodDescriptor) handlerMethodDescriptor).getEventType(),
+                this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(), handlerMethodOwner),
+                eventbindingConnectorFactory);
+    }
+
+    private String buildIdSelectorExpression(String prefix, String selectorExpression) {
+        return prefix + (prefix.isEmpty() ? "" : ".") + selectorExpression;
+    }
 }

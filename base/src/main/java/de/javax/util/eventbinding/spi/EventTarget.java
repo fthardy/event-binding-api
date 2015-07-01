@@ -16,16 +16,10 @@ public interface EventTarget {
 	 */
 	String getDescription();
 
-	/**
+    /**
      * @return the event type class which the receiving event target can handle.
      */
     Class<?> getEventClass();
-
-    /**
-     * @return the event source identifier selector which is used to select the
-     *         event sources by their identifiers.
-     */
-    EventSourceIdSelector getEventSourceIdSelector();
 
     /**
      * @return the event dispatcher used to dispatch the events from the event
@@ -66,4 +60,13 @@ public interface EventTarget {
      * @param eventSource The bound event source.
      */
     void removeBoundSource(EventSource eventSource);
+
+    /**
+     * Returns if this EventTarget can be connected to the given EventSource.
+     * 
+     * @return <code>true</code> if this EventTarget can be connected to the given EventSource, <code>false</code>
+     *         otherwise.
+     */
+    boolean canHandle(EventSource eventSource);
+
 }

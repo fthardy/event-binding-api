@@ -4,6 +4,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.javax.util.eventbinding.source.EventBindingConnector;
+import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
@@ -16,27 +21,36 @@ import de.javax.util.eventbinding.spi.EventTarget;
  */
 public class DefaultEventTarget implements EventTarget {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     private final Class<?> eventClass;
     private final EventSourceIdSelector sourceIdSelector;
     private final EventDispatcher eventDispatcher;
 
     private final Set<EventSource> boundEventSources = new HashSet<EventSource>();
 
-    public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, EventDispatcher dispatcher) {
+    private final EventBindingConnectorFactory connectorFactory;
+
+    public DefaultEventTarget(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, EventDispatcher dispatcher,
+            EventBindingConnectorFactory connectorFactory) {
         if (sourceIdSelector == null) {
             throw new NullPointerException("Undefined event source identifier pattern!");
         }
         this.sourceIdSelector = sourceIdSelector;
-        
+
         if (eventClass == null) {
             throw new NullPointerException("Undefined event class!");
         }
         this.eventClass = eventClass;
-        
+
         if (dispatcher == null) {
             throw new NullPointerException("Undefined event dispatcher!");
         }
         this.eventDispatcher = dispatcher;
+        if (connectorFactory == null) {
+            throw new NullPointerException("Undefined event binding connector factory");
+        }
+        this.connectorFactory = connectorFactory;
     }
 
     @Override
@@ -49,7 +63,6 @@ public class DefaultEventTarget implements EventTarget {
         return this.eventClass;
     }
 
-    @Override
     public EventSourceIdSelector getEventSourceIdSelector() {
         return this.sourceIdSelector;
     }
@@ -60,8 +73,14 @@ public class DefaultEventTarget implements EventTarget {
     }
 
     @Override
-    public void addBoundSource(EventSource source) {
-        this.boundEventSources.add(source);
+    public void addBoundSource(EventSource eventSource) {
+        EventBindingConnector connector = this.connectorFactory.createConnector(eventSource.getSource(),
+                getEventClass());
+        if (connector != null) {
+            logger.debug("connect source={} with target {}", eventSource.getId().toString(), this);
+            connector.connect(getEventDispatcher());
+            this.boundEventSources.add(eventSource);
+        }
     }
 
     @Override
@@ -87,5 +106,19 @@ public class DefaultEventTarget implements EventTarget {
     @Override
     public void removeBoundSource(EventSource eventSource) {
         this.boundEventSources.remove(eventSource);
+    }
+
+    @Override
+    public boolean canHandle(EventSource eventSource) {
+        if (!getEventSourceIdSelector().matches(eventSource.getId())) {
+            return false;
+        }
+        if (boundEventSources.contains(eventSource)) {
+            throw new IllegalStateException("The event target is already bound to this source!");
+        }
+
+        EventBindingConnector connector = this.connectorFactory.createConnector(eventSource.getSource(),
+                getEventClass());
+        return connector != null;
     }
 }

@@ -34,8 +34,7 @@ public class JavaFxEventSourceCollectorTest extends AbstractJavaFXTest {
     @Override
     public void prepare() throws Exception {
         super.prepare();
-        this.eventSourceCollector = new JavaFxEventSourceCollector(new DefaultEventSourceFactory(
-                new JavaFxEventBindingConnectorFactory()));
+        this.eventSourceCollector = new JavaFxEventSourceCollector(new DefaultEventSourceFactory());
     }
 
     @Test

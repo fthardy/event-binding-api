@@ -1,8 +1,5 @@
 package de.javax.util.eventbinding.spi.impl.source;
 
-import javax.inject.Inject;
-
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.source.EventSourceFactory;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceId;
@@ -15,28 +12,15 @@ import de.javax.util.eventbinding.spi.EventSourceId;
  */
 public class DefaultEventSourceFactory implements EventSourceFactory {
 
-	private final EventBindingConnectorFactory listenerAdapterFactory;
+    /**
+     * Creates a new instance of this factory.
+     * 
+     */
+    public DefaultEventSourceFactory() {
+    }
 
-	/**
-	 * Creates a new instance of this factory.
-	 * 
-	 * @param listenerAdapterFactory
-	 *            the listener adapter factory.
-	 */
-	@Inject
-	public DefaultEventSourceFactory(
-			EventBindingConnectorFactory listenerAdapterFactory) {
-		if (listenerAdapterFactory == null) {
-			throw new NullPointerException(
-					"Undefined listener adapter factory!");
-		}
-		this.listenerAdapterFactory = listenerAdapterFactory;
-	}
-
-	@Override
-	public EventSource createEventSource(EventSourceId eventSourceId,
-			Object eventSourceProvider) {
-		return new DefaultEventSource(eventSourceId, eventSourceProvider,
-				this.listenerAdapterFactory);
-	}
+    @Override
+    public EventSource createEventSource(EventSourceId eventSourceId, Object eventSourceProvider) {
+        return new DefaultEventSource(eventSourceId, eventSourceProvider);
+    }
 }
