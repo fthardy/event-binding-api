@@ -14,7 +14,6 @@ import de.javax.util.eventbinding.impl.testmodel.ButtonClickEvent;
 import de.javax.util.eventbinding.impl.testmodel.CalendarChangeEvent;
 import de.javax.util.eventbinding.impl.testmodel.ParentComponentEvent;
 import de.javax.util.eventbinding.impl.testmodel.TextChangeEvent;
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSource;
 import de.javax.util.eventbinding.spi.EventSourceCollector;
@@ -33,17 +32,16 @@ public class DefaultEventSourceTest {
     private EventSourceCollector eventSourceCollector;
     private EventDispatcher dispatcher;
     private Set<EventSource> collectedEventSources;
-    private EventBindingConnectorFactory eventbindingConnectorFactory;
 
     @Before
     public void prepare() throws Exception {
         adressEditorGui = new AddressEditorGui();
         personEditorGui = new PersonEditorGui();
         contactEditorGui = new ContactEditorGui(personEditorGui, adressEditorGui);
-        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory());
+        eventSourceCollector = new DefaultEventSourceCollector(new DefaultEventSourceFactory(
+                new DefaultEventBindingConnectorFactory()));
         dispatcher = Mockito.mock(EventDispatcher.class);
         collectedEventSources = eventSourceCollector.collectEventSourcesFrom(contactEditorGui);
-        eventbindingConnectorFactory = new DefaultEventBindingConnectorFactory();
     }
 
     @Test
@@ -99,8 +97,7 @@ public class DefaultEventSourceTest {
         EventSourceIdSelector eventTargetIdSelector = new EventSourceIdSelector(eventTargetIdExpression);
         EventSource eventSource = getEventSource(collectedEventSources, eventSourceIdSelector);
         Assert.assertNotNull(eventSource);
-        EventTarget eventTarget = new DefaultEventTarget(eventTargetIdSelector, eventType, dispatcher,
-                eventbindingConnectorFactory);
+        EventTarget eventTarget = new DefaultEventTarget(eventTargetIdSelector, eventType, dispatcher);
         eventSource.bindTo(eventTarget);
         Assert.assertEquals(expectedToBind, eventTarget.isBound());
         if (eventTarget.isBound()) {

@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.EventTargetCollector;
 import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescriptor;
@@ -25,14 +24,12 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 
     private final TargetProviderClassAnalyzer targetProviderClassAnalyzer;
     private final MethodEventTargetFactory eventTargetFactory;
-    private final EventBindingConnectorFactory eventBindingConnectorFactory;
 
     @Inject
     public DefaultEventTargetCollector(TargetProviderClassAnalyzer targetProviderClassAnalyzer,
-            MethodEventTargetFactory eventTargetFactory, EventBindingConnectorFactory eventbindingConnectorFactory) {
+            MethodEventTargetFactory eventTargetFactory) {
         this.targetProviderClassAnalyzer = targetProviderClassAnalyzer;
         this.eventTargetFactory = eventTargetFactory;
-        this.eventBindingConnectorFactory = eventbindingConnectorFactory;
     }
 
     @Override
@@ -61,7 +58,7 @@ public class DefaultEventTargetCollector implements EventTargetCollector {
 
             for (HandlerMethodDescriptor descriptor : targetProviderDescriptor.getHandlerMethodDescriptors()) {
                 eventTargets.add(this.eventTargetFactory.createMethodEventTarget(eventTargetProvider, idSelectorPrefix,
-                        descriptor, this.eventBindingConnectorFactory));
+                        descriptor));
             }
             for (TargetProviderFieldDescriptor descriptor : targetProviderDescriptor
                     .getNestedTargetProviderDescriptors()) {

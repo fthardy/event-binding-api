@@ -2,7 +2,6 @@ package de.javax.util.eventbinding.spi.impl.target;
 
 import java.lang.reflect.Method;
 
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.EventTarget;
@@ -20,16 +19,13 @@ import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescript
  */
 public class DefaultMethodEventTargetFactory implements MethodEventTargetFactory {
 
-    public DefaultMethodEventTargetFactory() {
-    }
-
     @Override
     public EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix,
-            HandlerMethodDescriptor handlerMethodDescriptor, EventBindingConnectorFactory eventbindingConnectorFactory) {
+            HandlerMethodDescriptor handlerMethodDescriptor) {
         return new DefaultEventTarget(new EventSourceIdSelector(buildIdSelectorExpression(idSelectorPrefix,
                 handlerMethodDescriptor.getIdSelectorExpression())), handlerMethodDescriptor.getHandlerMethod()
                 .getParameterTypes()[0], this.createEventDispatcher(handlerMethodDescriptor.getHandlerMethod(),
-                handlerMethodOwner), eventbindingConnectorFactory);
+                handlerMethodOwner));
     }
 
     /**

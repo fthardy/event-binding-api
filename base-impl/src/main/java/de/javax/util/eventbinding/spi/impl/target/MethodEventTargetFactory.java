@@ -1,6 +1,5 @@
 package de.javax.util.eventbinding.spi.impl.target;
 
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventTarget;
 import de.javax.util.eventbinding.spi.impl.target.metadata.HandlerMethodDescriptor;
 
@@ -20,10 +19,9 @@ public interface MethodEventTargetFactory {
      *            the ID-selector prefix expression.
      * @param handlerMethodDescriptor
      *            the handler method descriptor instance.
-     * @param eventbindingConnectorFactory the event binding connector factory           
      * 
      * @return a new event target instance.
      */
     EventTarget createMethodEventTarget(Object handlerMethodOwner, String idSelectorPrefix,
-            HandlerMethodDescriptor handlerMethodDescriptor, EventBindingConnectorFactory eventbindingConnectorFactory);
+            HandlerMethodDescriptor handlerMethodDescriptor);
 }

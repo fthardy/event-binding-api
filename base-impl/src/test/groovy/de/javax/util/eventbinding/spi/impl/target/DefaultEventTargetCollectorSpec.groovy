@@ -2,7 +2,6 @@ package de.javax.util.eventbinding.spi.impl.target
 
 import spock.lang.Specification
 import de.javax.util.eventbinding.spi.EventTarget
-import de.javax.util.eventbinding.spi.impl.source.DefaultEventBindingConnectorFactory
 import de.javax.util.eventbinding.spi.impl.target.metadata.DefaultHandlerMethodDescriptorCollector
 import de.javax.util.eventbinding.spi.impl.target.metadata.DefaultTargetProviderClassAnalyzer
 import de.javax.util.eventbinding.target.EventTargetProvider
@@ -13,7 +12,7 @@ class DefaultEventTargetCollectorSpec extends Specification {
     MethodEventTargetFactory methodEventTargetFactoryMock = Mock()
 
     DefaultEventTargetCollector collector = new DefaultEventTargetCollector(
-    new DefaultTargetProviderClassAnalyzer(new DefaultHandlerMethodDescriptorCollector()), methodEventTargetFactoryMock, new DefaultEventBindingConnectorFactory())
+    new DefaultTargetProviderClassAnalyzer(new DefaultHandlerMethodDescriptorCollector()), methodEventTargetFactoryMock)
 
     def 'Should evaluate nested target providers'() {
         given:
@@ -29,8 +28,8 @@ class DefaultEventTargetCollectorSpec extends Specification {
         Set eventTargets = collector.collectEventTargetsFrom(targetProvider)
 
         then:
-        methodEventTargetFactoryMock.createMethodEventTarget(targetProvider, "", _, _) >>> [eventTarget1, eventTarget2]
-        methodEventTargetFactoryMock.createMethodEventTarget(targetProvider.nested, "foo", _, _) >>> [eventTarget3, eventTarget4]
+        methodEventTargetFactoryMock.createMethodEventTarget(targetProvider, "", _) >>> [eventTarget1, eventTarget2]
+        methodEventTargetFactoryMock.createMethodEventTarget(targetProvider.nested, "foo", _) >>> [eventTarget3, eventTarget4]
 
         expect:
         eventTargets.containsAll([

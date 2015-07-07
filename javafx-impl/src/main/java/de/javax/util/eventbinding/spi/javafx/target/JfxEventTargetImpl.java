@@ -1,7 +1,6 @@
 package de.javax.util.eventbinding.spi.javafx.target;
 
 import javafx.event.EventType;
-import de.javax.util.eventbinding.source.EventBindingConnectorFactory;
 import de.javax.util.eventbinding.spi.EventDispatcher;
 import de.javax.util.eventbinding.spi.EventSourceIdSelector;
 import de.javax.util.eventbinding.spi.impl.target.DefaultEventTarget;
@@ -17,8 +16,8 @@ public class JfxEventTargetImpl extends DefaultEventTarget implements JfxEventTa
     private final EventType<?> eventType;
 
     public JfxEventTargetImpl(EventSourceIdSelector sourceIdSelector, Class<?> eventClass, EventType<?> eventType,
-            EventDispatcher dispatcher, EventBindingConnectorFactory eventbindingConnectorFactory) {
-        super(sourceIdSelector, eventClass, dispatcher, eventbindingConnectorFactory);
+            EventDispatcher dispatcher) {
+        super(sourceIdSelector, eventClass, dispatcher);
 
         if (eventType == null) {
             throw new NullPointerException("Undefined event type!");
