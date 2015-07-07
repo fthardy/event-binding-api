@@ -51,7 +51,7 @@ public class DefaultEventSource implements EventSource {
 
     @Override
     public void bindTo(EventTarget eventTarget) {
-        if (eventTarget.canHandle(this)) {
+        if (eventTarget.accepts(this)) {
             eventTarget.addBoundSource(this);
         }
     }

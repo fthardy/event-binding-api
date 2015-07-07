@@ -109,7 +109,7 @@ public class DefaultEventTarget implements EventTarget {
     }
 
     @Override
-    public boolean canHandle(EventSource eventSource) {
+    public boolean accepts(EventSource eventSource) {
         if (!getEventSourceIdSelector().matches(eventSource.getId())) {
             return false;
         }

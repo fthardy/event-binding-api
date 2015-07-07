@@ -12,9 +12,9 @@ import java.util.Set;
 public interface EventTarget {
 
     /**
-	 * @return a simple textual description of the receiving target.
-	 */
-	String getDescription();
+     * @return a simple textual description of the receiving target.
+     */
+    String getDescription();
 
     /**
      * @return the event type class which the receiving event target can handle.
@@ -22,8 +22,7 @@ public interface EventTarget {
     Class<?> getEventClass();
 
     /**
-     * @return the event dispatcher used to dispatch the events from the event
-     *         source to the event target.
+     * @return the event dispatcher used to dispatch the events from the event source to the event target.
      */
     EventDispatcher getEventDispatcher();
 
@@ -36,17 +35,16 @@ public interface EventTarget {
     void addBoundSource(EventSource source);
 
     /**
-     * @return the set of the bound event sources. The set is empty when no
-     *         sources are bound to the receiving event target.
+     * @return the set of the bound event sources. The set is empty when no sources are bound to the receiving event
+     *         target.
      */
     Set<EventSource> getBoundSources();
-    
+
     /**
-     * Check if the receiving event target is bound to at least one event
-     * source.
+     * Check if the receiving event target is bound to at least one event source.
      * 
-     * @return <code>true</code> if the receiving event target is bound to an
-     *         event source. Otherwise <code>false</code>.
+     * @return <code>true</code> if the receiving event target is bound to an event source. Otherwise <code>false</code>
+     *         .
      */
     boolean isBound();
 
@@ -57,16 +55,20 @@ public interface EventTarget {
 
     /**
      * Removes a bound event source from this event target.
-     * @param eventSource The bound event source.
+     * 
+     * @param eventSource
+     *            The bound event source.
      */
     void removeBoundSource(EventSource eventSource);
 
     /**
-     * Returns if this EventTarget can be connected to the given EventSource.
+     * Returns if this given EventSource accepts this EventTarget in terms of the defined id for event source or event
+     * target. It does <b>not</b> check if the event target can be bound to the event source regarding the event type or
+     * the mechanism to register the event type.
      * 
-     * @return <code>true</code> if this EventTarget can be connected to the given EventSource, <code>false</code>
+     * @return <code>true</code> if the given event source is accepted by this event target, <code>false</code>
      *         otherwise.
      */
-    boolean canHandle(EventSource eventSource);
+    boolean accepts(EventSource eventSource);
 
 }
